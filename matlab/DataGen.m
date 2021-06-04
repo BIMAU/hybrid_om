@@ -2,8 +2,8 @@ classdef DataGen < handle
 % Generates training data. Training data consists of a transient of a
 % perfect model (truth) and imperfect model predictions. When the two
 % models live on different grids, appropriate restriction and
-% prolongation operators should be supplied. Then we also assume that
-% the training data lives on the coarse grid.
+% prolongation operators should be supplied. We assume that the
+% training data lives on the coarse grid.
 
     properties
         % models
@@ -17,9 +17,12 @@ classdef DataGen < handle
         dt = 0.1; % time step
         T  = 10;  % end time
         Nt; % number of time steps
-        
+
         X; % stores the transient
         P; % stores the imperfect predictions
+
+        R; % restriction operator between the perfect and imperfect model
+           % grids
     end
 
     methods
@@ -34,7 +37,7 @@ classdef DataGen < handle
             self.x_init_prf(1) = 1;
         end
 
-        function X = generate_prf_transient(self);
+        function generate_prf_transient(self);
             % evolve full model for Nt steps
             time = tic;
             self.Nt = ceil(self.T / self.dt);
@@ -53,12 +56,49 @@ classdef DataGen < handle
             fprintf('Generate time series... done (%f)\n', toc(time));
             fprintf('Average # Newton iterations: (%f)\n', ...
                     avg_k / (self.Nt-1));
-        
         end
-        
-        function P = generate_imp_predictions(self)
-        % When the size of the perfect and imperfect models differ, 
-        % check that there is a suitable restriction from the perfect model grid to the
+
+        function generate_imp_predictions(self)
+        % When the size of the perfect and imperfect models differ, check that
+        % there is a suitable restriction from the perfect to the
+        % imperfect model grid.
+            if self.N_prf ~= self.N_imp
+                assert(~isempty(self.R), 'specify restriction operator R');
+                assert(self.N_imp == size(self.R,1), 'incorrect row dimension in R');
+                assert(self.N_prf == size(self.R,2), 'incorrect column dimension in R');
+            end
+        end
+
+        function build_grid_transfers(self, boundary, type)
+        % Computes grid transfers between a grid of size N_prf and another of
+        % size N_prf / 2
+
+        % R: weighted restriction operator
+        % P: prolongation operator
+
+            assert(mod(self.N_prf,2) == 0);
+
+            Nc = self.N_prf / 2;
+            ico = [];
+            jco = [];
+            co  = [];
+            for j = 1:Nc
+                ico = [ico, j, j, j];
+                jco = [jco, [2*j-1, 2*j, 2*j+1]];
+                co  = [co, (1/4), (1/2), (1/4)];
+            end
+            if strcmp(boundary, 'periodic')
+                % fix periodicity
+                jco(end) = 1;
+            end
+            
+            self.R = sparse(ico, jco, co, Nc, self.N_prf);
+            self.P = 2*self.R';
+            
+            if strcmp(type, '2D')
+                self.R = kron(self.R,self.R);
+                self.P = 4*self.R';
+            end
         end
     end
 end
