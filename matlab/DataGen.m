@@ -2,8 +2,8 @@ classdef DataGen < handle
 % Generates training data. Training data consists of a transient of a
 % perfect model (truth) and imperfect model predictions. When the two
 % models live on different grids, appropriate restriction and
-% prolongation operators should be supplied. We assume that the
-% training data lives on the coarse grid.
+% prolongation operators should be supplied. In that case we assume
+% that the training data lives on the coarse grid.
 
     properties
         % models
@@ -18,11 +18,15 @@ classdef DataGen < handle
         T  = 10;  % end time
         Nt; % number of time steps
 
-        X; % stores the transient
-        P; % stores the imperfect predictions
+        R; % restriction operator between two grids
+        P; % prolongation operator between two grids
 
-        R; % restriction operator between the perfect and imperfect model
-           % grids
+        X;   % stores the transient. In the case of two grids this is the
+             % transient restricted to the coarse grid. We discard the
+             % original fine grid transient to save memory.
+
+        Phi; % stores the imperfect predictions on the coarse grid
+
     end
 
     methods
@@ -66,12 +70,28 @@ classdef DataGen < handle
                 assert(~isempty(self.R), 'specify restriction operator R');
                 assert(self.N_imp == size(self.R,1), 'incorrect row dimension in R');
                 assert(self.N_prf == size(self.R,2), 'incorrect column dimension in R');
+                self.X = self.R*self.X; % restrict the transient to the coarse grid
             end
+
+            self.Phi = zeros(self.N_imp, self.Nt);
+            time = tic;
+            fprintf('Generate imperfect predictions... \n');
+            avg_k = 0;
+            for i = 1:self.Nt
+                [self.Phi(:,i), k] = self.model_imp.step(self.X(:,i), self.dt);
+                avg_k = avg_k + k;
+            end
+            fprintf('Generate imperfect predictions... done (%f)\n', toc(time));
+            fprintf('Average # Newton iterations: (%f)\n', avg_k / self.Nt);
+
         end
 
         function build_grid_transfers(self, boundary, type)
         % Computes grid transfers between a grid of size N_prf and another of
         % size N_prf / 2
+
+        % boundary: empty or 'periodic'
+        % type: '1D' or '2D'
 
         % R: weighted restriction operator
         % P: prolongation operator
@@ -91,10 +111,10 @@ classdef DataGen < handle
                 % fix periodicity
                 jco(end) = 1;
             end
-            
+
             self.R = sparse(ico, jco, co, Nc, self.N_prf);
             self.P = 2*self.R';
-            
+
             if strcmp(type, '2D')
                 self.R = kron(self.R,self.R);
                 self.P = 4*self.R';

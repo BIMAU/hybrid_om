@@ -14,6 +14,5 @@ dgen.build_grid_transfers('periodic', '1D');
 
 dgen.dt = 0.25;
 dgen.T  = 100;
-
 dgen.generate_prf_transient();
 dgen.generate_imp_predictions();
