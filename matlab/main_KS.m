@@ -1,5 +1,6 @@
 addpath('models')
 
+% create and initialize two KS models
 L      = 35;
 N_prf  = 128;
 N_imp  = 64;
@@ -9,10 +10,23 @@ ks_imp = KSmodel(L, N_imp);
 ks_prf.initialize();
 ks_imp.initialize();
 
+% create data generator for the two models
 dgen = DataGen(ks_prf, ks_imp);
+
+% the grids are different so grid transfers are necessary
 dgen.build_grid_transfers('periodic', '1D');
 
-dgen.dt = 0.25;
-dgen.T  = 100;
+% generate perfect model transient
+dgen.T = 200;        % end time
+dgen.dt_prf = 0.25;  % perfect model time step
 dgen.generate_prf_transient();
+
+% generate imperfect model predictions
+% imperfect model time step (should be an integer multiple of dt_prf)
+dgen.dt_imp = 2*dgen.dt_prf;
 dgen.generate_imp_predictions();
+
+subplot(2,1,1)
+imagesc(dgen.X)
+subplot(2,1,2)
+imagesc(dgen.Phi-dgen.X)

@@ -2,8 +2,8 @@ classdef DataGen < handle
 % Generates training data. Training data consists of a transient of a
 % perfect model (truth) and imperfect model predictions. When the two
 % models live on different grids, appropriate restriction and
-% prolongation operators should be supplied. In that case we assume
-% that the training data lives on the coarse grid.
+% prolongation operators are available. In that case we assume that
+% the resulting training data set lives on the coarse grid.
 
     properties
         % models
@@ -14,9 +14,15 @@ classdef DataGen < handle
         x_init_prf; % initial perfect model state
 
         % time stepping
-        dt = 0.1; % time step
-        T  = 10;  % end time
-        Nt; % number of time steps
+        dt_prf = 0.1; % time step perfect model
+        dt_imp = 0.1; % time step imperfect model (should be integer multiple
+                      % of dt_prf)
+
+        stride = 1; % dt_imp = stride * dt_prf
+
+        T = 10;  % end time
+        Nt_prf; % number of time steps of the perfect model
+        Nt_imp; % number of time steps of the imperfect model
 
         R; % restriction operator between two grids
         P; % prolongation operator between two grids
@@ -39,50 +45,63 @@ classdef DataGen < handle
 
             self.x_init_prf = zeros(self.N_prf, 1);
             self.x_init_prf(1) = 1;
+            
+            if self.N_prf ~= self.N_imp
+                fprintf('Datagen: grid transfer operators are required.\n')
+            end
         end
 
         function generate_prf_transient(self);
-            % evolve full model for Nt steps
+        % evolve full model for Nt steps
             time = tic;
-            self.Nt = ceil(self.T / self.dt);
+            self.Nt_prf = ceil(self.T / self.dt_prf);
 
-            self.X      = zeros(self.N_prf, self.Nt);
+            self.X      = zeros(self.N_prf, self.Nt_prf);
             self.X(:,1) = self.x_init_prf;
 
             fprintf('Generate time series... \n');
             avg_k = 0;
-            for i = 2:self.Nt
+            for i = 2:self.Nt_prf
                 [self.X(:,i), k] = ...
-                    self.model_prf.step(self.X(:,i-1), self.dt);
+                    self.model_prf.step(self.X(:,i-1), self.dt_prf);
                 avg_k = avg_k + k;
             end
 
             fprintf('Generate time series... done (%f)\n', toc(time));
             fprintf('Average # Newton iterations: (%f)\n', ...
-                    avg_k / (self.Nt-1));
+                    avg_k / (self.Nt_prf-1));
         end
 
         function generate_imp_predictions(self)
         % When the size of the perfect and imperfect models differ, check that
         % there is a suitable restriction from the perfect to the
         % imperfect model grid.
+            
             if self.N_prf ~= self.N_imp
                 assert(~isempty(self.R), 'specify restriction operator R');
                 assert(self.N_imp == size(self.R,1), 'incorrect row dimension in R');
                 assert(self.N_prf == size(self.R,2), 'incorrect column dimension in R');
                 self.X = self.R*self.X; % restrict the transient to the coarse grid
             end
+            
+            self.stride = round(self.dt_imp / self.dt_prf);
+            assert( self.stride * self.dt_prf - self.dt_imp < 1e-13 , ...
+                    'dt_imp is not an integer multiple of dt_prf');
 
-            self.Phi = zeros(self.N_imp, self.Nt);
+            % reduce the transient, keep columns according to <stride>
+            self.X = self.X(:,1:self.stride:self.Nt_prf);
+            self.Nt_imp = size(self.X, 2);
+            
+            self.Phi = zeros(self.N_imp, self.Nt_imp);
             time = tic;
             fprintf('Generate imperfect predictions... \n');
             avg_k = 0;
-            for i = 1:self.Nt
-                [self.Phi(:,i), k] = self.model_imp.step(self.X(:,i), self.dt);
+            for i = 1:self.Nt_imp
+                [self.Phi(:,i), k] = self.model_imp.step(self.X(:,i), self.dt_imp);
                 avg_k = avg_k + k;
             end
             fprintf('Generate imperfect predictions... done (%f)\n', toc(time));
-            fprintf('Average # Newton iterations: (%f)\n', avg_k / self.Nt);
+            fprintf('Average # Newton iterations: (%f)\n', avg_k / self.Nt_imp);
 
         end
 
@@ -107,6 +126,7 @@ classdef DataGen < handle
                 jco = [jco, [2*j-1, 2*j, 2*j+1]];
                 co  = [co, (1/4), (1/2), (1/4)];
             end
+            
             if strcmp(boundary, 'periodic')
                 % fix periodicity
                 jco(end) = 1;
