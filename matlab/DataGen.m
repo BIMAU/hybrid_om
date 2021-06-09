@@ -20,9 +20,11 @@ classdef DataGen < handle
 
         stride = 1; % dt_imp = stride * dt_prf
 
-        T = 10;  % end time
+        T = 10; % end time
         Nt_prf; % number of time steps of the perfect model
         Nt_imp; % number of time steps of the imperfect model
+        
+        trunc = 0; % truncation of initial transient phase
 
         R; % restriction operator between two grids
         P; % prolongation operator between two grids
@@ -55,7 +57,6 @@ classdef DataGen < handle
         % evolve full model for Nt steps
             time = tic;
             self.Nt_prf = ceil(self.T / self.dt_prf);
-
             self.X      = zeros(self.N_prf, self.Nt_prf);
             self.X(:,1) = self.x_init_prf;
 
@@ -70,6 +71,12 @@ classdef DataGen < handle
             fprintf('Generate time series... done (%f)\n', toc(time));
             fprintf('Average # Newton iterations: (%f)\n', ...
                     avg_k / (self.Nt_prf-1));
+            
+            fprintf('Truncating t = [0,%d]\n', self.trunc);
+            trunc_steps = floor(self.trunc / self.dt_prf);
+            self.X = self.X(:,trunc_steps+1:self.Nt_prf);
+            self.Nt_prf = size(self.X, 2);
+            self.T = self.T - self.trunc;
         end
 
         function generate_imp_predictions(self)
