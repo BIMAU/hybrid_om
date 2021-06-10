@@ -17,7 +17,7 @@ dgen = DataGen(ks_prf, ks_imp);
 dgen.build_grid_transfers('periodic', '1D');
 
 % generate perfect model transient
-dgen.T = 200;        % end time
+dgen.T = 80;        % end time
 dgen.dt_prf = 0.25;  % perfect model time step
 dgen.trunc = 50;     % truncate period
 dgen.generate_prf_transient();
@@ -27,9 +27,5 @@ dgen.generate_prf_transient();
 dgen.dt_imp = 2*dgen.dt_prf;
 dgen.generate_imp_predictions();
 
-subplot(2,1,1)
-imagesc(dgen.X)
-subplot(2,1,2)
-imagesc(dgen.Phi-dgen.X)
-
-dgen
+dgen.wavelet_blocksize = 8;
+dgen.build_wavelet

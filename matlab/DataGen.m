@@ -3,7 +3,9 @@ classdef DataGen < handle
 % perfect model (truth) and imperfect model predictions. When the two
 % models live on different grids, appropriate restriction and
 % prolongation operators are available. In that case we assume that
-% the resulting training data set lives on the coarse grid.
+% the resulting training data set lives on the coarse grid. In
+% addition this class generates the wavelet or pod modes that can be
+% used for scale separation of the training data.
 
     properties
         % models
@@ -34,6 +36,14 @@ classdef DataGen < handle
              % original fine grid transient to save memory.
 
         Phi; % stores the imperfect predictions on the coarse grid
+        
+        V; % stores the modes used for scale separation 
+        
+        % scale separation options
+        scale_separation = 'wavelet'; % options: 'wavelet', 'pod'
+        
+        wavelet_blocksize = 8; % size of the wavelet blocks inside a wavelet
+                               % transform matrix
 
     end
 
@@ -146,6 +156,57 @@ classdef DataGen < handle
                 self.R = kron(self.R,self.R);
                 self.P = 4*self.R';
             end
+        end
+        
+        function build_wavelet(self)
+        % Build a wavelet matrix to represent a state of size N_imp in wavelet
+        % coordinates: x = H*xc, with state x and coordinates xc.
+            
+            bs = self.wavelet_blocksize;
+            Nw = round(self.N_imp / bs); % number of wavelet blocks
+            assert(Nw == (self.N_imp / bs), ...
+                   'bs should be a divisor of N_imp');           
+            W  = self.haarmat(bs);
+            M  = speye(Nw);
+            
+            % create block diagonal wavelet matrix
+            H  = kron(M, W)';
+            
+            % create a permutation matrix
+            P  = speye(self.N_imp);
+            id = [];
+            for i = 1:bs
+                id = [id, (i:bs:self.N_imp)];
+            end
+            % permute the columns of H
+            P(:,id) = P(:,1:self.N_imp);
+
+            self.V = H*P';            
+        end
+        
+        
+        
+        function [W] = haarmat(self, p)
+        % builds a single orthogonal Haar wavelet block of size p x p
+            
+            if p == 1
+                W = 1;
+                return
+            end
+            
+            assert( round(log2(p)) == log2(p) , ...
+                    'wavelet block size should be a power of 2');
+            
+            W   = 1/sqrt(2)*[1 1; 1 -1];
+            dim = 2;
+            while dim < p    
+                W = 1/sqrt(2)*[kron(W,[1 1]); kron(eye(dim),[1 -1])];
+                dim = size(W,1);
+            end
+            W = sparse(W);
+        end
+        
+        function build_pod(self)
         end
     end
 end
