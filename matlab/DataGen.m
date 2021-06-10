@@ -158,7 +158,7 @@ classdef DataGen < handle
             end
         end
         
-        function build_wavelet(self)
+        function [H,P] = build_wavelet(self)
         % Build a wavelet matrix to represent a state of size N_imp in wavelet
         % coordinates: x = H*xc, with state x and coordinates xc.
             
@@ -170,21 +170,45 @@ classdef DataGen < handle
             M  = speye(Nw);
             
             % create block diagonal wavelet matrix
-            H  = kron(M, W)';
+            H  = kron(M, W);
             
-            % create a permutation matrix
-            P  = speye(self.N_imp);
+            % create a reordering matrix
+            P1  = speye(self.N_imp);
             id = [];
             for i = 1:bs
                 id = [id, (i:bs:self.N_imp)];
             end
-            % permute the columns of H
-            P(:,id) = P(:,1:self.N_imp);
-
-            self.V = H*P';            
+            P1(:,id) = P1(:,1:self.N_imp);
+            
+            % TODO
+            % create a block permutation matrix
+            % P2 = self.build_block_permutation();
+            
+            % final wavelet operator
+            % self.V = P2'*H'*P1' = ;            
         end
         
-        
+        function [P] = build_block_permutation(self)
+            dim = n*m*nun;
+            P   = sparse(dim,dim);
+            k   = 0;
+            for posj = 0:bs:n-bs
+                rangej = posj+1:posj+bs;
+                for posi = 0:bs:m-bs
+                    rangei = posi+1:posi+bs;
+                    for xx = 1:nun
+                        for j = rangej
+                            for i = rangei
+                                k = k + 1;
+                                col = nun*(n*(j-1)+(i-1))+xx;
+                                P(k,col) = 1;
+                            end
+                        end
+                    end
+                end
+            end
+            P = sparse(P);            
+        end
         
         function [W] = haarmat(self, p)
         % builds a single orthogonal Haar wavelet block of size p x p
