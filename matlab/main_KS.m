@@ -26,6 +26,3 @@ dgen.generate_prf_transient();
 % imperfect model time step (should be an integer multiple of dt_prf)
 dgen.dt_imp = 2*dgen.dt_prf;
 dgen.generate_imp_predictions();
-
-blocksize = 8;
-[H,P] = dgen.build_wavelet(blocksize, '1D');

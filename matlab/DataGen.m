@@ -52,7 +52,7 @@ classdef DataGen < handle
                                   % wavelet for a 2D field in column
                                   % major ordering
 
-        wavelet_nun = 8; % number of independent unknowns the wavelet needs to
+        wavelet_nun = 1; % number of independent unknowns the wavelet needs to
                          % act on
     end
 
@@ -169,7 +169,10 @@ classdef DataGen < handle
 
         function [V] = build_wavelet(self, bs, dim, nun)
         % Build a wavelet matrix to represent a state of size N_imp in wavelet
-        % coordinates: x = H*xc, with state x and coordinates xc.
+        % coordinates: x = H*xc, with state x and coordinates xc. The
+        % wavelet is ordered form large to small scales and is applied
+        % to subdomains of size <bs> in 1D and sqrt<bs> x sqrt<bs> in
+        % 2D.
 
         % dim: dimension, options:  '1D' or '2D'
         % bs:  block size. In 2D bs should have an integer sqrt
@@ -192,15 +195,18 @@ classdef DataGen < handle
             
             % build wavelet block
             if strcmp(dim, '1D')
-                W = self.haarmat(bs); % 1D wavelet transform for a state of size bs
+                % 1D wavelet transform for a state of size bs
+                W = self.haarmat(bs); 
 
             elseif strcmp(dim, '2D')
-                assert( round(sqrt(bs)) = sqrt(bs) ), ...
+                assert( round(sqrt(bs)) == sqrt(bs) , ...
                        'in 2D bs should have an integer sqrt');
                 %#FIXME this does not generalize to non-square 2D grids
                 W = self.haarmat(sqrt(bs));
-                W = kron(W,W); % 2D wavelet transform for a field of size sqrt(bs) x
-                               % sqrt(bs) in column major ordering (:)
+                
+                % 2D wavelet transform for a field of size sqrt(bs) x sqrt(bs) in
+                % column major ordering (:)
+                W = kron(W,W);
             else
                 error('invalid dim option')
             end
@@ -220,21 +226,24 @@ classdef DataGen < handle
             % create a block permutation matrix
             if strcmp(dim, '2D')
                 %#FIXME this does not generalize to non-square 2D grids
-                n  = sqrt(self.N_imp); %#FIXME
-                m  = sqrt(self.N_imp); %#FIXME
-                P2 = self.build_block_permutation(n, m, nun);
+                n  = sqrt(self.N_imp / nun); %#FIXME
+                m  = sqrt(self.N_imp / nun); %#FIXME
+                P2 = self.build_block_permutation(n, m, nun, sqrt(bs));
             else
                 P2 = speye(self.N_imp);
             end
-            % final wavelet operator
+
+            % complete wavelet operator
             V = P2'*H'*P1';
             self.V = V;
         end
 
-        function [P] = build_block_permutation(self, n, m, nun)
+        function [P] = build_block_permutation(self, n, m, nun, bs)
             dim = n*m*nun;
+            assert(dim == self.N_imp, 'inconsistend dimensions');
             P   = sparse(dim,dim);
             k   = 0;
+            %#FIXME this does not generalize to non-square 2D grids
             for posj = 0:bs:n-bs
                 rangej = posj+1:posj+bs;
                 for posi = 0:bs:m-bs
