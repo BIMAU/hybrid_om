@@ -7,7 +7,7 @@ github.com/erik808/ESN
 * training data generation class DataGen
   see DataGen.m
 
-* experiment class
+* ESN experiment wrapper class
   - Performs training and prediction for many training data sets and
     many realizations of the random ESN operators W and Win.
   - parallel and serial option

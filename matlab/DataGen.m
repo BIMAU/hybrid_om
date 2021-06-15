@@ -41,7 +41,7 @@ classdef DataGen < handle
         V; % stores the modes used for scale separation
 
         % scale separation options
-        scale_separation = 'wavelet'; % options: 'wavelet', 'pod'
+        scale_separation = 'wavelet'; % options: 'wavelet', 'pod' #TODO
 
         % Size of the wavelet blocks inside a wavelet transform matrix. For a
         % 2D wavelet the block size has an integer sqrt. #FIXME: this
@@ -167,7 +167,7 @@ classdef DataGen < handle
             end
         end
 
-        function [V] = build_wavelet(self, bs, dim, nun)
+        function [V,H,P1,P2] = build_wavelet(self, bs, dim, nun)
         % Build a wavelet matrix to represent a state of size N_imp in wavelet
         % coordinates: x = H*xc, with state x and coordinates xc. The
         % wavelet is ordered form large to small scales and is applied
@@ -218,8 +218,8 @@ classdef DataGen < handle
             % create a reordering matrix
             P1  = speye(self.N_imp);
             id = [];
-            for i = 1:bs
-                id = [id, (i:bs:self.N_imp)];
+            for i = 1:sqrt(bs)
+                id = [id, (i:sqrt(bs):self.N_imp)];
             end
             P1(:,id) = P1(:,1:self.N_imp);
 

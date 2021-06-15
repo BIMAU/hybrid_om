@@ -17,7 +17,7 @@ dgen = DataGen(ks_prf, ks_imp);
 dgen.build_grid_transfers('periodic', '1D');
 
 % generate perfect model transient
-dgen.T = 80;         % end time
+dgen.T = 80;         % total time
 dgen.dt_prf = 0.25;  % perfect model time step
 dgen.trunc = 50;     % truncate period
 dgen.generate_prf_transient();
