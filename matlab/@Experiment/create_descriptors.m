@@ -1,7 +1,7 @@
 function create_descriptors(self)
-    id2ind = @ (str) find(strcmp(self.hyp_ids, str));
+    hyp_ids = fieldnames(self.hyp);    
+    id2ind  = @ (str) find(strcmp(hyp_ids, str));
 
-    self.hyp_ids    = fieldnames(self.hyp);
     self.exp_ind    = [];
     self.file_descr = [];
 

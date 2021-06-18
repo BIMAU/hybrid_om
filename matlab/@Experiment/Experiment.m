@@ -9,8 +9,8 @@ classdef Experiment < handle
         hyp;     % hyperparameter collection
         name;    % experiment name
 
-        shifts = 1;      % shifts in training_range
-        reps   = 1;      % repetitions per shift
+        shifts = 5;      % shifts in training_range
+        reps   = 3;      % repetitions per shift
         max_preds = 100; % prediction barrier (in samples)
 
         testing_on = true; % if true/false we run the prediction with/without
@@ -23,12 +23,20 @@ classdef Experiment < handle
 
     properties (Access = private)
 
-        hyp_ids;
+        % All hyperparam settings
         hyp_range;
+
+        % Total number of different hyperparam settings.
+        num_hyp_settings;
+
+        % Experiment descriptor for output file
         file_descr;
 
-        exp_id  = {};
-        exp_ind = [];        
+        exp_id  = {}; % experiment identifiers
+        exp_ind = []; % experiment identifier index
+
+        % Number of predicted time steps that are within the error limit.
+        num_predicted;
 
         range2str = @ (range) ['_', num2str(range(1)), ...
                             '-', num2str(range(end)), '_'];
@@ -44,10 +52,7 @@ classdef Experiment < handle
         function run(self)
             self.create_descriptors();
             self.create_hyp_range();
-            
-            disp([self.file_descr{:}])
-            
-            disp(self.hyp_range)
+            self.create_workspace();
         end
 
         function set_default_hyp(self, id, value)
@@ -69,9 +74,10 @@ classdef Experiment < handle
     end
 
     methods (Access = private)
-        
+
+        [] = set_all_hyp_defaults(self);
         [] = create_descriptors(self);
         [] = create_hyp_range(self);
-        [] = set_all_hyp_defaults(self);
+        [] = create_workspace(self);
     end
 end
