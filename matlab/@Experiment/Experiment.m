@@ -22,12 +22,16 @@ classdef Experiment < handle
     end
 
     properties (Access = private)
+
         hyp_ids;
+        hyp_range;
+        file_descr;
 
-        exp_id = {};
+        exp_id  = {};
+        exp_ind = [];        
 
-        range2str = @ (range) ['_', num2str(range(1)), '-', num2str(range(end)), '_'];
-
+        range2str = @ (range) ['_', num2str(range(1)), ...
+                            '-', num2str(range(end)), '_'];
     end
 
     methods (Access = public)
@@ -38,7 +42,12 @@ classdef Experiment < handle
         end
 
         function run(self)
-            self.initialize();
+            self.create_descriptors();
+            self.create_hyp_range();
+            
+            disp([self.file_descr{:}])
+            
+            disp(self.hyp_range)
         end
 
         function set_default_hyp(self, id, value)
@@ -60,26 +69,9 @@ classdef Experiment < handle
     end
 
     methods (Access = private)
-        function initialize(self)
-            
-            id2ind = @ (str) find(strcmp(self.hyp_ids, str));
-                    
-            self.hyp_ids = fieldnames(self.hyp);
-            exp_ind = []; file_descr = [];
-
-            for i = 1:numel(self.exp_id)
-                exp_ind{i}    = id2ind(self.exp_id{i});
-                file_descr{i} = self.hyp.(self.exp_id{i}).descr;
-            end
-
-            assert(~isempty(exp_ind));
-
-            self.name = [[file_descr{:}], ...
-                         'ESN', num2str(self.esn_on), '_', ...
-                         'MDL', num2str(self.model_on)];
-            % ....... TODO
-        end
-
+        
+        [] = create_descriptors(self);
+        [] = create_hyp_range(self);
         [] = set_all_hyp_defaults(self);
     end
 end
