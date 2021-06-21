@@ -6,11 +6,9 @@ classdef Experiment < handle
 % collection of ESN hyperparameters that we like to experiment with.
 
     properties (Access = public)
-        hyp;     % hyperparameter collection
-        name;    % experiment name
 
-        shifts = 5;      % shifts in training_range
-        reps   = 3;      % repetitions per shift
+        shifts    = 5;   % shifts in training_range
+        reps      = 3;   % repetitions per shift
         max_preds = 100; % prediction barrier (in samples)
 
         testing_on = true; % if true/false we run the prediction with/without
@@ -22,6 +20,15 @@ classdef Experiment < handle
     end
 
     properties (Access = private)
+        tr_data; % training data struct
+        model;   % model object
+        
+        hyp;   % hyperparameter collection
+        name;  % experiment name
+        
+        % default serial setting
+        pid   = 0; 
+        procs = 1;
 
         % All hyperparam settings
         hyp_range;
@@ -35,24 +42,46 @@ classdef Experiment < handle
         exp_id  = {}; % experiment identifiers
         exp_ind = []; % experiment identifier index
 
-        % Number of predicted time steps that are within the error limit.
-        num_predicted;
-
         range2str = @ (range) ['_', num2str(range(1)), ...
                             '-', num2str(range(end)), '_'];
+        
+        % data storage for all runs
+        predictions; % stores all predictions
+        truths;      % stores all truths
+        errors;      % stores the errors
+        ESN_states;  % stores snapshots of the ESN state X
+        
+        % Number of predicted time steps that are within the error limit.
+        num_predicted;
     end
 
     methods (Access = public)
 
-        function self = Experiment()
+        function self = Experiment(tr_data, model, pid, procs)
         % constructor
+        %
+        % tr_data:  training data struct
+        % pid:      process id
+        % procs:    total number of processes
+            
+            self.tr_data = tr_data;
+            self.model   = model;
+            
+            switch nargin
+              case 3
+                self.pid = pid;
+              case 4
+                self.pid   = pid;
+                self.procs = procs;
+            end
+            
             self.set_all_hyp_defaults();
         end
 
         function run(self)
             self.create_descriptors();
             self.create_hyp_range();
-            self.create_workspace();
+            self.create_storage();
         end
 
         function set_default_hyp(self, id, value)
@@ -78,6 +107,8 @@ classdef Experiment < handle
         [] = set_all_hyp_defaults(self);
         [] = create_descriptors(self);
         [] = create_hyp_range(self);
-        [] = create_workspace(self);
+        [] = create_storage(self);
+        
+        [inds] = my_indices(self, pid, procs, Ni);
     end
 end
