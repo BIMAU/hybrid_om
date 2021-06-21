@@ -76,8 +76,13 @@ classdef Experiment < handle
             end
 
             % Seed the rng with time and pid
-            time = clock;
-            rng(round(100*pid*sqrt(time(end))));
+            now = clock;
+            rng(round(100*self.pid*sqrt(now(end))));
+            
+            self.print('\n')
+            self.print('- Experiment instance\n')
+            self.print('-  \x251C\x2500 procs  = %d \n', self.procs)
+            self.print('-  \x2514\x2500 pid    = %d \n', self.pid)
 
             self.set_all_hyp_defaults();
         end
@@ -114,5 +119,7 @@ classdef Experiment < handle
         [] = create_storage(self);
 
         [inds] = my_indices(self, pid, procs, Ni);
+        
+        [] = print(self, varargin);
     end
 end

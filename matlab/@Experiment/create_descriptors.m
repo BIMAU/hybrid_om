@@ -15,4 +15,6 @@ function create_descriptors(self)
     self.name = [[self.file_descr{:}], ...
                  'ESN', num2str(self.esn_on), '_', ...
                  'MDL', num2str(self.model_on)];    
+    
+    self.print('-  name: %s\n', self.name)
 end
