@@ -29,7 +29,10 @@ classdef Experiment < handle
         % default serial setting
         pid   = 0;
         procs = 1;
-
+        
+        % hyperparam identifier strings
+        hyp_ids;
+        
         % All hyperparam settings
         hyp_range;
 
@@ -44,6 +47,8 @@ classdef Experiment < handle
 
         range2str = @ (range) ['_', num2str(range(1)), ...
                             '-', num2str(range(end)), '_'];
+        
+        id2ind  = @ (hyp_ids, str) find(strcmp(hyp_ids, str));
 
         % data storage for all runs
         predictions; % stores all predictions
@@ -91,6 +96,11 @@ classdef Experiment < handle
             self.create_descriptors();
             self.create_hyp_range();
             self.create_storage();
+            
+            for j = 1:self.num_hyp_settings
+                self.print_hyperparams(j);
+                % self.set_ESN_parameters(j); #TODO
+            end
         end
 
         function set_default_hyp(self, id, value)
@@ -121,5 +131,20 @@ classdef Experiment < handle
         [inds] = my_indices(self, pid, procs, Ni);
         
         [] = print(self, varargin);
+        
+        function [] = print_hyperparams(self, exp_idx)
+            str = [];
+            for hyp_idx = 1:numel(self.hyp_ids)
+                id = self.hyp_ids{hyp_idx};
+
+                value = num2str(self.hyp_range(...
+                    self.id2ind(self.hyp_ids, id), exp_idx)...
+                                );
+                
+                str{hyp_idx} = ['\n    ', id, ': ', value, ''];
+            end
+            str = [str, '\n'];
+            self.print([str{:}]);
+        end
     end
 end
