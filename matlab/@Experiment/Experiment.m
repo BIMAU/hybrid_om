@@ -22,12 +22,12 @@ classdef Experiment < handle
     properties (Access = private)
         tr_data; % training data struct
         model;   % model object
-        
+
         hyp;   % hyperparameter collection
         name;  % experiment name
-        
+
         % default serial setting
-        pid   = 0; 
+        pid   = 0;
         procs = 1;
 
         % All hyperparam settings
@@ -44,13 +44,13 @@ classdef Experiment < handle
 
         range2str = @ (range) ['_', num2str(range(1)), ...
                             '-', num2str(range(end)), '_'];
-        
+
         % data storage for all runs
         predictions; % stores all predictions
         truths;      % stores all truths
         errors;      % stores the errors
         ESN_states;  % stores snapshots of the ESN state X
-        
+
         % Number of predicted time steps that are within the error limit.
         num_predicted;
     end
@@ -63,10 +63,10 @@ classdef Experiment < handle
         % tr_data:  training data struct
         % pid:      process id
         % procs:    total number of processes
-            
+
             self.tr_data = tr_data;
             self.model   = model;
-            
+
             switch nargin
               case 3
                 self.pid = pid;
@@ -74,7 +74,11 @@ classdef Experiment < handle
                 self.pid   = pid;
                 self.procs = procs;
             end
-            
+
+            % Seed the rng with time and pid
+            time = clock;
+            rng(round(100*pid*sqrt(time(end))));
+
             self.set_all_hyp_defaults();
         end
 
@@ -108,7 +112,7 @@ classdef Experiment < handle
         [] = create_descriptors(self);
         [] = create_hyp_range(self);
         [] = create_storage(self);
-        
+
         [inds] = my_indices(self, pid, procs, Ni);
     end
 end
