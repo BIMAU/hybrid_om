@@ -17,12 +17,28 @@ dgen = DataGen(ks_prf, ks_imp);
 dgen.build_grid_transfers('periodic', '1D');
 
 % generate perfect model transient
-dgen.T = 80;         % total time
+dgen.T = 20;         % total time
 dgen.dt_prf = 0.25;  % perfect model time step
-dgen.trunc = 50;     % truncate period
+dgen.trunc = 10;     % truncate period
 dgen.generate_prf_transient();
 
 % generate imperfect model predictions
 % imperfect model time step (should be an integer multiple of dt_prf)
 dgen.dt_imp = 2*dgen.dt_prf;
 dgen.generate_imp_predictions();
+
+% #TODO create training data struct
+tr_data = struct();
+
+model   = ks_imp;
+
+% create experiment class
+expObj = Experiment(tr_data, model);
+
+% adjust experiment settings
+expObj.set_default_hyp('ReservoirSize', 1000);
+expObj.add_experiment('ReservoirSize', [500, 1000, 2000]);
+expObj.add_experiment('BlockSize', [1, 4, 8]);
+
+% run experiments
+expObj.run();
