@@ -15,5 +15,5 @@ function create_descriptors(self)
                  'ESN', num2str(self.esn_on), '_', ...
                  'MDL', num2str(self.model_on)];    
     
-    self.print('-  name: %s\n', self.name)
+    self.print(' name: %s\n', self.name)
 end
