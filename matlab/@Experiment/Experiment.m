@@ -100,6 +100,7 @@ classdef Experiment < handle
             for j = 1:self.num_hyp_settings
                 self.print_hyperparams(j);
                 [esn_pars, bs, samples, RF] = self.create_run_parameters(j);
+                
             end
         end
 
@@ -122,7 +123,7 @@ classdef Experiment < handle
     end
 
     methods (Access = private)
-
+        
         [] = set_all_hyp_defaults(self);
         [] = create_descriptors(self);
         [] = create_hyp_range(self);
@@ -132,6 +133,7 @@ classdef Experiment < handle
         
         [] = print(self, varargin);
         [] = print_hyperparams(self, exp_idx);
+        
         [esn_pars, bs, samples, RF] = create_run_parameters(self, exp_idx);
     end
 end
