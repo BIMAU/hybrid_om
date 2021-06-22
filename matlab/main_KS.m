@@ -1,5 +1,3 @@
-addpath('models')
-
 % create and initialize two KS models
 L      = 35;
 N_prf  = 128;
