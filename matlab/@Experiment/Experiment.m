@@ -29,10 +29,10 @@ classdef Experiment < handle
         % default serial setting
         pid   = 0;
         procs = 1;
-        
+
         % hyperparam identifier strings
         hyp_ids;
-        
+
         % All hyperparam settings
         hyp_range;
 
@@ -47,7 +47,7 @@ classdef Experiment < handle
 
         range2str = @ (range) ['_', num2str(range(1)), ...
                             '-', num2str(range(end)), '_'];
-        
+
         id2ind  = @ (hyp_ids, str) find(strcmp(hyp_ids, str));
 
         % data storage for all runs
@@ -83,7 +83,7 @@ classdef Experiment < handle
             % Seed the rng with time and pid
             now = clock;
             rng(round(100*self.pid*sqrt(now(end))));
-            
+
             self.print('\n')
             self.print('Experiment instance\n')
             self.print(' \x251C\x2500 procs  = %d \n', self.procs)
@@ -96,11 +96,12 @@ classdef Experiment < handle
             self.create_descriptors();
             self.create_hyp_range();
             self.create_storage();
-            
+
             for j = 1:self.num_hyp_settings
                 self.print_hyperparams(j);
-                [esn_pars, bs, samples, RF] = self.create_run_parameters(j);
-                
+                [esn_pars, mod_pars, run_pars] = ...
+                    self.translate_hyp_params(j);
+
             end
         end
 
@@ -123,17 +124,17 @@ classdef Experiment < handle
     end
 
     methods (Access = private)
-        
+
         [] = set_all_hyp_defaults(self);
         [] = create_descriptors(self);
         [] = create_hyp_range(self);
         [] = create_storage(self);
 
         [inds] = my_indices(self, pid, procs, Ni);
-        
+
         [] = print(self, varargin);
         [] = print_hyperparams(self, exp_idx);
-        
+
         [esn_pars, bs, samples, RF] = create_run_parameters(self, exp_idx);
     end
 end
