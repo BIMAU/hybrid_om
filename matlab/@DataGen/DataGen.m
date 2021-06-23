@@ -45,8 +45,8 @@ classdef DataGen < handle
             self.model_prf = model_prf;
             self.model_imp = model_imp;
 
-            self.N_prf = self.model_prf.N();
-            self.N_imp = self.model_imp.N();
+            self.N_prf = self.model_prf.N;
+            self.N_imp = self.model_imp.N;
 
             self.x_init_prf = zeros(self.N_prf, 1);
             self.x_init_prf(1) = 1;
