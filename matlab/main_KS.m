@@ -35,8 +35,9 @@ expObj = Experiment(tr_data, model);
 
 % adjust experiment settings
 expObj.set_default_hyp('ReservoirSize', 1000);
+expObj.set_default_hyp('BlockSize', 16);
 expObj.add_experiment('ReservoirSize', [500, 1000, 2000]);
-expObj.add_experiment('BlockSize', [1, 4, 8]);
+expObj.add_experiment('BlockSize', [1, 4, 16]);
 
 % run experiments
 expObj.run();
