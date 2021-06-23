@@ -4,41 +4,39 @@ classdef Modes < handle
 % equal size in both dimensions.
 
     properties
+        
+        N; % state size
+        
+        V; % stores the modes        
 
-
-        V; % stores the modes
-
+        red_factor = 1; % reduction factor for order reduction
+        
         % scale separation options
         scale_separation = 'wavelet'; % options: 'wavelet', 'pod'
 
         % Size of the wavelet blocks inside a wavelet transform matrix. For a
         % 2D wavelet the block size has an integer sqrt.
-        wavelet_blocksize = 8;
+        blocksize = 8;
 
-        wavelet_dimension = '1D'; % selects a wavelet for a 1D field or a
-                                  % wavelet for a 2D field in column
-                                  % major ordering
+        dimension = '1D'; % selects a wavelet for a 1D field or a
+                          % wavelet for a 2D field in column
+                          % major ordering
 
-        wavelet_nun = 1; % number of independent unknowns the wavelet needs to
-                         % act on
-
+        nun = 1; % number of independent unknowns a wavelet needs to
+                 % act on
     end
 
     methods
         function self = Modes(type, pars)
         % constructor
-            switch nargin
-              case 1
-                self.scale_separation = type;
-              case 2
-                self.scale_separation = type;
-                self.set_parameters(pars);
-            end
+
+            self.scale_separation = type;
+            self.set_parameters(pars);
 
             if strcmp(self.scale_separation, 'wavelet')
-                self.V = self.build_wavelet(self.wavelet_blocksize,...
-                                            self.wavelet_dimensions,...
-                                            self.wavelet_nun);
+                self.V = self.build_wavelet(self.blocksize,...
+                                            self.dimension,...
+                                            self.nun);
             elseif strcmp(self.scale_separation, 'pod')
                 error('not implemented (yet)')
             else
@@ -67,33 +65,34 @@ classdef Modes < handle
 
             switch nargin
               case 1
-                bs  = self.wavelet_blocksize;
-                dim = self.wavelet_dimension;
-                nun = self.wavelet_nun;
+                bs  = self.blocksize;
+                dim = self.dimension;
+                nun = self.nun;
               case 2
-                dim = self.wavelet_dimension;
-                nun = self.wavelet_nun;
+                dim = self.dimension;
+                nun = self.nun;
               case 3
-                nun = self.wavelet_nun;
+                nun = self.nun;
             end
 
-            Nw = round(self.N_imp / bs); % number of wavelet blocks
-            assert(Nw == (self.N_imp / bs), ...
-                   'bs should be a divisor of N_imp');
-
+            Nw = round(self.N / bs); % number of wavelet blocks
+            assert(Nw == (self.N / bs), ...
+                   'bs should be a divisor of N');
+            
             % build wavelet block
             if strcmp(dim, '1D')
                 % 1D wavelet transform for a state of size bs
-                W = self.haarmat(bs);
-
+                W = self.haarmat(bs);            
+                
             elseif strcmp(dim, '2D')
-                assert( round(sqrt(bs)) == sqrt(bs) , ...
+                assert( round(sqrt(bs)) == sqrt(bs), ...
                         'in 2D bs should have an integer sqrt');
                 W = self.haarmat(sqrt(bs));
 
                 % 2D wavelet transform for a field of size sqrt(bs) x sqrt(bs) in
                 % column major ordering (:)
                 W = kron(W,W);
+                
             else
                 error('invalid dim option')
             end
@@ -102,30 +101,51 @@ classdef Modes < handle
             I  = speye(Nw);
             H  = kron(I, W);
 
-            % create a reordering matrix
-            P1  = speye(self.N_imp);
+            % create a reordering matrix with the block size
+            P1 = speye(self.N);
             id = [];
-            for i = 1:sqrt(bs)
-                id = [id, (i:sqrt(bs):self.N_imp)];
+            
+            for i = 1:bs
+                id = [id, (i:bs:self.N)];
             end
-            P1(:,id) = P1(:,1:self.N_imp);
+            P1(:,id) = P1(:,1:self.N);
+            
+            if strcmp(dim, '2D')
+                % create a nested reordering matrix within the block
+                Pn = speye(bs);
+                id = [];
+                
+                for i = 1:sqrt(bs)
+                    id = [id, (i:sqrt(bs):bs)];
+                end
+                Pn(:,id) = Pn(:,1:bs);
+                
+                % duplicate for all blocks
+                Pn = kron(I, Pn);
+                
+                % adjust P1 with this nested reordering
+                P1 = Pn*P1;
+            end                
 
             % create a block permutation matrix
             if strcmp(dim, '2D')
-                n  = sqrt(self.N_imp / nun);
-                m  = sqrt(self.N_imp / nun);
+                n  = sqrt(self.N / nun);
+                m  = sqrt(self.N / nun);
                 P2 = self.build_block_permutation(n, m, nun, sqrt(bs));
             else
-                P2 = speye(self.N_imp);
+                P2 = speye(self.N);
             end
 
             % complete wavelet operator
-            V = P2'*H'*P1';
+            V.V = P2'*H'*P1';
+            V.H  = H';
+            V.P1 = P1';
+            V.P2 = P2';
         end
 
         function [P] = build_block_permutation(self, n, m, nun, bs)
             dim = n*m*nun;
-            assert(dim == self.N_imp, 'inconsistend dimensions');
+            assert(dim == self.N, 'inconsistent dimensions');
             P   = sparse(dim,dim);
             k   = 0;
             for posj = 0:bs:n-bs
@@ -167,6 +187,7 @@ classdef Modes < handle
         end
 
         function build_pod(self)
+        %$#TODO
         end
     end
 end
