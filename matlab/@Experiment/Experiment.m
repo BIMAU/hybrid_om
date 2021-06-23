@@ -16,7 +16,12 @@ classdef Experiment < handle
         esn_on     = true; % enable/disable ESN
         model_on   = true; % enable/disable physics based model
 
-        store_state = 'all';  % which state to store: 'all', 'final'
+        store_state = 'all'; % which state to store: 'all', 'final'
+        
+        dimension = '1D'; % problem dimension: '1D' or '2D'
+        
+        % Modes object used for scale separation and order reduction
+        modes;
     end
 
     properties (Access = private)
@@ -57,7 +62,7 @@ classdef Experiment < handle
         ESN_states;  % stores snapshots of the ESN state X
 
         % Number of predicted time steps that are within the error limit.
-        num_predicted;
+        num_predicted;        
     end
 
     methods (Access = public)
@@ -100,8 +105,10 @@ classdef Experiment < handle
             for j = 1:self.num_hyp_settings
                 self.print_hyperparams(j);
                 [esn_pars, mod_pars, run_pars] = ...
-                    self.translate_hyp_params(j);
-
+                    self.distribute_params(j);
+                mod_pars.N = self.model.N;
+                mod_pars.dimension = self.dimension;
+                self.modes = Modes('wavelet', mod_pars);
             end
         end
 
@@ -134,7 +141,5 @@ classdef Experiment < handle
 
         [] = print(self, varargin);
         [] = print_hyperparams(self, exp_idx);
-
-        [esn_pars, bs, samples, RF] = create_run_parameters(self, exp_idx);
     end
 end
