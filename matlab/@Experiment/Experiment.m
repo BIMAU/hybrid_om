@@ -72,6 +72,15 @@ classdef Experiment < handle
 
         % Range of the test samples
         test_range;
+        
+        % Temporary variables to store transformed states and imperfect
+        % predictions
+        VX;
+        VPhi;
+        
+        % A memory with a windowsize is needed to be able to compute a NRMSE
+        memory;
+        windowsize = 10;
     end
 
     methods (Access = public)
@@ -86,7 +95,7 @@ classdef Experiment < handle
             self.data      = data;
             self.model     = data.model_imp;
             self.dimension = data.dimension;
-            
+
             switch nargin
               case 3
                 self.pid = pid;
@@ -116,11 +125,10 @@ classdef Experiment < handle
                 self.print_hyperparams(j);
                 [esn_pars, mod_pars] = self.distribute_params(j);
                 self.modes = Modes('wavelet', mod_pars);
-                
+
                 self.print('transform input/output data with wavelet modes\n');
-                % ?? self.data.X   = self.modes.V' * self.data.X;
-                % ?? self.data.Phi = self.modes.V' * self.data.Phi;                
-               
+                self.VX   = self.modes.V' * self.data.X;
+                self.VPhi = self.modes.V' * self.data.Phi;
             end
         end
 
@@ -155,5 +163,11 @@ classdef Experiment < handle
 
         [] = print_hyperparams(self, exp_idx);
         [esn_pars, mod_pars] = distribute_params(self, exp_idx);
+
+        [err, NRM] = NRMSE(self, pred, test);
+        
+        
+        [] = add_field_to_memory(self, name, field);
+
     end
 end
