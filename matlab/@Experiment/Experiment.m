@@ -106,8 +106,6 @@ classdef Experiment < handle
                 self.print_hyperparams(j);
                 [esn_pars, mod_pars, run_pars] = ...
                     self.distribute_params(j);
-                mod_pars.N = self.model.N;
-                mod_pars.dimension = self.dimension;
                 self.modes = Modes('wavelet', mod_pars);
             end
         end
