@@ -17,15 +17,15 @@ classdef Experiment < handle
         model_on   = true; % enable/disable physics based model
 
         store_state = 'all'; % which state to store: 'all', 'final'
-        
+
         dimension = '1D'; % problem dimension: '1D' or '2D'
-        
+
         % Modes object used for scale separation and order reduction
         modes;
     end
 
     properties (Access = private)
-        tr_data; % training data struct
+        data;   % training data object
         model;   % model object
 
         hyp;   % hyperparameter collection
@@ -62,21 +62,31 @@ classdef Experiment < handle
         ESN_states;  % stores snapshots of the ESN state X
 
         % Number of predicted time steps that are within the error limit.
-        num_predicted;        
+        num_predicted;
+
+        % Number of training samples
+        tr_samples;
+
+        % Range of the training samples
+        train_range;
+
+        % Range of the test samples
+        test_range;
     end
 
     methods (Access = public)
 
-        function self = Experiment(tr_data, model, pid, procs)
+        function self = Experiment(data, pid, procs)
         % constructor
         %
-        % tr_data:  training data struct
+        % data:     training data object
         % pid:      process id
         % procs:    total number of processes
 
-            self.tr_data = tr_data;
-            self.model   = model;
-
+            self.data      = data;
+            self.model     = data.model_imp;
+            self.dimension = data.dimension;
+            
             switch nargin
               case 3
                 self.pid = pid;
@@ -104,9 +114,13 @@ classdef Experiment < handle
 
             for j = 1:self.num_hyp_settings
                 self.print_hyperparams(j);
-                [esn_pars, mod_pars, run_pars] = ...
-                    self.distribute_params(j);
+                [esn_pars, mod_pars] = self.distribute_params(j);
                 self.modes = Modes('wavelet', mod_pars);
+                
+                self.print('transform input/output data with wavelet modes\n');
+                % ?? self.data.X   = self.modes.V' * self.data.X;
+                % ?? self.data.Phi = self.modes.V' * self.data.Phi;                
+               
             end
         end
 
@@ -138,6 +152,8 @@ classdef Experiment < handle
         [inds] = my_indices(self, pid, procs, Ni);
 
         [] = print(self, varargin);
+
         [] = print_hyperparams(self, exp_idx);
+        [esn_pars, mod_pars] = distribute_params(self, exp_idx);
     end
 end

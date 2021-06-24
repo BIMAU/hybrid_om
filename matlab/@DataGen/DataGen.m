@@ -37,7 +37,8 @@ classdef DataGen < handle
              % original fine grid transient to save memory.
 
         Phi; % stores the imperfect predictions on the coarse grid
-
+        
+        dimension = '1D'; % can be '1D' or '2D'
     end
 
     methods
@@ -115,12 +116,11 @@ classdef DataGen < handle
 
         end
 
-        function build_grid_transfers(self, boundary, type)
+        function build_grid_transfers(self, boundary)
         % Computes grid transfers between a grid of size N_prf and another of
         % size N_prf / 2
 
         % boundary: empty or 'periodic'
-        % type: '1D' or '2D'
 
         % R: weighted restriction operator
         % P: prolongation operator
@@ -145,9 +145,10 @@ classdef DataGen < handle
             self.R = sparse(ico, jco, co, Nc, self.N_prf);
             self.P = 2*self.R';
 
-            if strcmp(type, '2D')
-                self.R = kron(self.R,self.R);
-                self.P = 4*self.R';
+            if strcmp(self.dimension, '2D')
+                error('this is not implemented (yet)');
+                % self.R = kron(self.R,self.R);
+                % self.P = 4*self.R';
             end
         end
 

@@ -42,6 +42,10 @@ classdef Modes < handle
             else
                 error('unexpected input')
             end
+            
+            if self.red_factor ~= 1
+                error('option not implemented (yet)');
+            end
         end
 
         function [] = set_parameters(self, pars)

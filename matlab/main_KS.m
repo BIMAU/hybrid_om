@@ -12,7 +12,8 @@ ks_imp.initialize();
 dgen = DataGen(ks_prf, ks_imp);
 
 % the grids are different so grid transfers are necessary
-dgen.build_grid_transfers('periodic', '1D');
+dgen.dimension = '1D';
+dgen.build_grid_transfers('periodic');
 
 % generate perfect model transient
 dgen.T = 20;         % total time
@@ -25,17 +26,10 @@ dgen.generate_prf_transient();
 dgen.dt_imp = 2*dgen.dt_prf;
 dgen.generate_imp_predictions();
 
-% #TODO create training data struct
-tr_data = struct();
-
-model   = ks_imp;
-
 % create experiment class
-expObj = Experiment(tr_data, model);
+expObj = Experiment(dgen);
 
 % adjust experiment settings
-
-expObj.dimension='2D';
 expObj.set_default_hyp('ReservoirSize', 1000);
 expObj.set_default_hyp('BlockSize', 16);
 expObj.add_experiment('ReservoirSize', [500, 1000, 2000]);
