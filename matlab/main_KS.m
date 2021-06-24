@@ -34,6 +34,8 @@ model   = ks_imp;
 expObj = Experiment(tr_data, model);
 
 % adjust experiment settings
+
+expObj.dimension='2D';
 expObj.set_default_hyp('ReservoirSize', 1000);
 expObj.set_default_hyp('BlockSize', 16);
 expObj.add_experiment('ReservoirSize', [500, 1000, 2000]);

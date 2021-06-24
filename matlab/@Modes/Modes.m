@@ -124,7 +124,7 @@ classdef Modes < handle
                 Pn = kron(I, Pn);
                 
                 % adjust P1 with this nested reordering
-                P1 = Pn*P1;
+                P1 = P1*Pn;
             end                
 
             % create a block permutation matrix
@@ -137,10 +137,7 @@ classdef Modes < handle
             end
 
             % complete wavelet operator
-            V.V = P2'*H'*P1';
-            V.H  = H';
-            V.P1 = P1';
-            V.P2 = P2';
+            V = P2'*H'*P1';
         end
 
         function [P] = build_block_permutation(self, n, m, nun, bs)
