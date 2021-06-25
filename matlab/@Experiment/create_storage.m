@@ -1,11 +1,6 @@
 function create_storage(self)
-% The core experiment is repeated with <reps>*<shifts> realizations of
-% the network. The range of the training data changes with <shifts>.
-
-    cvec = combvec((1:self.reps),(1:self.shifts))';
-    rvec = cvec(:,1);
-    svec = cvec(:,2);
-    N_rl = numel(svec); % total number of realizations
+    % total number of realizations
+    N_rl = self.reps*self.shifts;
 
     self.predictions = cell(N_rl, self.num_hyp_settings);
     self.truths      = cell(N_rl, self.num_hyp_settings);
