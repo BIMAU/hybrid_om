@@ -7,9 +7,10 @@ classdef Experiment < handle
 
     properties (Access = public)
 
-        shifts    = 5;   % shifts in training_range
-        reps      = 3;   % repetitions per shift
-        max_preds = 100; % prediction barrier (in samples)
+        shifts = 5;   % shifts in training_range
+        reps   = 3;   % repetitions per shift
+
+        max_preds = 10; % prediction barrier (in samples)s
 
         testing_on = true; % if true/false we run the prediction with/without
                            % generating errors w.r.t. the truth.
@@ -72,12 +73,13 @@ classdef Experiment < handle
 
         % Range of the test samples
         test_range;
-        
+    end
+    properties (Access = public)
         % Temporary variables to store transformed states and imperfect
         % predictions
         VX;
         VPhi;
-        
+
         % A memory with a windowsize is needed to be able to compute a NRMSE
         memory;
         windowsize = 10;
@@ -129,6 +131,36 @@ classdef Experiment < handle
                 self.print('transform input/output data with wavelet modes\n');
                 self.VX   = self.modes.V' * self.data.X;
                 self.VPhi = self.modes.V' * self.data.Phi;
+                
+                Nt = size(self.data.X, 2); % number of time steps in series                
+                if self.testing_on
+                    max_shift = Nt - self.max_preds - self.tr_samples - 1;
+                else
+                    max_shift = Nt - self.tr_samples - 1;
+                end
+                
+                % assert(max_shift > 1);
+                tr_shifts = round(linspace(0, max_shift, self.shifts));
+
+                % The core experiment is repeated with <reps>*<shifts> realizations of
+                % the network. The range of the training data changes with <shifts>.
+                cvec = combvec((1:self.reps),(1:self.shifts))';
+                rvec = cvec(:,1);
+                svec = cvec(:,2);
+                Ni   = numel(svec); % number of indices
+
+                % domain decomposition
+                my_inds = self.my_indices(self.pid, self.procs, Ni);
+                
+                for i = my_inds
+                    self.train_range = (1:self.tr_samples) + tr_shifts(svec(i));
+                    self.test_range  = self.train_range(end) + (1:self.max_preds);
+                    
+                    self.print(' train range: %d - %d\n', ...
+                           min(self.train_range), max(self.train_range));
+                    self.print('  test range: %d - %d\n', ...
+                           min(self.test_range), max(self.test_range));
+                end
             end
         end
 
@@ -165,9 +197,13 @@ classdef Experiment < handle
         [esn_pars, mod_pars] = distribute_params(self, exp_idx);
 
         [err, NRM] = NRMSE(self, pred, test);
-        
-        
+
+
         [] = add_field_to_memory(self, name, field);
+
+        function [stop_flag] = stopping_criterion(self)
+        % TODO
+        end
 
     end
 end
