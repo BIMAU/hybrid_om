@@ -61,6 +61,9 @@ classdef Experiment < handle
         truths;      % stores all truths
         errors;      % stores the errors
         ESN_states;  % stores snapshots of the ESN state X
+        
+        % generated parameters of for the ESN
+        esn_pars;
 
         % Number of predicted time steps that are within the error limit.
         num_predicted;
@@ -73,8 +76,7 @@ classdef Experiment < handle
 
         % Range of the test samples
         test_range;
-    end
-    properties (Access = public)
+
         % Temporary variables to store transformed states and imperfect
         % predictions
         VX;
@@ -125,7 +127,7 @@ classdef Experiment < handle
 
             for j = 1:self.num_hyp_settings
                 self.print_hyperparams(j);
-                [esn_pars, mod_pars] = self.distribute_params(j);
+                [self.esn_pars, mod_pars] = self.distribute_params(j);
                 self.modes = Modes('wavelet', mod_pars);
 
                 self.print('transform input/output data with wavelet modes\n');
@@ -160,6 +162,8 @@ classdef Experiment < handle
                            min(self.train_range), max(self.train_range));
                     self.print('  test range: %d - %d\n', ...
                            min(self.test_range), max(self.test_range));
+                    
+                    [predY, testY, err, esnX] = self.experiment_core();
                 end
             end
         end
@@ -204,6 +208,8 @@ classdef Experiment < handle
         function [stop_flag] = stopping_criterion(self)
         % TODO
         end
+        
+        [predY, testY, err, esnX] = self.experiment_core(self);
 
     end
 end
