@@ -5,11 +5,10 @@ function [err, NRM] = NRMSE(self, pred, test)
     pred = pred(:);
     test = test(:);
 
-    self.add_field_to_memory('pred', pred);
+    self.add_field_to_memory('pred', pred);    
     self.add_field_to_memory('test', test);
 
     diff =  self.memory.pred - self.memory.test;
-
     tvar =  self.memory.test - mean(self.memory.test, 2);
 
     T   = size(diff,2);
