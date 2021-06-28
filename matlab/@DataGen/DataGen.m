@@ -98,6 +98,10 @@ classdef DataGen < handle
             self.stride = round(self.dt_imp / self.dt_prf);
             assert( self.stride * self.dt_prf - self.dt_imp < 1e-13 , ...
                     'dt_imp is not an integer multiple of dt_prf');
+            
+            fprintf('skipping every %d steps\n', self.stride)
+            fprintf('   perfect model time step: %1.3f\n', self.dt_prf)
+            fprintf(' imperfect model time step: %1.3f\n', self.dt_imp)
 
             % reduce the transient, keep columns according to <stride>
             self.X = self.X(:,1:self.stride:self.Nt_prf);
