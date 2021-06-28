@@ -1,5 +1,4 @@
 classdef Experiment < handle
-
 % Experiment class that creates hybrid DMD/ESN setups and performs
 % training and prediction for many training data sets and many
 % realizations of the random ESN operators W and Win. It stores a
@@ -20,9 +19,8 @@ classdef Experiment < handle
         store_state = 'all'; % which state to store: 'all', 'final'
 
         dimension = '1D'; % problem dimension: '1D' or '2D'
-
-        % Modes object used for scale separation and order reduction
-        modes;
+        
+        err_tol = 0.5; % error tolerance in stopping criterion
     end
 
     properties (Access = private)
@@ -62,6 +60,9 @@ classdef Experiment < handle
         errors;      % stores the errors
         ESN_states;  % stores snapshots of the ESN state X
         
+        % Modes object used for scale separation and order reduction
+        modes;
+
         % generated parameters of for the ESN
         esn_pars;
 
@@ -83,7 +84,7 @@ classdef Experiment < handle
         VPhi;
 
         % A memory with a windowsize is needed to be able to compute a NRMSE
-        memory;
+        memory = struct();
         windowsize = 10;
     end
 
@@ -205,11 +206,15 @@ classdef Experiment < handle
 
         [] = add_field_to_memory(self, name, field);
 
-        function [stop_flag] = stopping_criterion(self)
-        % TODO
+        function [stop_flag, err] = stopping_criterion(self, predY, testY)
+            err = self.NRMSE(predY(:), testY(:));
+
+            stop_flag = false;
+            if (err > self.err_tol) && ~strcmp(self.store_state, 'all')
+                stop_flag = true;
+            end
         end
         
-        [predY, testY, err, esnX] = self.experiment_core(self);
-
+        [predY, testY, err, esnX] = experiment_core(self);
     end
 end
