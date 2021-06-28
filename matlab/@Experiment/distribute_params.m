@@ -8,6 +8,8 @@ function [esn_pars, mod_pars] = distribute_params(self, exp_idx)
     hyp_id2value = @ (id) ...
         self.hyp_range(self.id2ind(self.hyp_ids, id), exp_idx);
     
+    esn_pars = default_esn_parameters();
+    
     esn_pars.Nr          = hyp_id2value('ReservoirSize');
     mod_pars.blocksize   = hyp_id2value('BlockSize');
     self.tr_samples      = hyp_id2value('TrainingSamples');
@@ -29,4 +31,21 @@ function [esn_pars, mod_pars] = distribute_params(self, exp_idx)
     % finish the modes parameters
     mod_pars.N = self.model.N;
     mod_pars.dimension = self.dimension;
+end
+
+function [pars_out] = default_esn_parameters()
+    pars_out                    = struct();
+    pars_out                    = {};
+    pars_out.scalingType        = 'standardize';
+    pars_out.Nr                 = 1000;
+    pars_out.rhoMax             = 0.3;
+    pars_out.alpha              = 1.0;
+    pars_out.Wconstruction      = 'avgDegree';
+    pars_out.avgDegree          = 10;
+    pars_out.lambda             = 1e-1;
+    pars_out.bias               = 0.0;
+    pars_out.squaredStates      = 'even';
+    pars_out.reservoirStateInit = 'random';
+    pars_out.inputMatrixType    = 'balancedSparse';
+    pars_out.inAmplitude        = 1.0;
 end
