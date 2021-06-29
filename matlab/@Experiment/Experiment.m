@@ -122,6 +122,8 @@ classdef Experiment < handle
         end
 
         function run(self)
+            time = tic;
+            
             self.create_descriptors();
             self.create_hyp_range();
             self.create_storage();
@@ -159,14 +161,51 @@ classdef Experiment < handle
                     self.train_range = (1:self.tr_samples) + tr_shifts(svec(i));
                     self.test_range  = self.train_range(end) + (1:self.max_preds);
                     
-                    self.print(' train range: %d - %d\n', ...
-                           min(self.train_range), max(self.train_range));
-                    self.print('  test range: %d - %d\n', ...
-                           min(self.test_range), max(self.test_range));
-                    
                     [predY, testY, err, esnX] = self.experiment_core();
+                    
+                    self.num_predicted(i, j) = size(predY, 1);
+                    
+                    if strcmp(self.store_state, 'all')
+                        self.predictions{i, j} = predY(:,:);
+                        self.truths{i, j} = testY(:,:);
+                        self.ESN_states{i,j} = esnX(round(linspace(1,size(esnX,1),20)),:);
+
+                    elseif strcmp(self.store_state, 'final');
+                        self.predictions{i, j} = predY(end,:);
+                        self.truths{i, j} = testY(end,:);
+                        self.ESN_states{i,j} = esnX(end,:);
+                    else
+                        error('Unexpected input');
+                    end
+                    errs{i, j} = err;
+
+                    xlab = self.exp_id;
+                    ylab = 'Predicted days';
+                   
+                    % name-value pairs:
+                    % add whatever is useful here and use a meaningful name
+                    pairs = { {'my_inds', my_inds}, {'hyp_range', self.hyp_range}, ...
+                              {'hyp', self.hyp}, ...
+                              {'exp_id', self.exp_id}, ...
+                              {'exp_ind', self.exp_ind}, ...
+                              {'xlab', xlab}, ...
+                              {'ylab', ylab}, ...
+                              {'num_predicted', self.num_predicted}, ...
+                              {'errs', errs}, ...
+                              {'predictions', self.predictions}, ...
+                              {'truths', self.truths}, ...
+                              {'test_range', self.test_range}, ...
+                              {'train_range', self.train_range}, ...
+                              {'esn_on', self.esn_on}, ...
+                              {'model_on', self.model_on}, ...
+                              {'testing_on', self.testing_on}, ...
+                              {'esn_pars', self.esn_pars}, ...
+                              {'ESN_states', self.ESN_states} };
+                    
+                    self.store_results(pairs)
                 end
             end
+            self.print('done (%fs)\n', toc(time));
         end
 
         function set_default_hyp(self, id, value)
@@ -203,7 +242,6 @@ classdef Experiment < handle
 
         [err, NRM] = NRMSE(self, pred, test);
 
-
         [] = add_field_to_memory(self, name, field);
 
         function [stop_flag, err] = stopping_criterion(self, predY, testY)
@@ -216,5 +254,7 @@ classdef Experiment < handle
         end
         
         [predY, testY, err, esnX] = experiment_core(self);
+        
+        [] = store_results(self, pairs);
     end
 end
