@@ -49,7 +49,7 @@ function [predY, testY, err, esnX] = experiment_core(self)
 
     % full dimensional output testing
     if self.testing_on
-        testY = self.VX(:, 2:end);
+        testY = self.data.X(:, 2:end);
         testY = testY(:, self.test_range)';
     else
         testY = [];
@@ -62,7 +62,7 @@ function [predY, testY, err, esnX] = experiment_core(self)
 
     % initial state for the predictions
     init_idx = self.train_range(end)+1;
-    yk = self.VX(:, init_idx);
+    yk = self.data.X(:, init_idx);
 
     self.print('initialization index: %d\n', init_idx);
 
@@ -127,18 +127,17 @@ function [predY, testY, err, esnX] = experiment_core(self)
                     self.stopping_criterion(predY(i,:), testY(i,:));
             end
 
-            if stop
-                break;
-            end
 
-            if mod(i,verbosity) == 0
+            if (mod(i,verbosity) == 0) || (i == Npred) || stop
                 self.print(['prediction step %4d/%4d, Newton iterations %d,',...
                             'error %1.2e, %s\n'], ...
                            i, Npred, Nk, err(i), exp_type);
             end
+            
+            if stop
+                break;
+            end
         end
-        self.print(' last prediction step %4d/%4d, error %1.2e, %s\n', ...
-                   i, Npred, err(i), exp_type);
 
         % truncate output arrays
         predY = predY(1:i,:);
