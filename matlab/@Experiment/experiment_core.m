@@ -3,7 +3,12 @@ function [predY, testY, err, esnX] = experiment_core(self)
 %   predY:  full dimensional predictions
 %   testY:  full dimensional truths
 
-% we use the time step size of  the imperfect model
+    self.print(' train range: %d - %d\n', ...
+               min(self.train_range), max(self.train_range));
+    self.print('  test range: %d - %d\n', ...
+               min(self.test_range), max(self.test_range));
+
+    % we use the time step size of  the imperfect model
     dt  = self.data.dt_imp;
 
     % sample/state vector dimension, possibly reduced
@@ -49,7 +54,7 @@ function [predY, testY, err, esnX] = experiment_core(self)
     else
         testY = [];
     end
-    
+
     Npred = numel(self.test_range); % number of prediction steps
     predY = zeros(Npred, dim); % full dimensional predictions
     err   = zeros(Npred, 1); % error array
@@ -62,7 +67,7 @@ function [predY, testY, err, esnX] = experiment_core(self)
     self.print('initialization index: %d\n', init_idx);
 
     clear self.VX self.VPhi;
-    
+
     if self.esn_on
         % enable hybrid input design
         if hybrid
@@ -71,7 +76,7 @@ function [predY, testY, err, esnX] = experiment_core(self)
             self.esn_pars.feedThrough = true;
             self.esn_pars.ftRange     = dim+1:2*dim;
         end
-        
+
         % create ESN, train the ESN and save the final state
         esn = ESN(self.esn_pars.Nr, size(trainU,2), size(trainY,2));
         esn.setPars(self.esn_pars);
@@ -79,14 +84,14 @@ function [predY, testY, err, esnX] = experiment_core(self)
         esn.train(trainU, trainY);
         esn_state = esn.X(end,:);
         esnX = esn.X;
-        
+
         clear trainU trainY
-        
+
         verbosity = 1;
         for i = 1:Npred
             % model prediction of next time step
             [Pyk, Nk] = self.model.step(yk, dt);
-            
+
             if model_only
                 % result is not adapted
                 yk = Pyk;
@@ -99,34 +104,47 @@ function [predY, testY, err, esnX] = experiment_core(self)
                 else
                     error('incorrect model config')
                 end
-                
+
                 u_in      = esn.scaleInput(u_in);
                 esn_state = esn.update(esn_state, u_in)';
                 u_out     = esn.apply(esn_state, u_in);
                 u_out     = esn.unscaleOutput(u_out);
 
-                % transform ESN prediction back to the state space 
+                % transform ESN prediction back to the state space
                 yk = self.modes.V * u_out(:);
-                
+
                 % combine ESN prediction with model prediction
                 % yk = yk + Vc*(Vc'*Pyk); % TODO
             end
-            
+
             % store result
             predY(i,:) = yk;
-            
+
             % check stopping criterion
             stop = false;
             if self.testing_on
                 [stop, err(i)] = ...
                     self.stopping_criterion(predY(i,:), testY(i,:));
             end
-            
+
+            if stop
+                break;
+            end
+
             if mod(i,verbosity) == 0
                 self.print(['prediction step %4d/%4d, Newton iterations %d,',...
                             'error %1.2e, %s\n'], ...
                            i, Npred, Nk, err(i), exp_type);
             end
         end
+        self.print(' last prediction step %4d/%4d, error %1.2e, %s\n', ...
+                   i, Npred, err(i), exp_type);
+
+        % truncate output arrays
+        predY = predY(1:i,:);
+        if self.testing_on
+            testY = testY(1:i,:);
+        end
+        err = err(1:i);
     end
 end
