@@ -37,12 +37,21 @@ classdef DataGen < handle
              % original fine grid transient to save memory.
 
         Phi; % stores the imperfect predictions on the coarse grid
-        
+
         dimension = '1D'; % can be '1D' or '2D'
+
+        % save the data to out_file in path
+        out_file;
+        out_file_path
+
+        % overwrite the data in out_file if true
+        overwrite = false;
     end
 
     methods
         function self = DataGen(model_prf, model_imp)
+            assert(strcmp(model_prf.name, model_imp.name));
+
             self.model_prf = model_prf;
             self.model_imp = model_imp;
 
@@ -55,6 +64,16 @@ classdef DataGen < handle
             if self.N_prf ~= self.N_imp
                 fprintf('Datagen: grid transfer operators are required.\n')
             end
+            
+            self.out_file_path = sprintf('../data/%s/%d_%d', ...
+                                         self.model_prf.name, ...
+                                         self.N_prf, self.N_imp);
+
+            syscall = sprintf('mkdir -p %s', self.out_file_path);
+            path
+            %system(syscall)
+            
+            %out_file = sprintf([self.model_prf.name])
         end
 
         function generate_prf_transient(self);
@@ -98,7 +117,7 @@ classdef DataGen < handle
             self.stride = round(self.dt_imp / self.dt_prf);
             assert( self.stride * self.dt_prf - self.dt_imp < 1e-13 , ...
                     'dt_imp is not an integer multiple of dt_prf');
-            
+
             fprintf('skipping every %d steps\n', self.stride)
             fprintf('   perfect model time step: %1.3f\n', self.dt_prf)
             fprintf(' imperfect model time step: %1.3f\n', self.dt_imp)

@@ -4,6 +4,8 @@ classdef KSmodel < handle
 % d/dt u + u du/dx + (1+epsilon)*(d/dx)^2 u + nu * (d/dx)^4 u = 0
 
     properties
+        % str identifier for class
+        name = 'KSmodel';
 
         % domain length parameter
         L  = 100
