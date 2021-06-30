@@ -46,6 +46,9 @@ classdef DataGen < handle
 
         % overwrite the data in out_file if true
         overwrite = false;
+        
+        % output during transient and predictions
+        verbosity = 500;
     end
 
     methods
@@ -62,44 +65,67 @@ classdef DataGen < handle
             self.x_init_prf(1) = 1;
 
             if self.N_prf ~= self.N_imp
-                fprintf('Datagen: grid transfer operators are required.\n')
+                fprintf('Grid transfer operators are required.\n')
             end
-            
-            self.out_file_path = sprintf('../data/%s/%d_%d', ...
+
+            % create path
+            self.out_file_path = sprintf('../data/%s/%d_%d/', ...
                                          self.model_prf.name, ...
                                          self.N_prf, self.N_imp);
 
             syscall = sprintf('mkdir -p %s', self.out_file_path);
-            path
-            %system(syscall)
-            
-            %out_file = sprintf([self.model_prf.name])
+            system(syscall);
         end
 
         function generate_prf_transient(self);
         % evolve full model for Nt steps
-            time = tic;
-            self.Nt_prf = ceil(self.T / self.dt_prf);
-            self.X      = zeros(self.N_prf, self.Nt_prf);
-            self.X(:,1) = self.x_init_prf;
 
-            fprintf('Generate time series... \n');
-            avg_k = 0;
-            for i = 2:self.Nt_prf
-                [self.X(:,i), k] = ...
-                    self.model_prf.step(self.X(:,i-1), self.dt_prf);
-                avg_k = avg_k + k;
+            out_file = [self.out_file_path, ...
+                        sprintf('transient_T=%d_dt=%1.3f.mat', ...
+                                self.T - self.trunc, self.dt_prf)];
+
+            if exist(out_file, 'file') && ~self.overwrite
+                fprintf('Obtain time series from file: \n %s \n', out_file);
+                d = load(out_file);
+                self.X = d.X;
+                self.Nt_prf = d.Nt_prf;
+                assert(d.T == self.T - self.trunc);
+                self.T = d.T;
+            else
+                time = tic;
+                self.Nt_prf = ceil(self.T / self.dt_prf);
+                self.X      = zeros(self.N_prf, self.Nt_prf);
+                self.X(:,1) = self.x_init_prf;
+
+                fprintf('Generate time series... \n');
+                avg_k = 0;
+                for i = 2:self.Nt_prf
+                    [self.X(:,i), k] = ...
+                        self.model_prf.step(self.X(:,i-1), self.dt_prf);
+                    avg_k = avg_k + k;
+
+                    if mod(i, self.verbosity) == 0
+                        fprintf(' step %4d/%4d, Newton iterations: %d\n',...
+                                i, self.Nt_prf, k);
+                    end
+                end
+
+                fprintf('Generate time series... done (%f)\n', toc(time));
+                fprintf('Average # Newton iterations: (%f)\n', ...
+                        avg_k / (self.Nt_prf-1));
+
+                fprintf('Truncating t = [0,%d]\n', self.trunc);
+                trunc_steps = floor(self.trunc / self.dt_prf);
+                self.X = self.X(:,trunc_steps+1:self.Nt_prf);
+                self.Nt_prf = size(self.X, 2);
+                self.T = self.T - self.trunc;
+
+                fprintf('Saving time series to: \n %s \n', out_file);
+                pairs = {{'X', self.X}, ...
+                         {'Nt_prf', self.Nt_prf}, ...
+                         {'T', self.T}};
+                self.save_pairs(out_file, pairs);
             end
-
-            fprintf('Generate time series... done (%f)\n', toc(time));
-            fprintf('Average # Newton iterations: (%f)\n', ...
-                    avg_k / (self.Nt_prf-1));
-
-            fprintf('Truncating t = [0,%d]\n', self.trunc);
-            trunc_steps = floor(self.trunc / self.dt_prf);
-            self.X = self.X(:,trunc_steps+1:self.Nt_prf);
-            self.Nt_prf = size(self.X, 2);
-            self.T = self.T - self.trunc;
         end
 
         function generate_imp_predictions(self)
@@ -111,32 +137,54 @@ classdef DataGen < handle
                 assert(~isempty(self.R), 'specify restriction operator R');
                 assert(self.N_imp == size(self.R,1), 'incorrect row dimension in R');
                 assert(self.N_prf == size(self.R,2), 'incorrect column dimension in R');
+                fprintf('Grid transfer operators are available.\n')
                 self.X = self.R*self.X; % restrict the transient to the coarse grid
             end
+
 
             self.stride = round(self.dt_imp / self.dt_prf);
             assert( self.stride * self.dt_prf - self.dt_imp < 1e-13 , ...
                     'dt_imp is not an integer multiple of dt_prf');
 
-            fprintf('skipping every %d steps\n', self.stride)
-            fprintf('   perfect model time step: %1.3f\n', self.dt_prf)
-            fprintf(' imperfect model time step: %1.3f\n', self.dt_imp)
-
+            if self.stride > 1
+                fprintf('skipping every %d steps\n', self.stride)
+                fprintf('   perfect model time step: %1.3f\n', self.dt_prf)
+                fprintf(' imperfect model time step: %1.3f\n', self.dt_imp)
+            end
             % reduce the transient, keep columns according to <stride>
             self.X = self.X(:,1:self.stride:self.Nt_prf);
             self.Nt_imp = size(self.X, 2);
 
-            self.Phi = zeros(self.N_imp, self.Nt_imp);
-            time = tic;
-            fprintf('Generate imperfect predictions... \n');
-            avg_k = 0;
-            for i = 1:self.Nt_imp
-                [self.Phi(:,i), k] = self.model_imp.step(self.X(:,i), self.dt_imp);
-                avg_k = avg_k + k;
-            end
-            fprintf('Generate imperfect predictions... done (%f)\n', toc(time));
-            fprintf('Average # Newton iterations: (%f)\n', avg_k / self.Nt_imp);
+            out_file = [self.out_file_path, ...
+                        sprintf('predictions_T=%d_dt=%1.3f_stride=%d_Nt=%d.mat', ...
+                                self.T, self.dt_imp, self.stride, self.Nt_imp)];
 
+            if exist(out_file, 'file') && ~self.overwrite
+                fprintf('Obtain predictions from file: \n %s \n', out_file);
+                d = load(out_file);
+                self.Phi = d.Phi;
+            else
+
+                self.Phi = zeros(self.N_imp, self.Nt_imp);
+                time = tic;
+                fprintf('Generate imperfect predictions... \n');
+                avg_k = 0;
+
+                for i = 1:self.Nt_imp
+                    [self.Phi(:,i), k] = self.model_imp.step(self.X(:,i), self.dt_imp);
+                    avg_k = avg_k + k;
+                                        if mod(i, self.verbosity) == 0
+                        fprintf(' step %4d/%4d, Newton iterations: %d\n',...
+                                i, self.Nt_prf, k);
+                    end
+
+                end
+
+                fprintf('Generate imperfect predictions... done (%f)\n', toc(time));
+                fprintf('Average # Newton iterations: (%f)\n', avg_k / self.Nt_imp);
+                fprintf('Saving predictions to: \n %s \n', out_file);
+                self.save_pairs(out_file, {{'Phi', self.Phi}});
+            end
         end
 
         function build_grid_transfers(self, boundary)
@@ -175,5 +223,17 @@ classdef DataGen < handle
             end
         end
 
+        function save_pairs(self, file, pairs)
+            Np = numel(pairs);
+            for i = 1:Np
+                var = pairs{i}{1};
+                eval([var, ' = pairs{i}{2};'])
+                if (i == 1)
+                    save(file, var)
+                else
+                    save(file, var, '-append')
+                end
+            end
+        end
     end
 end
