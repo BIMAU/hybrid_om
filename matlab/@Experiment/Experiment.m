@@ -19,16 +19,16 @@ classdef Experiment < handle
         store_state = 'all'; % which state to store: 'all', 'final'
 
         dimension = '1D'; % problem dimension: '1D' or '2D'
-        
+
         err_tol = 0.5; % error tolerance in stopping criterion
     end
 
     properties (Access = private)
-        data;   % training data object
-        model;   % model object
+        data; % training data object
+        model; % model object
 
-        hyp;   % hyperparameter collection
-        name;  % experiment name
+        hyp; % hyperparameter collection
+        name; % experiment name
 
         % default serial setting
         pid   = 0;
@@ -59,7 +59,7 @@ classdef Experiment < handle
         truths;      % stores all truths
         errors;      % stores the errors
         ESN_states;  % stores snapshots of the ESN state X
-        
+
         % Modes object used for scale separation and order reduction
         modes;
 
@@ -123,7 +123,9 @@ classdef Experiment < handle
 
         function run(self)
             time = tic;
-            
+
+            assert(~isempty(self.exp_id), 'no experiment added');
+
             self.create_descriptors();
             self.create_hyp_range();
             self.create_storage();
@@ -136,14 +138,14 @@ classdef Experiment < handle
                 self.print('transform input/output data with wavelet modes\n');
                 self.VX   = self.modes.V' * self.data.X;
                 self.VPhi = self.modes.V' * self.data.Phi;
-                
-                Nt = size(self.data.X, 2); % number of time steps in series                
+
+                Nt = size(self.data.X, 2); % number of time steps in series
                 if self.testing_on
                     max_shift = Nt - self.max_preds - self.tr_samples - 1;
                 else
                     max_shift = Nt - self.tr_samples - 1;
                 end
-                
+
                 % assert(max_shift > 1);
                 tr_shifts = round(linspace(0, max_shift, self.shifts));
 
@@ -156,15 +158,15 @@ classdef Experiment < handle
 
                 % domain decomposition
                 my_inds = self.my_indices(self.pid, self.procs, Ni);
-                
+
                 for i = my_inds
                     self.train_range = (1:self.tr_samples) + tr_shifts(svec(i));
                     self.test_range  = self.train_range(end) + (1:self.max_preds);
-                    
+
                     [predY, testY, err, esnX] = self.experiment_core();
-                    
+
                     self.num_predicted(i, j) = size(predY, 1);
-                    
+
                     if strcmp(self.store_state, 'all')
                         self.predictions{i, j} = predY(:,:);
                         self.truths{i, j} = testY(:,:);
@@ -181,7 +183,7 @@ classdef Experiment < handle
 
                     xlab = self.exp_id;
                     ylab = 'Predicted days';
-                   
+
                     % name-value pairs:
                     % add whatever is useful here and use a meaningful name
                     pairs = { {'my_inds', my_inds}, {'hyp_range', self.hyp_range}, ...
@@ -201,7 +203,7 @@ classdef Experiment < handle
                               {'testing_on', self.testing_on}, ...
                               {'esn_pars', self.esn_pars}, ...
                               {'ESN_states', self.ESN_states} };
-                    
+
                     self.store_results(pairs)
                 end
             end
@@ -252,9 +254,9 @@ classdef Experiment < handle
                 stop_flag = true;
             end
         end
-        
+
         [predY, testY, err, esnX] = experiment_core(self);
-        
+
         [] = store_results(self, pairs);
     end
 end
