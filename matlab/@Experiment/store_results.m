@@ -16,16 +16,6 @@ function [] = store_results(self, pairs)
     end
 
     fprintf('saving results to %s\n', fname);
-    Np = numel(pairs);
-    for i = 1:Np
-        var = pairs{i}{1};
-        eval([var, ' = pairs{i}{2};'])
-        fprintf(' %s', var)
-        if (i == 1)
-            save(fname, var)
-        else
-            save(fname, var, '-append')
-        end
-    end
-    fprintf('\n\n')
+    
+    self.data.save_pairs(fname, pairs);
 end
