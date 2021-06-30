@@ -16,7 +16,7 @@ classdef Experiment < handle
         esn_on     = true; % enable/disable ESN
         model_on   = true; % enable/disable physics based model
 
-        store_state = 'all'; % which state to store: 'all', 'final'
+        store_state = 'final'; % which state to store: 'all', 'final'
 
         dimension = '1D'; % problem dimension: '1D' or '2D'
 
@@ -248,7 +248,7 @@ classdef Experiment < handle
 
         function [stop_flag, err] = stopping_criterion(self, predY, testY)
             err = self.NRMSE(predY(:), testY(:));
-
+            
             stop_flag = false;
             if (err > self.err_tol) && ~strcmp(self.store_state, 'all')
                 stop_flag = true;

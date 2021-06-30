@@ -50,5 +50,5 @@ dir = expObj.run();
 
 % create plot object
 p = Plot(dir);
-p.description = true;
+p.description = false;
 p.plot_experiment();

@@ -1,5 +1,6 @@
 classdef Plot < handle
 % class that handles (box)plotting of the grid search experiment
+% dir: it requires a directory dir
 
     properties (Access = public)
         
