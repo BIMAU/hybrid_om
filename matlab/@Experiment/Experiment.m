@@ -246,17 +246,11 @@ classdef Experiment < handle
 
         [] = add_field_to_memory(self, name, field);
 
-        function [stop_flag, err] = stopping_criterion(self, predY, testY)
-            err = self.NRMSE(predY(:), testY(:));
-            
-            stop_flag = false;
-            if (err > self.err_tol) && ~strcmp(self.store_state, 'all')
-                stop_flag = true;
-            end
-        end
-
+        
         [predY, testY, err, esnX] = experiment_core(self);
 
+        [stop_flag, err] = stopping_criterion(self, predY, testY);
+        
         [dir] = store_results(self, pairs);
     end
 end

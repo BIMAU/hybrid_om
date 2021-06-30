@@ -34,7 +34,8 @@ dgen.generate_imp_predictions();
 expObj = Experiment(dgen);
 expObj.shifts = 2;
 expObj.reps = 1;
-expObj.max_preds = round(10 / dgen.dt_imp);
+expObj.store_state = 'all';
+expObj.max_preds = round(30 / dgen.dt_imp);
 
 % adjust hyperparam defaults
 expObj.set_default_hyp('ReservoirSize', 1000);
@@ -51,4 +52,5 @@ dir = expObj.run();
 % create plot object
 p = Plot(dir);
 p.description = false;
+figure(1);
 p.plot_experiment();
