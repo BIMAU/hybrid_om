@@ -121,7 +121,7 @@ classdef Experiment < handle
             self.set_all_hyp_defaults();
         end
 
-        function run(self)
+        function [dir] = run(self)
             time = tic;
 
             assert(~isempty(self.exp_id), 'no experiment added');
@@ -204,7 +204,7 @@ classdef Experiment < handle
                               {'esn_pars', self.esn_pars}, ...
                               {'ESN_states', self.ESN_states} };
 
-                    self.store_results(pairs)
+                    dir = self.store_results(pairs);
                 end
             end
             self.print('done (%fs)\n', toc(time));
@@ -257,6 +257,6 @@ classdef Experiment < handle
 
         [predY, testY, err, esnX] = experiment_core(self);
 
-        [] = store_results(self, pairs);
+        [dir] = store_results(self, pairs);
     end
 end
