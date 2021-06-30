@@ -4,22 +4,27 @@ We also include the KS model here.
 Dependencies:
 github.com/erik808/ESN
 
-* training data generation class DataGen
+* DONE training data generation class DataGen
+  CLOSED: [2021-06-30 wo 19:50]
   see DataGen.m
 
-* ESN experiment wrapper class
+* DONE ESN experiment wrapper class
+  CLOSED: [2021-06-30 wo 19:50]
   - Performs training and prediction for many training data sets and
     many realizations of the random ESN operators W and Win.
   - parallel and serial option
 
-** TODO remove matlab threading  
+** DONE remove matlab threading  
+   CLOSED: [2021-06-30 wo 19:50]
 
-** data members
+** DONE data members
+   CLOSED: [2021-06-30 wo 19:50]
    exp_id;      % experiment id
    store_state; % which state to store
    hyp;         % hyper parameter struct
 
-** member functions
+** DONE member functions
+   CLOSED: [2021-06-30 wo 19:50]
    range2str()  % converts numeric range to a string
    
 * visualization class
