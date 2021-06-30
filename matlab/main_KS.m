@@ -15,30 +15,34 @@ dgen = DataGen(ks_prf, ks_imp);
 dgen.dimension = '1D';
 dgen.build_grid_transfers('periodic');
 
+% initial state
+dgen.x_init_prf = zeros(N_prf, 1);
+dgen.x_init_prf(1) = 1;
+            
 % generate perfect model transient
-dgen.T = 500; % total time
-dgen.dt_prf = 0.1; % perfect model time step
-dgen.trunc = 10; % truncate period
+dgen.trunc = 30; % truncate period
+dgen.T = 4000 + dgen.trunc; % total time
+dgen.dt_prf = 0.25; % perfect model time step
 dgen.generate_prf_transient();
 
 % generate imperfect model predictions
 % imperfect model time step (should be an integer multiple of dt_prf)
-dgen.dt_imp = 2*dgen.dt_prf;
+dgen.dt_imp = dgen.dt_prf;
 dgen.generate_imp_predictions();
 
 % create experiment class
 expObj = Experiment(dgen);
-expObj.shifts = 2;
+expObj.shifts = 4;
 expObj.reps = 1;
-expObj.max_preds = 200;
+expObj.max_preds = round(100 / dgen.dt_imp);
 
 % adjust hyperparam defaults
 expObj.set_default_hyp('ReservoirSize', 1000);
-expObj.set_default_hyp('BlockSize', 8);
-expObj.set_default_hyp('TrainingSamples', 1000);
+expObj.set_default_hyp('BlockSize', 1);
+expObj.set_default_hyp('TrainingSamples', 10000);
 
 % set experiments
-expObj.add_experiment('ReservoirSize', [500, 1000]);
+expObj.add_experiment('ReservoirSize', [1000]);
 % expObj.add_experiment('BlockSize', [1, 4, 16]);
 
 % run experiments
