@@ -21,7 +21,7 @@ function [] = store_results(self, pairs)
         var = pairs{i}{1};
         eval([var, ' = pairs{i}{2};'])
         fprintf(' %s', var)
-        if (i == 2)
+        if (i == 1)
             save(fname, var)
         else
             save(fname, var, '-append')
