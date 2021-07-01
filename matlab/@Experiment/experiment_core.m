@@ -82,6 +82,7 @@ function [predY, testY, err, esnX] = experiment_core(self)
         esn.setPars(self.esn_pars);
         esn.initialize;
         esn.train(trainU, trainY);
+        esn
         esn_state = esn.X(end,:);
         esnX = esn.X;
         

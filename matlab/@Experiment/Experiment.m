@@ -169,8 +169,8 @@ classdef Experiment < handle
                 my_inds = self.my_indices(self.pid, self.procs, Ni);
 
                 for i = my_inds
-                    self.print_hyperparams(j);
-                    self.print('__ shift: %d/%d __ rep: %d/%d __ \n\n', ...
+                    self.print_hyperparams(j);                    
+                    self.print(' shift: %d/%d repetitions: %d/%d \n', ...
                                svec(i), self.shifts, rvec(i), self.reps);
                     
                     self.train_range = (1:self.tr_samples) + tr_shifts(svec(i));
