@@ -32,10 +32,11 @@ dgen.generate_imp_predictions();
 
 % create experiment class
 expObj = Experiment(dgen);
-expObj.shifts = 2;
+expObj.shifts = 4;
 expObj.reps = 1;
-expObj.store_state = 'all';
-expObj.max_preds = round(30 / dgen.dt_imp);
+expObj.store_state = 'final';
+expObj.nrmse_windowsize = 50;
+expObj.max_preds = round(100 / dgen.dt_imp);
 
 % adjust hyperparam defaults
 expObj.set_default_hyp('ReservoirSize', 1000);
@@ -43,7 +44,7 @@ expObj.set_default_hyp('BlockSize', 1);
 expObj.set_default_hyp('TrainingSamples', 1000);
 
 % set experiments
-expObj.add_experiment('ReservoirSize', [1000]);
+expObj.add_experiment('ReservoirSize', [500, 1000]);
 % expObj.add_experiment('BlockSize', [1, 4, 16]);
 
 % run experiments

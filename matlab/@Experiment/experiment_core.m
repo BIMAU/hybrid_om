@@ -84,66 +84,70 @@ function [predY, testY, err, esnX] = experiment_core(self)
         esn.train(trainU, trainY);
         esn_state = esn.X(end,:);
         esnX = esn.X;
-
-        clear trainU trainY
-
-        verbosity = 1;
-        for i = 1:Npred
-            % model prediction of next time step
-            [Pyk, Nk] = self.model.step(yk, dt);
-
-            if model_only
-                % result is not adapted
-                yk = Pyk;
-            else
-                % create an input vector for the ESN
-                if hybrid
-                    u_in = [self.modes.V' * yk(:); self.modes.V' * Pyk(:)]';
-                elseif esn_only
-                    u_in = [self.modes.V' * yk(:)];
-                else
-                    error('incorrect model config')
-                end
-
-                u_in      = esn.scaleInput(u_in);
-                esn_state = esn.update(esn_state, u_in)';
-                u_out     = esn.apply(esn_state, u_in);
-                u_out     = esn.unscaleOutput(u_out);
-
-                % transform ESN prediction back to the state space
-                yk = self.modes.V * u_out(:);
-
-                % combine ESN prediction with model prediction
-                % yk = yk + Vc*(Vc'*Pyk); % TODO
-            end
-
-            % store result
-            predY(i,:) = yk;
-
-            % check stopping criterion
-            stop = false;
-            if self.testing_on
-                [stop, err(i)] = ...
-                    self.stopping_criterion(predY(i,:), testY(i,:));
-            end
-
-
-            if (mod(i,verbosity) == 0) || (i == Npred) || stop
-                self.print(['prediction step %4d/%4d, Newton iterations %d,',...
-                            'error %1.2e, %s\n'], ...
-                           i, Npred, Nk, err(i), exp_type);
-            end
-            
-            if stop
-                break;
-            end
-        end
-
-        % truncate output arrays
-        predY = predY(1:i,:);
-        if self.testing_on
-            testY = testY(1:i,:);
-        end
-        err = err(1:i);
+        
     end
+
+    clear trainU trainY
+
+    % reset memory for nrmse
+    self.nrmse_memory = struct();
+    verbosity = 1;
+    for i = 1:Npred
+        % model prediction of next time step
+        [Pyk, Nk] = self.model.step(yk, dt);
+
+        if model_only
+            % result is not adapted
+            yk = Pyk;
+        else
+            % create an input vector for the ESN
+            if hybrid
+                u_in = [self.modes.V' * yk(:); self.modes.V' * Pyk(:)]';
+            elseif esn_only
+                u_in = [self.modes.V' * yk(:)];
+            else
+                error('incorrect model config')
+            end
+
+            u_in      = esn.scaleInput(u_in);
+            esn_state = esn.update(esn_state, u_in)';
+            u_out     = esn.apply(esn_state, u_in);
+            u_out     = esn.unscaleOutput(u_out);
+
+            % transform ESN prediction back to the state space
+            yk = self.modes.V * u_out(:);
+
+            % combine ESN prediction with model prediction
+            % yk = yk + Vc*(Vc'*Pyk); % TODO
+        end
+
+        % store result
+        predY(i,:) = yk;
+
+        % check stopping criterion
+        stop = false;
+        if self.testing_on
+            [stop, err(i)] = ...
+                self.stopping_criterion(predY(i,:), testY(i,:));
+        end
+
+
+        if (mod(i,verbosity) == 0) || (i == Npred) || stop
+            self.print(['prediction step %4d/%4d, Newton iterations %d,',...
+                        'error %1.2e, %s\n'], ...
+                       i, Npred, Nk, err(i), exp_type);
+        end
+        
+        if stop
+            break;
+        end
+    end
+
+    % truncate output arrays
+    predY = predY(1:i,:);
+    if self.testing_on
+        testY = testY(1:i,:);
+    end
+    err = err(1:i);
+
 end

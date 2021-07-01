@@ -21,6 +21,9 @@ classdef Experiment < handle
         dimension = '1D'; % problem dimension: '1D' or '2D'
 
         err_tol = 0.5; % error tolerance in stopping criterion
+        
+        % set the window size for the nrmse
+        nrmse_windowsize = 100;
     end
 
     properties (Access = private)
@@ -84,8 +87,8 @@ classdef Experiment < handle
         VPhi;
 
         % A memory with a windowsize is needed to be able to compute a NRMSE
-        memory = struct();
-        windowsize = 10;
+        nrmse_memory = struct();
+
     end
 
     methods (Access = public)
@@ -242,7 +245,7 @@ classdef Experiment < handle
         [] = print_hyperparams(self, exp_idx);
         [esn_pars, mod_pars] = distribute_params(self, exp_idx);
 
-        [err, NRM] = NRMSE(self, pred, test);
+        [err, nrm] = nrmse(self, pred, test);
 
         [] = add_field_to_memory(self, name, field);
 

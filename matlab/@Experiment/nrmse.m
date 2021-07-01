@@ -1,4 +1,4 @@
-function [err, NRM] = NRMSE(self, pred, test)
+function [err, nrm] = nrmse(self, pred, test)
 % pred: predicted field
 % test: testing field/truth
     
@@ -8,15 +8,15 @@ function [err, NRM] = NRMSE(self, pred, test)
     self.add_field_to_memory('pred', pred);    
     self.add_field_to_memory('test', test);
 
-    diff =  self.memory.pred - self.memory.test;
-    tvar =  self.memory.test - mean(self.memory.test, 2);
+    diff =  self.nrmse_memory.pred - self.nrmse_memory.test;
+    tvar =  self.nrmse_memory.test - mean(self.nrmse_memory.test, 2);
 
     T   = size(diff,2);
     N   = size(diff,1);
 
-    if T < self.windowsize
+    if T < self.nrmse_windowsize
         % padding diff with zeros
-        diff = [zeros(N, self.windowsize-T), diff];
+        diff = [zeros(N, self.nrmse_windowsize-T), diff];
     end
 
     NRM = 1;
