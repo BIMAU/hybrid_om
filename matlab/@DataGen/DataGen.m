@@ -125,7 +125,8 @@ classdef DataGen < handle
                          {'Nt_prf', self.Nt_prf}, ...
                          {'T', self.T}};
                 self.save_pairs(out_file, pairs);
-            end
+            end            
+            fprintf('Created time series with %d samples.\n', self.Nt_prf);
         end
 
         function generate_imp_predictions(self)
@@ -175,7 +176,7 @@ classdef DataGen < handle
                     avg_k = avg_k + k;
                                         if mod(i, self.verbosity) == 0
                         fprintf(' step %4d/%4d, Newton iterations: %d\n',...
-                                i, self.Nt_prf, k);
+                                i, self.Nt_imp, k);
                     end
 
                 end
@@ -185,6 +186,7 @@ classdef DataGen < handle
                 fprintf('Saving predictions to: \n %s \n', out_file);
                 self.save_pairs(out_file, {{'Phi', self.Phi}});
             end
+            fprintf('Created predictions: %d samples.\n', self.Nt_imp);
         end
 
         function build_grid_transfers(self, boundary)

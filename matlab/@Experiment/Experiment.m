@@ -22,7 +22,10 @@ classdef Experiment < handle
 
         err_tol = 0.5; % error tolerance in stopping criterion
         
-        % set the window size for the nrmse
+        % Modes object used for scale separation and order reduction
+        modes;
+
+        % set the window size for the nrs
         nrmse_windowsize = 100;
     end
 
@@ -62,9 +65,6 @@ classdef Experiment < handle
         truths;      % stores all truths
         errors;      % stores the errors
         ESN_states;  % stores snapshots of the ESN state X
-
-        % Modes object used for scale separation and order reduction
-        modes;
 
         % generated parameters of for the ESN
         esn_pars;
@@ -134,7 +134,7 @@ classdef Experiment < handle
             self.create_storage();
 
             for j = 1:self.num_hyp_settings
-                self.print_hyperparams(j);
+
                 [self.esn_pars, mod_pars] = self.distribute_params(j);
                 self.modes = Modes('wavelet', mod_pars);
 
@@ -143,14 +143,20 @@ classdef Experiment < handle
                 self.VPhi = self.modes.V' * self.data.Phi;
 
                 Nt = size(self.data.X, 2); % number of time steps in series
+                                          
+                % -1 to make sure there is output training data
                 if self.testing_on
                     max_shift = Nt - self.max_preds - self.tr_samples - 1;
                 else
                     max_shift = Nt - self.tr_samples - 1;
                 end
+                assert(max_shift > 1, 'invalid number of training samples, choose less');
 
-                % assert(max_shift > 1);
-                tr_shifts = round(linspace(0, max_shift, self.shifts));
+                if self.shifts > 1
+                    tr_shifts = round(linspace(0, max_shift, self.shifts));
+                else
+                    tr_shifts = 0;
+                end
 
                 % The core experiment is repeated with <reps>*<shifts> realizations of
                 % the network. The range of the training data changes with <shifts>.

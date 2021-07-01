@@ -20,7 +20,7 @@ dgen.x_init_prf = zeros(N_prf, 1);
 dgen.x_init_prf(1) = 1;
             
 % generate perfect model transient
-dgen.trunc = 30; % truncate period
+dgen.trunc = 0; % truncate period
 dgen.T = 4000 + dgen.trunc; % total time
 dgen.dt_prf = 0.25; % perfect model time step
 dgen.generate_prf_transient();
@@ -32,8 +32,8 @@ dgen.generate_imp_predictions();
 
 % create experiment class
 expObj = Experiment(dgen);
-expObj.shifts = 4;
-expObj.reps = 1;
+expObj.shifts = 1;
+expObj.reps   = 10;
 expObj.store_state = 'final';
 expObj.nrmse_windowsize = 50;
 expObj.max_preds = round(100 / dgen.dt_imp);
@@ -41,11 +41,12 @@ expObj.max_preds = round(100 / dgen.dt_imp);
 % adjust hyperparam defaults
 expObj.set_default_hyp('ReservoirSize', 1000);
 expObj.set_default_hyp('BlockSize', 1);
-expObj.set_default_hyp('TrainingSamples', 1000);
+expObj.set_default_hyp('TrainingSamples', 12000);
+expObj.set_default_hyp('AverageDegree', 30);
 
 % set experiments
-expObj.add_experiment('ReservoirSize', [500, 1000]);
-% expObj.add_experiment('BlockSize', [1, 4, 16]);
+% expObj.add_experiment('ReservoirSize', [1000]);
+expObj.add_experiment('BlockSize', [1, 2, 4]);
 
 % run experiments
 dir = expObj.run();
@@ -53,5 +54,6 @@ dir = expObj.run();
 % create plot object
 p = Plot(dir);
 p.description = false;
-figure(1);
 p.plot_experiment();
+
+V = expObj.modes.V;

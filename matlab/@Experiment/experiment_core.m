@@ -91,7 +91,7 @@ function [predY, testY, err, esnX] = experiment_core(self)
 
     % reset memory for nrmse
     self.nrmse_memory = struct();
-    verbosity = 1;
+    verbosity = 100;
     for i = 1:Npred
         % model prediction of next time step
         [Pyk, Nk] = self.model.step(yk, dt);
