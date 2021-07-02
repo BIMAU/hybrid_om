@@ -28,7 +28,8 @@ function [] = plot_experiment(self)
 
     H = mdat.hyp_range(exp_ind(xlab_index), :);
     range1 = 1:numel(H);
-    if Nexp == 2
+    range2 = 1:numel(H);
+    if Nexp == 2 && numel(H) > 1
         M = reshape(1:numel(H), Nvalues(1), Nvalues(2));
         if H(2) ~= H(1)
             range1 = M(:);
@@ -39,7 +40,11 @@ function [] = plot_experiment(self)
             M = M';
             range1 = M(:);
         end
+    elseif Nexp > 2
+        warning('undefined behaviour for Nexp = %d', Nexp);
     end
+
+    nums = nums * self.scaling;
 
     for i = 1:Nboxplots
         subrange = range1((i-1)*maxValues+1:i*maxValues);
@@ -53,7 +58,12 @@ function [] = plot_experiment(self)
     xticklabels(mdat.hyp_range(exp_ind(xlab_index), subrange));
     xtickangle(45);
     xlabel(xlab{xlab_index});
-    ylabel(mdat.ylab);
+    
+    if isempty(self.ylab)
+        ylabel(mdat.ylab);
+    else
+        ylabel(self.ylab);
+    end
 
     % for combined experiments and multiple boxplots we need a legend
     if Nexp == 2
@@ -69,7 +79,7 @@ function [] = plot_experiment(self)
         % create description
         descr = self.create_description(mdat);
         ylim([min(ylim), 1.1*max(ylim)])
-        text(min(xlim), (min(ylim)+max(ylim))/2, descr, ...
+        text(min(xlim), max(ylim), descr, ...
              'color', [0,0,0] , 'VerticalAlignment', 'top', ...
              'FontName', 'Monospaced', 'FontSize', 9);
     end

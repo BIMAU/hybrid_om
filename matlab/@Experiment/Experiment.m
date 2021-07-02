@@ -27,6 +27,9 @@ classdef Experiment < handle
 
         % set the window size for the nrs
         nrmse_windowsize = 100;
+        
+        % y-axis label
+        ylab = 'samples';
     end
 
     properties (Access = private)
@@ -195,7 +198,6 @@ classdef Experiment < handle
                     errs{i, j} = err;
 
                     xlab = self.exp_id;
-                    ylab = 'Predicted days';
 
                     % name-value pairs:
                     % add whatever is useful here and use a meaningful name
@@ -204,7 +206,7 @@ classdef Experiment < handle
                               {'exp_id', self.exp_id}, ...
                               {'exp_ind', self.exp_ind}, ...
                               {'xlab', xlab}, ...
-                              {'ylab', ylab}, ...
+                              {'ylab', self.ylab}, ...
                               {'num_predicted', self.num_predicted}, ...
                               {'errs', errs}, ...
                               {'predictions', self.predictions}, ...

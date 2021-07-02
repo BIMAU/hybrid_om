@@ -32,22 +32,21 @@ dgen.generate_imp_predictions();
 
 % create experiment class
 expObj = Experiment(dgen);
-expObj.shifts = 1;
-expObj.reps   = 10;
+expObj.shifts = 30;
+expObj.reps   = 1;
 expObj.store_state = 'final';
 expObj.nrmse_windowsize = 50;
-expObj.max_preds = round(100 / dgen.dt_imp);
+expObj.err_tol = 0.5;
+expObj.max_preds = round(200 / dgen.dt_imp);
 
 % adjust hyperparam defaults
-expObj.set_default_hyp('ReservoirSize', 100);
-expObj.set_default_hyp('BlockSize', 1);
 expObj.set_default_hyp('Alpha', 1);
 expObj.set_default_hyp('TrainingSamples', 12000);
-expObj.set_default_hyp('AverageDegree', 30);
+expObj.set_default_hyp('AverageDegree', 3);
 
 % set experiments
-% expObj.add_experiment('ReservoirSize', [1000]);
-expObj.add_experiment('BlockSize', [1, 2, 4]);
+% expObj.add_experiment('ReservoirSize', [1,500,1000,1500,2000,2500,3000,3500]);
+% expObj.add_experiment('BlockSize', [1,2,4,8]);
 
 % run experiments
 dir = expObj.run();
@@ -55,6 +54,6 @@ dir = expObj.run();
 % create plot object
 p = Plot(dir);
 p.description = true;
+p.scaling = dgen.dt_imp * 0.07;
+p.ylab = 'Valid time';
 p.plot_experiment();
-
-V = expObj.modes.V;

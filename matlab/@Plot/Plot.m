@@ -10,6 +10,11 @@ classdef Plot < handle
         % flag to add hyperparam settings in plot
         description = false;
         
+        % scales the amount of samples
+        scaling = 1.0;
+        
+        % overwrites ylabel prescribed in data
+        ylab = {};
     end
 
     methods (Access = public)
