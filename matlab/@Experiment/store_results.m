@@ -5,7 +5,7 @@ function [dir] = store_results(self, pairs)
         run_type = 'serial';
     end
 
-    dir = sprintf('../data/experiments/%s_%s/', ...
+    dir = sprintf([self.data.base_dir, '/data/experiments/%s_%s/'], ...
                   self.name, run_type);
     
     syscall = sprintf('mkdir -p %s', dir);
@@ -17,7 +17,6 @@ function [dir] = store_results(self, pairs)
         fname = sprintf('%sresults.mat', dir);
     end
 
-    fprintf('saving results to %s\n', fname);
-    
-    Utils.data.save_pairs(fname, pairs);
+    fprintf('saving results to %s\n', fname);    
+    Utils.save_pairs(fname, pairs);
 end

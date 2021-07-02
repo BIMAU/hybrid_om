@@ -42,7 +42,9 @@ classdef DataGen < handle
 
         % save the data to out_file in path
         out_file;
-        out_file_path
+        out_file_path;
+        
+        base_dir = '~/Projects/hybrid_om';
 
         % overwrite the data in out_file if true
         overwrite = false;
@@ -69,10 +71,10 @@ classdef DataGen < handle
             end
 
             % create path
-            self.out_file_path = sprintf('../data/%s/%d_%d/', ...
+            self.out_file_path = sprintf([self.base_dir, '/data/%s/%d_%d/'], ...
                                          self.model_prf.name, ...
                                          self.N_prf, self.N_imp);
-
+            
             syscall = sprintf('mkdir -p %s', self.out_file_path);
             system(syscall);
         end
@@ -92,6 +94,7 @@ classdef DataGen < handle
                 assert(d.T == self.T - self.trunc);
                 self.T = d.T;
             else
+                fprintf('Not existing: %s\n', out_file);
                 time = tic;
                 self.Nt_prf = ceil(self.T / self.dt_prf);
                 self.X      = zeros(self.N_prf, self.Nt_prf);

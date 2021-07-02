@@ -1,22 +1,17 @@
-function [dir] = KS_exp1(pid, procs)
+function [dir] = KS_exp1(varargin)
     
     switch nargin
       case 0
         pid      = 0;
         procs    = 1;
-
       case 2
         pid     = Utils.arg_to_value(varargin{1});
         procs   = Utils.arg_to_value(varargin{2});
-
-      case 3
-        pid     = Utils.arg_to_value(varargin{1});
-        procs   = Utils.arg_to_value(varargin{2});
-        threads = Utils.arg_to_value(varargin{3});
-
       otherwise
         error('Unexpected input');
     end
+    
+    fprintf(' %d  %d \n', pid, procs)
 
     % create and initialize two KS models
     L      = 35;
@@ -51,7 +46,7 @@ function [dir] = KS_exp1(pid, procs)
     dgen.generate_imp_predictions();
 
     % create experiment class
-    expObj = Experiment(dgen);
+    expObj = Experiment(dgen, pid, procs);
     expObj.shifts = 30;
     expObj.reps   = 1;
     expObj.store_state = 'final';
@@ -67,15 +62,16 @@ function [dir] = KS_exp1(pid, procs)
     % set experiments
     % expObj.add_experiment('ReservoirSize', [1,500,1000,1500,2000,2500,3000,3500]);
     % expObj.add_experiment('BlockSize', [1,2,4,8]);
-
+    expObj.add_experiment('ReservoirSize', [10,100,1000]);
     % run experiments
     dir = expObj.run();
 
     % create plot object
-    p = Plot(dir);
-    p.description = true;
-    p.scaling = dgen.dt_imp * 0.07;
-    p.ylab = 'Valid time';
-    p.plot_experiment();
+    
+    %p = Plot(dir);
+    %p.description = true;
+    %p.scaling = dgen.dt_imp * 0.07;
+    %p.ylab = 'Valid time';
+    %p.plot_experiment();
 
 end

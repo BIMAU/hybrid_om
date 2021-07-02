@@ -108,9 +108,9 @@ classdef Experiment < handle
             self.dimension = data.dimension;
 
             switch nargin
-              case 3
+              case 2
                 self.pid = pid;
-              case 4
+              case 3
                 self.pid   = pid;
                 self.procs = procs;
             end
