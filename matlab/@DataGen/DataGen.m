@@ -124,7 +124,7 @@ classdef DataGen < handle
                 pairs = {{'X', self.X}, ...
                          {'Nt_prf', self.Nt_prf}, ...
                          {'T', self.T}};
-                self.save_pairs(out_file, pairs);
+                Utils.save_pairs(out_file, pairs);
             end            
             fprintf('Created time series with %d samples.\n', self.Nt_prf);
         end
@@ -184,7 +184,7 @@ classdef DataGen < handle
                 fprintf('Generate imperfect predictions... done (%f)\n', toc(time));
                 fprintf('Average # Newton iterations: (%f)\n', avg_k / self.Nt_imp);
                 fprintf('Saving predictions to: \n %s \n', out_file);
-                self.save_pairs(out_file, {{'Phi', self.Phi}});
+                Utils.save_pairs(out_file, {{'Phi', self.Phi}});
             end
             fprintf('Created predictions: %d samples.\n', self.Nt_imp);
         end
@@ -222,19 +222,6 @@ classdef DataGen < handle
                 error('this is not implemented and tested yet');
                 % self.R = kron(self.R,self.R);
                 % self.P = 4*self.R';
-            end
-        end
-
-        function save_pairs(self, file, pairs)
-            Np = numel(pairs);
-            for i = 1:Np
-                var = pairs{i}{1};
-                eval([var, ' = pairs{i}{2};'])
-                if (i == 1)
-                    save(file, var)
-                else
-                    save(file, var, '-append')
-                end
             end
         end
     end

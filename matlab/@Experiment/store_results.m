@@ -19,5 +19,5 @@ function [dir] = store_results(self, pairs)
 
     fprintf('saving results to %s\n', fname);
     
-    self.data.save_pairs(fname, pairs);
+    Utils.data.save_pairs(fname, pairs);
 end
