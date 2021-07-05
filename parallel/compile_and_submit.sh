@@ -51,7 +51,7 @@ mpicxx -Wall $interface_src -o interface -lmpi
 
 if [ $on_cluster -eq 1 ]
 then
-    sbatch submit_mpi_experiment.sh
+    sbatch submit_mpi_experiment.sh $output_exec
 else
     mpirun -np 4 ./interface $output_exec
 fi
