@@ -21,13 +21,13 @@ classdef Experiment < handle
         dimension = '1D'; % problem dimension: '1D' or '2D'
 
         err_tol = 0.5; % error tolerance in stopping criterion
-        
+
         % Modes object used for scale separation and order reduction
         modes;
 
         % set the window size for the nrs
         nrmse_windowsize = 100;
-        
+
         % y-axis label
         ylab = 'samples';
     end
@@ -146,7 +146,7 @@ classdef Experiment < handle
                 self.VPhi = self.modes.V' * self.data.Phi;
 
                 Nt = size(self.data.X, 2); % number of time steps in series
-                                          
+
                 % -1 to make sure there is output training data
                 if self.testing_on
                     max_shift = Nt - self.max_preds - self.tr_samples - 1;
@@ -172,10 +172,12 @@ classdef Experiment < handle
                 my_inds = self.my_indices(self.pid, self.procs, Ni);
 
                 for i = my_inds
-                    self.print_hyperparams(j);                    
-                    self.print(' shift: %d/%d repetitions: %d/%d \n', ...
-                               svec(i), self.shifts, rvec(i), self.reps);
-                    
+                    self.print_hyperparams(j);
+                    self.print(' hyp setting: %d/%d shift: %d/%d repetitions: %d/%d \n', ...
+                               j, self.num_hyp_settings, ...
+                               svec(i), self.shifts, ...
+                               rvec(i), self.reps);
+
                     self.train_range = (1:self.tr_samples) + tr_shifts(svec(i));
                     self.test_range  = self.train_range(end) + (1:self.max_preds);
 
@@ -261,11 +263,11 @@ classdef Experiment < handle
 
         [] = add_field_to_memory(self, name, field);
 
-        
+
         [predY, testY, err, esnX] = experiment_core(self);
 
         [stop_flag, err] = stopping_criterion(self, predY, testY);
-        
+
         [dir] = store_results(self, pairs);
     end
 end
