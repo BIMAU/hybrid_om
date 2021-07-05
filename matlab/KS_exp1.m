@@ -56,13 +56,16 @@ function [dir] = KS_exp1(varargin)
 
     % adjust hyperparam defaults
     expObj.set_default_hyp('Alpha', 1);
-    expObj.set_default_hyp('TrainingSamples', 12000);
+    expObj.set_default_hyp('TrainingSamples', 20000);
     expObj.set_default_hyp('AverageDegree', 3);
-
+    expObj.set_default_hyp('RhoMax', 0.4);
+    expObj.set_default_hyp('InputMatrixType', 1);
+    expObj.set_default_hyp('InAmplitude', 1);
+    
     % set experiments
-    % expObj.add_experiment('ReservoirSize', [1,500,1000,1500,2000,2500,3000,3500]);
-    % expObj.add_experiment('BlockSize', [1,2,4,8]);
-    expObj.add_experiment('ReservoirSize', [10,100,1000]);
+    expObj.add_experiment('ReservoirSize', [100, 200, 400, 800, 1600, 3200, 6400]);
+    expObj.add_experiment('BlockSize', [1,2,4]);
+
     % run experiments
     dir = expObj.run();
 
