@@ -11,7 +11,8 @@ function [dir] = KS_exp1(varargin)
         error('Unexpected input');
     end
     
-    fprintf(' %d  %d \n', pid, procs)
+    st = dbstack;
+    fprintf('%s: pid %d  procs %d \n', st.name, pid, procs)
 
     % create and initialize two KS models
     L      = 35;
