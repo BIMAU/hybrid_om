@@ -68,6 +68,7 @@ classdef Experiment < handle
         truths;      % stores all truths
         errors;      % stores the errors
         ESN_states;  % stores snapshots of the ESN state X
+        damping;     % stores SVD damping curves
 
         % generated parameters of for the ESN
         esn_pars;
@@ -181,10 +182,11 @@ classdef Experiment < handle
                     self.train_range = (1:self.tr_samples) + tr_shifts(svec(i));
                     self.test_range  = self.train_range(end) + (1:self.max_preds);
 
-                    [predY, testY, err, esnX] = self.experiment_core();
+                    [predY, testY, err, esnX, damping] = self.experiment_core();
 
                     self.num_predicted(i, j) = size(predY, 1);
 
+                    self.predictions{i, j} = damping;
                     if strcmp(self.store_state, 'all')
                         self.predictions{i, j} = predY(:,:);
                         self.truths{i, j} = testY(:,:);

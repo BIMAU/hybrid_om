@@ -1,4 +1,4 @@
-function [predY, testY, err, esnX] = experiment_core(self)
+function [predY, testY, err, esnX, damping] = experiment_core(self)
 % Core routine for running an experiment
 %   predY:  full dimensional predictions
 %   testY:  full dimensional truths
@@ -67,7 +67,8 @@ function [predY, testY, err, esnX] = experiment_core(self)
     self.print('initialization index: %d\n', init_idx);
 
     clear self.VX self.VPhi;
-
+    
+    damping = 0;
     if self.esn_on
         % enable hybrid input design
         if hybrid
@@ -81,10 +82,10 @@ function [predY, testY, err, esnX] = experiment_core(self)
         esn = ESN(self.esn_pars.Nr, size(trainU,2), size(trainY,2));
         esn.setPars(self.esn_pars);
         esn.initialize;
-        esn.train(trainU, trainY);
+        esn.train(trainU, trainY);        
         esn_state = esn.X(end,:);
         esnX = esn.X;
-        
+        damping = esn.TikhonovDamping;        
     end
 
     clear trainU trainY

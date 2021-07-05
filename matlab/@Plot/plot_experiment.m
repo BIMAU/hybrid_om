@@ -1,4 +1,4 @@
-function [] = plot_experiment(self)
+function [nums] = plot_experiment(self)
 %
 
 % gather data from experiment dir

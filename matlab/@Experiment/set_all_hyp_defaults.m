@@ -57,6 +57,16 @@ function [] = set_all_hyp_defaults(self)
     self.hyp.(name).descr   = ['LB', self.range2str(self.hyp.(name).range)];
     self.hyp.(name).default = 1e-1;
 
+    name = 'WaveletReduction';
+    self.hyp.(name).range   = [1,2,4,8];
+    self.hyp.(name).descr   = ['WB', self.range2str(self.hyp.(name).range)];
+    self.hyp.(name).default = 1;
+
+    name = 'WaveletBlockSize';
+    self.hyp.(name).range   = [2,4,8];
+    self.hyp.(name).descr   = ['WB', self.range2str(self.hyp.(name).range)];
+    self.hyp.(name).default = 8;
+
     % string based options
     name = 'SquaredStates';
     self.hyp.(name).opts    = {'disabled', 'append', 'even'};
