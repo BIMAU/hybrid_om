@@ -27,6 +27,9 @@ function [esn_pars, mod_pars] = distribute_params(self, exp_idx)
     
     esn_pars.reservoirStateInit = ...
         self.hyp.ReservoirStateInit.opts{hyp_id2value('ReservoirStateInit')};
+
+    esn_pars.inputMatrixType = ...
+        self.hyp.InputMatrixType.opts{hyp_id2value('InputMatrixType')};
     
     % finish the modes parameters
     mod_pars.N = self.model.N;

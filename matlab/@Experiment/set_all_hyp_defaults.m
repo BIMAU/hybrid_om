@@ -68,5 +68,11 @@ function [] = set_all_hyp_defaults(self)
     self.hyp.(name).opts    = {'zero', 'random'};
     self.hyp.(name).range   = [1, 2];
     self.hyp.(name).descr   = ['RI', self.range2str(self.hyp.(name).range)];
-    self.hyp.(name).default = 2; 
+    self.hyp.(name).default = 2;
+
+    name = 'InputMatrixType';
+    self.hyp.(name).opts    = {'sparse', 'balancedSparse'};
+    self.hyp.(name).range   = [1, 2];
+    self.hyp.(name).descr   = ['WI', self.range2str(self.hyp.(name).range)];
+    self.hyp.(name).default = 2;
 end
