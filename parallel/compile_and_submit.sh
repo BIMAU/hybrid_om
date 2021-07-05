@@ -25,17 +25,35 @@ then
    export MCR_CACHE_ROOT=`mktemp -d /scratch-local/mcr.XXXXXX`
 fi
 
-output_exec=run
 
-#if ! [[ -s $2/$output_exec ]]
-#then
+# check whether we need to recompile
+recompile=0
+src_name=$1
+md5_tmp=.md5tmp
+m0=$(cat "$md5_tmp")
+m1=$(md5sum "$src_name")
+if [ "${m0:0:32}" != "${m1:0:32}" ]
+then
+    echo "source has changed"
+    echo ${m0:0:32}
+    echo ${m1:0:32}
+    recompile=1
+else
+    echo "source not changed"
+fi
+
+echo $m1 > $md5_tmp
+
+output_exec=run
+if ! [[ -s $2/$output_exec ]] || [ $recompile -eq 1 ]
+then
 mkdir -p $2
-mcc -R -singleCompThread -v -C -m $1 -d $2 -a ../matlab \
+mcc -R -singleCompThread -v -C -m $src_name -d $2 -a ../matlab \
     -a ~/local/matlab -a ~/Projects/ESN/matlab/ESN.m \
     -o $output_exec
-#else
-#    echo "found executable" $2/$output_exec
-#fi
+else
+    echo "found executable" $2/$output_exec
+fi
 
 interface_src=interface.cc
 cp -v $interface_src $2/.

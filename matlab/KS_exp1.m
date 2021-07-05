@@ -69,12 +69,5 @@ function [dir] = KS_exp1(varargin)
     % run experiments
     dir = expObj.run();
 
-    % create plot object
-    
-    %p = Plot(dir);
-    %p.description = true;
-    %p.scaling = dgen.dt_imp * 0.07;
-    %p.ylab = 'Valid time';
-    %p.plot_experiment();
-
+    %
 end
