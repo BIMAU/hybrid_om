@@ -121,8 +121,8 @@ classdef Experiment < handle
 
             self.print('\n')
             self.print('Experiment instance\n')
-            self.print(' \x251C\x2500 procs  = %d \n', self.procs)
-            self.print(' \x2514\x2500 pid    = %d \n', self.pid)
+            self.print(' procs  = %d \n', self.procs)
+            self.print(' pid    = %d \n', self.pid)
 
             self.set_all_hyp_defaults();
         end
