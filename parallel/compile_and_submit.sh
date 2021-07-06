@@ -71,5 +71,5 @@ if [ $on_cluster -eq 1 ]
 then
     sbatch submit_mpi_experiment.sh $output_exec
 else
-    mpirun -np 4 ./interface $output_exec
+    mpirun --oversubscribe -np 10 ./interface $output_exec
 fi

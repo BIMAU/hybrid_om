@@ -48,7 +48,7 @@ function [dir] = KS_exp1(varargin)
 
     % create experiment class
     expObj = Experiment(dgen, pid, procs);
-    expObj.shifts = 50;
+    expObj.shifts = 10;
     expObj.reps   = 1;
     expObj.store_state = 'final';
     expObj.nrmse_windowsize = 50;
@@ -64,13 +64,12 @@ function [dir] = KS_exp1(varargin)
     expObj.set_default_hyp('InAmplitude', 1);
     expObj.set_default_hyp('WaveletBlockSize', 64);
     expObj.set_default_hyp('WaveletReduction', 1);
-    expObj.set_default_hyp('ReservoirSize', 2000);
+    expObj.set_default_hyp('ReservoirSize', 1000);
     
     % set experiments
-    expObj.add_experiment('WaveletReduction', [1,2,4,8,16,32]);
-    expObj.add_experiment('TrainingSamples', [2e4, 5e3]);
+    expObj.add_experiment('WaveletReduction', [1,2,4,8]);
+    expObj.add_experiment('ReservoirSize', [100,200,400,800,1600,3200]);
 
     % run experiments
     dir = expObj.run();
-
 end
