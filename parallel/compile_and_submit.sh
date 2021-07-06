@@ -34,12 +34,12 @@ m0=$(cat "$md5_tmp")
 m1=$(md5sum "$src_name")
 if [ "${m0:0:32}" != "${m1:0:32}" ]
 then
-    echo "source has changed"
+    echo $src_name "has changed"
     echo ${m0:0:32}
     echo ${m1:0:32}
     recompile=1
 else
-    echo "source not changed"
+    echo $src_name "not changed"
 fi
 
 echo $m1 > $md5_tmp
