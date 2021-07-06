@@ -1,7 +1,7 @@
-function [nums] = plot_experiment(self)
+function [nums, mdat] = plot_experiment(self)
 %
-
 % gather data from experiment dir
+
     [errs, nums, pids, mdat] = self.gather_data(self.dir);
     [exp_ind, I] = sort( [mdat.exp_ind{:}]);
     Nexp = numel(exp_ind);

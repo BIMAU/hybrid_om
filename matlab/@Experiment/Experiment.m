@@ -186,7 +186,7 @@ classdef Experiment < handle
 
                     self.num_predicted(i, j) = size(predY, 1);
 
-                    self.predictions{i, j} = damping;
+                    self.damping{i, j} = damping;
                     if strcmp(self.store_state, 'all')
                         self.predictions{i, j} = predY(:,:);
                         self.truths{i, j} = testY(:,:);
@@ -221,7 +221,8 @@ classdef Experiment < handle
                               {'model_on', self.model_on}, ...
                               {'testing_on', self.testing_on}, ...
                               {'esn_pars', self.esn_pars}, ...
-                              {'ESN_states', self.ESN_states} };
+                              {'ESN_states', self.ESN_states}, ... 
+                              {'damping', self.damping} };
 
                     dir = self.store_results(pairs);
                 end
@@ -266,7 +267,7 @@ classdef Experiment < handle
         [] = add_field_to_memory(self, name, field);
 
 
-        [predY, testY, err, esnX] = experiment_core(self);
+        [predY, testY, err, esnX, damping] = experiment_core(self);
 
         [stop_flag, err] = stopping_criterion(self, predY, testY);
 
