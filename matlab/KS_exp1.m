@@ -1,5 +1,5 @@
 function [dir] = KS_exp1(varargin)
-    
+
     switch nargin
       case 0
         pid      = 0;
@@ -48,7 +48,7 @@ function [dir] = KS_exp1(varargin)
 
     % create experiment class
     expObj = Experiment(dgen, pid, procs);
-    expObj.shifts = 10;
+    expObj.shifts = 50;
     expObj.reps   = 1;
     expObj.store_state = 'final';
     expObj.nrmse_windowsize = 50;
