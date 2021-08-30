@@ -10,7 +10,7 @@ function [dir] = KS_exp1(varargin)
       otherwise
         error('Unexpected input');
     end
-    
+
     st = dbstack;
     fprintf('%s: pid %d  procs %d \n', st.name, pid, procs)
 
@@ -34,7 +34,7 @@ function [dir] = KS_exp1(varargin)
     % initial state
     dgen.x_init_prf = zeros(N_prf, 1);
     dgen.x_init_prf(1) = 1;
-    
+
     % generate perfect model transient
     dgen.trunc = 30; % truncate period
     dgen.T = 6000 + dgen.trunc; % total time
@@ -48,7 +48,7 @@ function [dir] = KS_exp1(varargin)
 
     % create experiment class
     expObj = Experiment(dgen, pid, procs);
-    expObj.shifts = 50;
+    expObj.shifts = 100;
     expObj.reps   = 1;
     expObj.store_state = 'final';
     expObj.nrmse_windowsize = 50;
@@ -65,7 +65,7 @@ function [dir] = KS_exp1(varargin)
     expObj.set_default_hyp('WaveletBlockSize', 64);
     expObj.set_default_hyp('WaveletReduction', 1);
     expObj.set_default_hyp('ReservoirSize', 1000);
-    
+
     % set experiments
     expObj.add_experiment('WaveletReduction', [1,2,4,8]);
     expObj.add_experiment('ReservoirSize', [100,200,400,800,1600,3200]);

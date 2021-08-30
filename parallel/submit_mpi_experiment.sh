@@ -2,7 +2,7 @@
 
 #SBATCH --time=12:00:00
 #SBATCH --nodes=1
-#SBATCH --tasks=22
+#SBATCH --tasks=16
 #SBATCH -p normal
 
 if [ "$#" -ne 1 ]; then
@@ -15,4 +15,4 @@ export MCR_CACHE_ROOT=`mktemp -d /scratch-local/mcr.XXXXXX`
 
 echo "running ./interface" $1
 
-srun -n 22 ./interface $1
+srun -n 16 ./interface $1
