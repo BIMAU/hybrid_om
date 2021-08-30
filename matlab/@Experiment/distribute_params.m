@@ -21,8 +21,8 @@ function [esn_pars, mod_pars] = distribute_params(self, exp_idx)
     esn_pars.inAmplitude = hyp_id2value('InAmplitude');
     esn_pars.avgDegree = hyp_id2value('AverageDegree');
     esn_pars.lambda = hyp_id2value('Lambda');
-    esn_pars.waveletReduction = hyp_id2value('WaveletReduction');
-    esn_pars.waveletBlockSize = hyp_id2value('WaveletBlockSize');
+    esn_pars.waveletReduction = hyp_id2value('SVDWaveletReduction');
+    esn_pars.waveletBlockSize = hyp_id2value('SVDWaveletBlockSize');
 
     esn_pars.squaredStates = ...
         self.hyp.SquaredStates.opts{hyp_id2value('SquaredStates')};

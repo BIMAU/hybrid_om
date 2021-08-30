@@ -57,12 +57,12 @@ function [] = set_all_hyp_defaults(self)
     self.hyp.(name).descr   = ['LB', self.range2str(self.hyp.(name).range)];
     self.hyp.(name).default = 1e-1;
 
-    name = 'WaveletReduction';
+    name = 'SVDWaveletReduction';
     self.hyp.(name).range   = [1,2,4,8];
     self.hyp.(name).descr   = ['WB', self.range2str(self.hyp.(name).range)];
     self.hyp.(name).default = 1;
 
-    name = 'WaveletBlockSize';
+    name = 'SVDWaveletBlockSize';
     self.hyp.(name).range   = [2,4,8];
     self.hyp.(name).descr   = ['WB', self.range2str(self.hyp.(name).range)];
     self.hyp.(name).default = 8;
