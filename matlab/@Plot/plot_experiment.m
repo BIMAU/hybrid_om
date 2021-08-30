@@ -1,9 +1,18 @@
 function [nums, mdat] = plot_experiment(self)
 %
 % gather data from experiment dir
-
+    
     [errs, nums, pids, mdat] = self.gather_data(self.dir);
-    [exp_ind, I] = sort( [mdat.exp_ind{:}]);
+    
+    % Failed experiments (usually out of memory) give nans. The whole row
+    % is ignored.
+    plotIds = find(~isnan(sum(nums,2)));
+    if numel(plotIds) ~= size(nums,1)
+        fprintf('ignoring rows with nans\n');
+        nums = nums(plotIds,:);
+    end
+    
+    [exp_ind, I] = sort( [mdat.exp_ind{:}] );
     Nexp = numel(exp_ind);
 
     labels  = [];
