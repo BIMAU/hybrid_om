@@ -62,12 +62,12 @@ function [dir] = KS_exp1(varargin)
     expObj.set_default_hyp('RhoMax', 0.4);
     expObj.set_default_hyp('InputMatrixType', 1);
     expObj.set_default_hyp('InAmplitude', 1);
-    expObj.set_default_hyp('WaveletBlockSize', 64);
-    expObj.set_default_hyp('WaveletReduction', 1);
+    expObj.set_default_hyp('SVDWaveletBlockSize', 64);
+    expObj.set_default_hyp('SVDWaveletReduction', 1);
     expObj.set_default_hyp('ReservoirSize', 1000);
     
     % set experiments
-    expObj.add_experiment('WaveletReduction', [1,2,4,8]);
+    expObj.add_experiment('SVDWaveletReduction', [1,2,4,8]);
     expObj.add_experiment('ReservoirSize', [100,200,400,800,1600,3200]);
 
     % run experiments
