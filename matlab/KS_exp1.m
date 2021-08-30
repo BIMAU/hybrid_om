@@ -10,10 +10,10 @@ function [dir] = KS_exp1(varargin)
       otherwise
         error('Unexpected input');
     end
-
+    
     st = dbstack;
     fprintf('%s: pid %d  procs %d \n', st.name, pid, procs)
-
+    
     % create and initialize two KS models
     L      = 35;
     N_prf  = 128;
@@ -49,7 +49,7 @@ function [dir] = KS_exp1(varargin)
     % create experiment class
     expObj = Experiment(dgen, pid, procs);
     expObj.shifts = 100;
-    expObj.reps   = 1;
+    expObj.reps = 1;
     expObj.store_state = 'final';
     expObj.nrmse_windowsize = 50;
     expObj.err_tol = 0.5;
@@ -60,16 +60,16 @@ function [dir] = KS_exp1(varargin)
     expObj.set_default_hyp('TrainingSamples', 20000);
     expObj.set_default_hyp('AverageDegree', 3);
     expObj.set_default_hyp('RhoMax', 0.4);
-    expObj.set_default_hyp('InputMatrixType', 1);
+    expObj.set_default_hyp('BlockSize', 1);
     expObj.set_default_hyp('InAmplitude', 1);
     expObj.set_default_hyp('SVDWaveletBlockSize', 64);
     expObj.set_default_hyp('SVDWaveletReduction', 1);
     expObj.set_default_hyp('ReservoirSize', 1000);
+    expObj.set_default_hyp('Lambda', 1e-6);
 
     % set experiments
-    expObj.add_experiment('SVDWaveletReduction', [1,2,4,8]);
-    expObj.add_experiment('ReservoirSize', [100,200,400,800,1600,3200]);
-
+    expObj.add_experiment('ReservoirSize', [100,1000,2000,3000,4000,5000,6000]);
+    
     % run experiments
     dir = expObj.run();
 end
