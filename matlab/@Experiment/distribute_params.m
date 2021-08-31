@@ -5,6 +5,9 @@ function [esn_pars, mod_pars] = distribute_params(self, exp_idx)
 % esn_pars: ESN network parameters
 % mod_pars: parameters for the Modes object (scale separation)
 
+% Note: all available hyp settings can be found in
+% set_all_hyp_defaults. Additions should be added there and here.
+
     hyp_id2value = @ (id) ...
         self.hyp_range(self.id2ind(self.hyp_ids, id), exp_idx);
 
@@ -32,6 +35,8 @@ function [esn_pars, mod_pars] = distribute_params(self, exp_idx)
 
     esn_pars.inputMatrixType = ...
         self.hyp.InputMatrixType.opts{hyp_id2value('InputMatrixType')};
+
+    self.set_model_config(self.hyp.ModelConfig.opts{hyp_id2value('ModelConfig')});
 
     % finish the modes parameters
     mod_pars.N = self.model.N;

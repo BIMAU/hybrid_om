@@ -49,6 +49,7 @@ function [nums, mdat] = plot_experiment(self)
             M = M';
             range1 = M(:);
         end
+        
     elseif Nexp > 2
         warning('undefined behaviour for Nexp = %d', Nexp);
     end
@@ -75,7 +76,7 @@ function [nums, mdat] = plot_experiment(self)
     end
 
     % for combined experiments and multiple boxplots we need a legend
-    if Nexp == 2
+    if Nexp >= 2
         str = cell(Nboxplots,1);
         for i = 1:Nboxplots
             value = mdat.hyp_range(exp_ind(I(2)), range2(i));

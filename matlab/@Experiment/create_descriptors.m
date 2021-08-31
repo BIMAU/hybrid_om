@@ -1,4 +1,5 @@
 function create_descriptors(self)
+% create descriptors exp_ind, file_descr and name
     self.hyp_ids = fieldnames(self.hyp);    
 
     self.exp_ind    = [];

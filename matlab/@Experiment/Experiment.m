@@ -126,7 +126,7 @@ classdef Experiment < handle
             self.print(' pid    = %d \n', self.pid)
 
             self.set_all_hyp_defaults();
-        end
+         end
 
         function [dir] = run(self)
             time = tic;
@@ -221,7 +221,7 @@ classdef Experiment < handle
                               {'model_on', self.model_on}, ...
                               {'testing_on', self.testing_on}, ...
                               {'esn_pars', self.esn_pars}, ...
-                              {'ESN_states', self.ESN_states}, ... 
+                              {'ESN_states', self.ESN_states}, ...
                               {'damping', self.damping} };
 
                     dir = self.store_results(pairs);
@@ -247,7 +247,6 @@ classdef Experiment < handle
             self.hyp.(id).descr = [str(1:2), self.range2str(range)];
         end
     end
-
     methods (Access = private)
 
         [] = set_all_hyp_defaults(self);
@@ -271,6 +270,8 @@ classdef Experiment < handle
 
         [stop_flag, err] = stopping_criterion(self, predY, testY);
 
-        [dir] = store_results(self, pairs);
+        [dir] = store_results(self, pairs);        
+        
+        [] = set_model_config(self, value);
     end
 end

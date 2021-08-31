@@ -68,7 +68,8 @@ function [dir] = KS_exp1(varargin)
     expObj.set_default_hyp('Lambda', 1e-6);
 
     % set experiments
-    expObj.add_experiment('ReservoirSize', [100,1000,2000,3000,4000,5000,6000]);
+    expObj.add_experiment('ReservoirSize', [200,400,800,1600,3200,6400]);
+    expObj.add_experiment('ModelConfig', [1,2,3]);
     
     % run experiments
     dir = expObj.run();

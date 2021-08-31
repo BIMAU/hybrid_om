@@ -1,4 +1,5 @@
 function create_hyp_range(self)
+% create the range of hyperparameter settings hyp_range
     self.hyp_ids = fieldnames(self.hyp);    
     evalstr = '';
     for i = 1:numel(self.hyp_ids)

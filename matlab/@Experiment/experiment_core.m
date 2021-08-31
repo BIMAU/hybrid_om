@@ -58,7 +58,7 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
     Npred = numel(self.test_range); % number of prediction steps
     predY = zeros(Npred, dim); % full dimensional predictions
     err   = zeros(Npred, 1); % error array
-    esnX  = [];       % esn state snapshots
+    esnX  = 0; % esn state snapshots
 
     % initial state for the predictions
     init_idx = self.train_range(end)+1;
@@ -107,7 +107,8 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
             elseif esn_only
                 u_in = [self.modes.V' * yk(:)]';
             else
-                error('incorrect model config')
+                fprintf('no model active, doing nothing\n');
+                continue
             end
             
             u_in      = esn.scaleInput(u_in);
