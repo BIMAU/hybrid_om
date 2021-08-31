@@ -105,11 +105,11 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
             if hybrid
                 u_in = [self.modes.V' * yk(:); self.modes.V' * Pyk(:)]';
             elseif esn_only
-                u_in = [self.modes.V' * yk(:)];
+                u_in = [self.modes.V' * yk(:)]';
             else
                 error('incorrect model config')
             end
-
+            
             u_in      = esn.scaleInput(u_in);
             esn_state = esn.update(esn_state, u_in)';
             u_out     = esn.apply(esn_state, u_in);
