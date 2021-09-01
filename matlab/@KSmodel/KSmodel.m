@@ -39,9 +39,11 @@ classdef KSmodel < handle
 
         % Max Newton iterations
         Nkmx = 10;
-        
+
         % Optional modes
-        V 
+        V
+
+        initialized = false;
 
     end
 
@@ -55,7 +57,8 @@ classdef KSmodel < handle
         end
 
         function initialize(self)
-            self.computeMatrices()
+            self.computeMatrices();
+            self.initialized = true;
         end
 
         function computeMatrices(self)
@@ -85,6 +88,7 @@ classdef KSmodel < handle
         function [out] = f(self, y)
         % RHS
             assert(numel(y) == self.N);
+            assert(self.initialized, 'KSmodel not initialized');
 
             out = - (1/self.L)*y.*(self.D1*y) ...
                   - ((1+self.epsilon)/self.L^2)*self.D2*y ...
@@ -101,6 +105,7 @@ classdef KSmodel < handle
         function [out] = J(self, y)
         % Jacobian
             assert(numel(y) == self.N);
+            assert(self.initialized, 'KSmodel not initialized');
 
             dydx = self.D1*y;
             D1y  = sparse(1:self.N, 1:self.N, dydx, self.N, self.N);
@@ -125,11 +130,11 @@ classdef KSmodel < handle
         function [y, k] = step(self, y, dt, frc)
         % perform single step time integration
             ym = y;
-            
+
             if nargin < 4
                 frc = zeros(self.N,1);
             end
-            
+
             % Newton
             for k = 1:self.Nkmx
                 H = self.H(y, dt);
