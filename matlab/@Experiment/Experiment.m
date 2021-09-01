@@ -24,7 +24,7 @@ classdef Experiment < handle
 
         % Modes object used for scale separation and order reduction
         modes;
-        
+
         % Problem identifier
         ident = 'default';
 
@@ -248,6 +248,10 @@ classdef Experiment < handle
             % adjust hyperparam description
             str = self.hyp.(id).descr;
             self.hyp.(id).descr = [str(1:2), self.range2str(range)];
+
+            assert( numel(self.exp_id) <= 2, ...
+                    ['combining 3 or more experiments ', ...
+                     'is not yet supported by the plotting routines'] );
         end
     end
     methods (Access = private)
@@ -273,8 +277,8 @@ classdef Experiment < handle
 
         [stop_flag, err] = stopping_criterion(self, predY, testY);
 
-        [dir] = store_results(self, pairs);        
-        
+        [dir] = store_results(self, pairs);
+
         [] = set_model_config(self, value);
     end
 end

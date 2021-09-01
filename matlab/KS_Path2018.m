@@ -33,7 +33,7 @@ function [dir] = KS_Path2018(varargin)
     expObj = Experiment(dgen, pid, procs);
     
     % add experiment identification
-    expObj.ident = 'Pathak2018repl'
+    expObj.ident = 'Pathak2018repl';
     
     % experimental setup
     expObj.shifts = 100;
