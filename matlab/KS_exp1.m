@@ -1,19 +1,7 @@
 function [dir] = KS_exp1(varargin)
+    
+    [pid, procs] = Utils.input_handling(nargin, varargin);
 
-    switch nargin
-      case 0
-        pid      = 0;
-        procs    = 1;
-      case 2
-        pid     = Utils.arg_to_value(varargin{1});
-        procs   = Utils.arg_to_value(varargin{2});
-      otherwise
-        error('Unexpected input');
-    end
-    
-    st = dbstack;
-    fprintf('%s: pid %d  procs %d \n', st.name, pid, procs)
-    
     % create and initialize two KS models
     L      = 35;
     N_prf  = 128;
@@ -70,7 +58,7 @@ function [dir] = KS_exp1(varargin)
     % set experiments
     expObj.add_experiment('ReservoirSize', [200,400,800,1600,3200,6400]);
     expObj.add_experiment('ModelConfig', [1,2,3]);
-    
+
     % run experiments
     dir = expObj.run();
 end
