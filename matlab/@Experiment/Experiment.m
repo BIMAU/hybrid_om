@@ -24,6 +24,9 @@ classdef Experiment < handle
 
         % Modes object used for scale separation and order reduction
         modes;
+        
+        % Problem identifier
+        ident = 'default';
 
         % set the window size for the nrs
         nrmse_windowsize = 100;

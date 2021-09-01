@@ -1,5 +1,5 @@
 function [dir] = KS_exp1(varargin)
-    
+
     [pid, procs] = Utils.input_handling(nargin, varargin);
 
     % create and initialize two KS models
@@ -36,6 +36,11 @@ function [dir] = KS_exp1(varargin)
 
     % create experiment class
     expObj = Experiment(dgen, pid, procs);
+
+    % add experiment identification
+    expObj.ident = 'KS_exp1';
+
+    %
     expObj.shifts = 100;
     expObj.reps = 1;
     expObj.store_state = 'final';

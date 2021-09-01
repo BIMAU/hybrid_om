@@ -5,8 +5,8 @@ function [dir] = store_results(self, pairs)
         run_type = 'serial';
     end
 
-    dir = sprintf([self.data.base_dir, '/data/experiments/%s_%s/'], ...
-                  self.name, run_type);
+    dir = sprintf([self.data.base_dir, '/data/experiments/%s/%s%s/'], ...
+                  self.ident, self.name, run_type);
     
     syscall = sprintf('mkdir -p %s', dir);
     system(syscall);

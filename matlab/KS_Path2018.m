@@ -31,6 +31,11 @@ function [dir] = KS_Path2018(varargin)
 
     % create experiment class
     expObj = Experiment(dgen, pid, procs);
+    
+    % add experiment identification
+    expObj.ident = 'Pathak2018repl'
+    
+    % experimental setup
     expObj.shifts = 100;
     expObj.reps = 1;
     expObj.store_state = 'final';
