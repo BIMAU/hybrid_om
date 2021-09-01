@@ -145,7 +145,6 @@ classdef DataGen < handle
                 self.X = self.R*self.X; % restrict the transient to the coarse grid
             end
 
-
             self.stride = round(self.dt_imp / self.dt_prf);
             assert( self.stride * self.dt_prf - self.dt_imp < 1e-13 , ...
                     'dt_imp is not an integer multiple of dt_prf');
@@ -160,15 +159,17 @@ classdef DataGen < handle
             self.Nt_imp = size(self.X, 2);
 
             out_file = [self.out_file_path, ...
-                        sprintf('predictions_T=%d_dt=%1.3f_stride=%d_Nt=%d.mat', ...
-                                self.T, self.dt_imp, self.stride, self.Nt_imp)];
+                        sprintf(['predictions_T=%d_dt=%1.3f_', ...
+                                'stride=%d_Nt=%d_epsilon=%1.3f.mat'], ...
+                                self.T, self.dt_imp, self.stride, ...
+                                self.Nt_imp, self.model_imp.epsilon)];
 
             if exist(out_file, 'file') && ~self.overwrite
                 fprintf('Obtain predictions from file: \n %s \n', out_file);
                 d = load(out_file);
                 self.Phi = d.Phi;
             else
-
+                fprintf('Not existing: %s\n', out_file);
                 self.Phi = zeros(self.N_imp, self.Nt_imp);
                 time = tic;
                 fprintf('Generate imperfect predictions... \n');

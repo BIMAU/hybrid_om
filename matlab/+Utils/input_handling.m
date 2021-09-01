@@ -11,5 +11,5 @@ function [pid, procs] = input_handling(n_argin, var_argin)
         error('Unexpected input');
     end
 
-    fprintf('pid %d  procs %d \n', pid, procs)
+    fprintf('pid %d  procs %d \n', pid, procs);
 end
