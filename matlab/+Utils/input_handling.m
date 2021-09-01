@@ -11,7 +11,5 @@ function [pid, procs] = input_handling(n_argin, var_argin)
         error('Unexpected input');
     end
 
-    st = dbstack;
-    fprintf('%s: pid %d  procs %d \n', st.name, pid, procs)
-
+    fprintf('pid %d  procs %d \n', pid, procs)
 end
