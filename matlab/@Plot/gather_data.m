@@ -5,6 +5,8 @@ function [errs, nums, pids, ...
     switch nargin
       case 2
         dir = varargin{1};
+        assert(exist(dir) == 7, ...
+               'experiment directory does not exist');
 
         % number of procs = number of files in dir:
         [~, fc] = system(['ls ', dir, ' -1 | wc -l']);
@@ -44,7 +46,6 @@ function [errs, nums, pids, ...
     end
 
     initialize = true;
-
     for d = 1:procs
         if strcmp(fileNames{d}, 'failedproc')
             continue;
