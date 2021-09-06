@@ -37,7 +37,7 @@ function [esn_pars, mod_pars] = distribute_params(self, exp_idx)
         self.hyp.InputMatrixType.opts{hyp_id2value('InputMatrixType')};
 
     self.model_config = ...
-        set_model_config(self.hyp.ModelConfig.opts{hyp_id2value('ModelConfig')});
+        self.hyp.ModelConfig.opts{hyp_id2value('ModelConfig')};
 
     % finish the modes parameters
     mod_pars.N = self.model.N;
