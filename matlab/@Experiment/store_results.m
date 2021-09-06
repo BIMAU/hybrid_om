@@ -17,6 +17,6 @@ function [dir] = store_results(self, pairs)
         fname = sprintf('%sresults.mat', dir);
     end
 
-    fprintf('saving results to %s\n', fname);    
+    fprintf('  saving results to %s\n', fname);    
     Utils.save_pairs(fname, pairs);
 end
