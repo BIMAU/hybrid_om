@@ -1,5 +1,5 @@
 function [dir] = KS_Path2018(varargin)
-    
+
     [pid, procs] = Utils.input_handling(nargin, varargin);
 
     % epsilon
@@ -31,10 +31,10 @@ function [dir] = KS_Path2018(varargin)
 
     % create experiment class
     expObj = Experiment(dgen, pid, procs);
-    
+
     % add experiment identification
     expObj.ident = 'Pathak2018repl';
-    
+
     % experimental setup
     expObj.shifts = 100;
     expObj.reps = 1;
@@ -61,5 +61,4 @@ function [dir] = KS_Path2018(varargin)
 
     % run experiments
     dir = expObj.run();
-    
 end

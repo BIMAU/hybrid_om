@@ -13,14 +13,14 @@ function [esn_pars, mod_pars] = distribute_params(self, exp_idx)
 
     esn_pars = default_esn_parameters();
 
-    esn_pars.Nr   = hyp_id2value('ReservoirSize');
-    mod_pars.blocksize  = hyp_id2value('BlockSize');
-    self.tr_samples  = hyp_id2value('TrainingSamples');
+    esn_pars.Nr = hyp_id2value('ReservoirSize');
+    mod_pars.blocksize = hyp_id2value('BlockSize');
+    self.tr_samples = hyp_id2value('TrainingSamples');
     mod_pars.red_factor = hyp_id2value('ReductionFactor');
     esn_pars.alpha = hyp_id2value('Alpha');
     esn_pars.rhoMax = hyp_id2value('RhoMax');
     esn_pars.ftAmp = hyp_id2value('FeedthroughAmp');
-    esn_pars.resAmp  = hyp_id2value('ReservoirAmp');
+    esn_pars.resAmp = hyp_id2value('ReservoirAmp');
     esn_pars.inAmplitude = hyp_id2value('InAmplitude');
     esn_pars.avgDegree = hyp_id2value('AverageDegree');
     esn_pars.lambda = hyp_id2value('Lambda');
@@ -36,7 +36,8 @@ function [esn_pars, mod_pars] = distribute_params(self, exp_idx)
     esn_pars.inputMatrixType = ...
         self.hyp.InputMatrixType.opts{hyp_id2value('InputMatrixType')};
 
-    self.set_model_config(self.hyp.ModelConfig.opts{hyp_id2value('ModelConfig')});
+    self.model_config = ...
+        set_model_config(self.hyp.ModelConfig.opts{hyp_id2value('ModelConfig')});
 
     % finish the modes parameters
     mod_pars.N = self.model.N;

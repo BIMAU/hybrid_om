@@ -87,8 +87,8 @@ function [] = set_all_hyp_defaults(self)
     self.hyp.(name).default = 2;
 
     name = 'ModelConfig';
-    self.hyp.(name).opts    = {'model_only', 'esn_only', 'hybrid'};
-    self.hyp.(name).range   = [1, 2, 3];
+    self.hyp.(name).opts    = {'model_only', 'esn_only', 'hybrid_esn', 'dmd_only', 'hybrid_dmd'};
+    self.hyp.(name).range   = [1, 2, 3, 4, 5];
     self.hyp.(name).descr   = ['MC', self.range2str(self.hyp.(name).range)];
     self.hyp.(name).default = 3;
 end

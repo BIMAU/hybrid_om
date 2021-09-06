@@ -9,12 +9,14 @@ classdef Experiment < handle
         shifts = 5;   % shifts in training_range
         reps   = 3;   % repetitions per shift
 
-        max_preds = 10; % prediction barrier (in samples)s
+        max_preds = 10; % prediction barrier (in samples)
 
         testing_on = true; % if true/false we run the prediction with/without
                            % generating errors w.r.t. the truth.
-        esn_on     = true; % enable/disable ESN
-        model_on   = true; % enable/disable physics based model
+
+        % Model configuration. Options: model_only, esn_only, dmd_only,
+        % hybrid_esn, hybrid_dmd.
+        model_config = 'hybrid_esn';
 
         store_state = 'final'; % which state to store: 'all', 'final'
 
@@ -220,9 +222,8 @@ classdef Experiment < handle
                               {'truths', self.truths}, ...
                               {'test_range', self.test_range}, ...
                               {'train_range', self.train_range}, ...
-                              {'esn_on', self.esn_on}, ...
-                              {'model_on', self.model_on}, ...
                               {'testing_on', self.testing_on}, ...
+                              {'model_config', self.model_config}, ...
                               {'esn_pars', self.esn_pars}, ...
                               {'ESN_states', self.ESN_states}, ...
                               {'damping', self.damping} };
@@ -278,7 +279,6 @@ classdef Experiment < handle
         [stop_flag, err] = stopping_criterion(self, predY, testY);
 
         [dir] = store_results(self, pairs);
-
-        [] = set_model_config(self, value);
+        
     end
 end

@@ -17,29 +17,37 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
     % sanity check
     assert(dim == size(self.modes.V,2))
 
-    % three different experiments based on settings
-    hybrid     = logical( (self.esn_on   == true ) && ...
-                          (self.model_on == true ) );
-    esn_only   = logical( (self.esn_on   == true ) && ...
-                          (self.model_on == false) );
-    model_only = logical( (self.esn_on   == false) && ...
-                          (self.model_on == true ) );
+    % There are several different model configurations based on settings
+    % model_only, esn_only, dmd_only, hybrid_esn, hybrid_dmd. DMD is
+    % part of ESN so from the point of view of experiment_core there
+    % are three basic types: hybrid, esn_dmd_only and model_only.
 
+    hybrid = ( strcmp(self.model_config, 'hybrid_esn') || ...
+               strcmp(self.model_config, 'hybrid_dmd') );
+
+    esn_dmd_only = ( strcmp(self.model_config, 'esn_only') || ...
+                     strcmp(self.model_config, 'dmd_only') );
+    
+    model_only = ( strcmp(self.model_config, 'model_only') );
+    
+    % only with model_only the datadriven component ESN/DMD is inactive
+    esn_dmd_active = ~model_only;
+    
     if hybrid
         self.print('Create input/output data for hybrid ESN\n');
         exp_type = 'hybrid';
         U = [self.VX(:, 1:end-1); self.VPhi(:, 1:end-1)];
         Y = [self.VX(:, 2:end)];
-    elseif esn_only
+    elseif esn_dmd_only
         self.print('Create input/output data for standalone ESN\n')
-        exp_type = 'esn_only';
+        exp_type = 'esn_dmd_only';
         U = [self.VX(:, 1:end-1)];
         Y = [self.VX(:, 2:end)];
     elseif model_only
         exp_type = 'model_only';
     end
 
-    if self.esn_on
+    if esn_dmd_active
         assert(self.train_range(end)+1 == self.test_range(1), ...
                'incompatible train and test range');
         trainU = U(:, self.train_range)';
@@ -69,7 +77,7 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
     clear self.VX self.VPhi;
     
     damping = 0;
-    if self.esn_on
+    if esn_dmd_active
         % enable hybrid input design
         if hybrid
             assert(size(trainU,2) == 2*dim, ...
@@ -104,7 +112,7 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
             % create an input vector for the ESN
             if hybrid
                 u_in = [self.modes.V' * yk(:); self.modes.V' * Pyk(:)]';
-            elseif esn_only
+            elseif esn_dmd_only
                 u_in = [self.modes.V' * yk(:)]';
             else
                 fprintf('no model active, doing nothing\n');
