@@ -67,6 +67,16 @@ function [] = set_all_hyp_defaults(self)
     self.hyp.(name).descr   = ['WB', self.range2str(self.hyp.(name).range)];
     self.hyp.(name).default = 8;
 
+    name = 'TimeDelay';
+    self.hyp.(name).range   = [0,1,4];
+    self.hyp.(name).descr   = ['TD', self.range2str(self.hyp.(name).range)];
+    self.hyp.(name).default = 0;
+
+    name = 'TimeDelayShift';
+    self.hyp.(name).range   = [10,100,400];
+    self.hyp.(name).descr   = ['TD', self.range2str(self.hyp.(name).range)];
+    self.hyp.(name).default = 100;
+
     % string based options
     name = 'SquaredStates';
     self.hyp.(name).opts    = {'disabled', 'append', 'even'};
@@ -80,6 +90,12 @@ function [] = set_all_hyp_defaults(self)
     self.hyp.(name).descr   = ['RI', self.range2str(self.hyp.(name).range)];
     self.hyp.(name).default = 2;
 
+    name = 'ScalingType';
+    self.hyp.(name).opts    = {'none', 'minMax1', 'minMax2', 'minMaxAll', 'standardize'};
+    self.hyp.(name).range   = [1:5];
+    self.hyp.(name).descr   = ['ST', self.range2str(self.hyp.(name).range)];
+    self.hyp.(name).default = 5;
+
     name = 'InputMatrixType';
     self.hyp.(name).opts    = {'sparse', 'balancedSparse'};
     self.hyp.(name).range   = [1, 2];
@@ -87,8 +103,12 @@ function [] = set_all_hyp_defaults(self)
     self.hyp.(name).default = 2;
 
     name = 'ModelConfig';
-    self.hyp.(name).opts    = {'model_only', 'esn_only', 'hybrid_esn', 'dmd_only', 'hybrid_dmd'};
-    self.hyp.(name).range   = [1, 2, 3, 4, 5];
+    self.hyp.(name).opts = ... 
+        {'model_only', 'esn_only', 'dmd_only', ...
+         'hybrid_esn', 'hybrid_dmd', 'corr_only', ...
+         'esn_plus_dmd', 'hybrid_esn_dmd'};
+    
+    self.hyp.(name).range   = [3];
     self.hyp.(name).descr   = ['MC', self.range2str(self.hyp.(name).range)];
     self.hyp.(name).default = 3;
 end

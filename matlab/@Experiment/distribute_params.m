@@ -6,7 +6,8 @@ function [esn_pars, mod_pars] = distribute_params(self, exp_idx)
 % mod_pars: parameters for the Modes object (scale separation)
 
 % Note: all available hyp settings can be found in
-% set_all_hyp_defaults. Additions should be added there and here.
+% set_all_hyp_defaults. Additions are added there, here we redirect
+% them.
 
     hyp_id2value = @ (id) ...
         self.hyp_range(self.id2ind(self.hyp_ids, id), exp_idx);
@@ -14,9 +15,15 @@ function [esn_pars, mod_pars] = distribute_params(self, exp_idx)
     esn_pars = default_esn_parameters();
 
     esn_pars.Nr = hyp_id2value('ReservoirSize');
+
     mod_pars.blocksize = hyp_id2value('BlockSize');
-    self.tr_samples = hyp_id2value('TrainingSamples');
     mod_pars.red_factor = hyp_id2value('ReductionFactor');
+
+    self.tr_samples = hyp_id2value('TrainingSamples');
+
+    self.model_config = ...
+        self.hyp.ModelConfig.opts{hyp_id2value('ModelConfig')}
+
     esn_pars.alpha = hyp_id2value('Alpha');
     esn_pars.rhoMax = hyp_id2value('RhoMax');
     esn_pars.ftAmp = hyp_id2value('FeedthroughAmp');
@@ -26,6 +33,8 @@ function [esn_pars, mod_pars] = distribute_params(self, exp_idx)
     esn_pars.lambda = hyp_id2value('Lambda');
     esn_pars.waveletReduction = hyp_id2value('SVDWaveletReduction');
     esn_pars.waveletBlockSize = hyp_id2value('SVDWaveletBlockSize');
+    esn_pars.timeDelay = hyp_id2value('TimeDelay');
+    esn_pars.timeDelayShift = hyp_id2value('TimeDelayShift');
 
     esn_pars.squaredStates = ...
         self.hyp.SquaredStates.opts{hyp_id2value('SquaredStates')};
@@ -36,8 +45,14 @@ function [esn_pars, mod_pars] = distribute_params(self, exp_idx)
     esn_pars.inputMatrixType = ...
         self.hyp.InputMatrixType.opts{hyp_id2value('InputMatrixType')};
 
-    self.model_config = ...
-        self.hyp.ModelConfig.opts{hyp_id2value('ModelConfig')};
+    esn_pars.scalingType = ...
+        self.hyp.ScalingType.opts{hyp_id2value('ScalingType')};
+
+    % The ESN goes into pure DMD mode for the following model
+    % configurations:
+    esn_pars.dmdMode = ( strcmp(self.model_config, 'dmd_only') || ...
+                         strcmp(self.model_config, 'hybrid_dmd') || ...
+                         strcmp(self.model_config, 'corr_only') );
 
     % finish the modes parameters
     mod_pars.N = self.model.N;
@@ -61,4 +76,5 @@ function [pars_out] = default_esn_parameters()
     pars_out.inAmplitude        = 1.0;
     pars_out.waveletBlockSize   = 1.0;
     pars_out.waveletReduction   = 1.0;
+    pars_out.dmdMode            = false;
 end
