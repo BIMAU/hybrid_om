@@ -14,8 +14,7 @@ classdef Experiment < handle
         testing_on = true; % if true/false we run the prediction with/without
                            % generating errors w.r.t. the truth.
 
-        % Model configuration. Options: model_only, esn_only, dmd_only,
-        % hybrid_esn, hybrid_dmd.
+        % Model configuration.
         model_config = 'hybrid_esn';
 
         store_state = 'final'; % which state to store: 'all', 'final'
@@ -279,6 +278,6 @@ classdef Experiment < handle
         [stop_flag, err] = stopping_criterion(self, predY, testY);
 
         [dir] = store_results(self, pairs);
-        
+
     end
 end

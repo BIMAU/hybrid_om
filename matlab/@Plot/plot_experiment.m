@@ -1,8 +1,9 @@
-function [nums, mdat] = plot_experiment(self)
+function [nums, mdat, preds, truths] = plot_experiment(self)
 %
 % gather data from experiment dir
     
-    [errs, nums, pids, mdat] = self.gather_data(self.dir);
+    [errs, nums, pids, mdat, preds, truths] = ...
+        self.gather_data(self.dir);
     
     % Failed experiments (usually out of memory) give nans. The whole row
     % is ignored.
