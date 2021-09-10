@@ -23,7 +23,7 @@ classdef Plot < handle
             self.dir = dir;
         end
 
-        [nums, mdat] = plot_experiment(self);
+        [nums, mdat, preds, truths] = plot_experiment(self);
     end
 
     methods (Access = private)
