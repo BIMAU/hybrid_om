@@ -18,33 +18,39 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
     assert(dim == size(self.modes.V,2))
 
     % There are several different model configurations based on settings
-    % model_only, esn_only, dmd_only, hybrid_esn, hybrid_dmd. DMD is
-    % part of ESN so from the point of view of experiment_core there
-    % are three basic types: hybrid, esn_dmd_only and model_only.
+    % model_only, esn_only, dmd_only, hybrid_esn, hybrid_dmd,
+    % corr_only, esn_plus_dmd. DMD is part of ESN so from the point of
+    % view of experiment_core there are four basic types: hybrid,
+    % esn_or_dmd_only, model_only, corr_only.
 
-    hybrid = ( strcmp(self.model_config, 'hybrid_esn') || ...
-               strcmp(self.model_config, 'hybrid_dmd') );
+    hybrid_esn = ( strcmp(self.model_config, 'hybrid_esn') );
+    hybrid_dmd = ( strcmp(self.model_config, 'hybrid_dmd') );
 
-    esn_dmd_only = ( strcmp(self.model_config, 'esn_only') || ...
-                     strcmp(self.model_config, 'dmd_only') );
-    
+    esn_only = ( strcmp(self.model_config, 'esn_only') );
+    dmd_only = ( strcmp(self.model_config, 'dmd_only') );
+
     model_only = ( strcmp(self.model_config, 'model_only') );
-    
+    corr_only = ( strcmp(self.model_config, 'corr_only') );
+
+    esn_plus_dmd = ( strcmp(self.model_config, 'esn_plus_dmd') );
+    hybrid_esn_dmd = ( strcmp(self.model_config, 'hybrid_esn_dmd') );
+
     % only with model_only the datadriven component ESN/DMD is inactive
     esn_dmd_active = ~model_only;
-    
-    if hybrid
+
+    if hybrid_esn || hybrid_dmd || hybrid_esn_dmd
         self.print('Create input/output data for hybrid ESN\n');
-        exp_type = 'hybrid';
         U = [self.VX(:, 1:end-1); self.VPhi(:, 1:end-1)];
         Y = [self.VX(:, 2:end)];
-    elseif esn_dmd_only
+    elseif esn_only || dmd_only || esn_plus_dmd
         self.print('Create input/output data for standalone ESN\n')
-        exp_type = 'esn_dmd_only';
         U = [self.VX(:, 1:end-1)];
         Y = [self.VX(:, 2:end)];
+    elseif corr_only
+        self.print('Create input/output to only fit the correction\n')
+        U = [self.VPhi(:, 1:end-1)];
+        Y = [self.VX(:, 2:end)];
     elseif model_only
-        exp_type = 'model_only';
     end
 
     if esn_dmd_active
@@ -75,25 +81,41 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
     self.print('initialization index: %d\n', init_idx);
 
     clear self.VX self.VPhi;
-    
-    damping = 0;
+
+    damping = 0; % Tikhonov damping array
+
     if esn_dmd_active
-        % enable hybrid input design
-        if hybrid
+        % setup of different feedthroughs
+        if hybrid_esn
             assert(size(trainU,2) == 2*dim, ...
                    'inconsistent hybrid input dimension');
             self.esn_pars.feedThrough = true;
             self.esn_pars.ftRange     = dim+1:2*dim;
+        elseif hybrid_dmd || hybrid_esn_dmd
+            assert(size(trainU,2) == 2*dim, ...
+                   'inconsistent hybrid input dimension');
+            self.esn_pars.feedThrough = true;
+            self.esn_pars.ftRange     = 1:2*dim;
+        elseif esn_plus_dmd || dmd_only || corr_only
+            assert(size(trainU,2) == dim, ...
+                   'inconsistent input dimension');
+            self.esn_pars.feedThrough = true;
+            self.esn_pars.ftRange     = 1:dim;
         end
 
         % create ESN, train the ESN and save the final state
         esn = ESN(self.esn_pars.Nr, size(trainU,2), size(trainY,2));
         esn.setPars(self.esn_pars);
         esn.initialize;
-        esn.train(trainU, trainY);        
-        esn_state = esn.X(end,:);
-        esnX = esn.X;
-        damping = esn.TikhonovDamping;        
+        esn.train(trainU, trainY);
+
+        if ~isempty(esn.X)
+            esn_state = esn.X(end,:);
+        else
+            esn_state = [];
+        end
+
+        damping = esn.TikhonovDamping;
     end
 
     clear trainU trainY
@@ -110,20 +132,21 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
             yk = Pyk;
         else
             % create an input vector for the ESN
-            if hybrid
+            if hybrid_esn || hybrid_dmd || hybrid_esn_dmd
                 u_in = [self.modes.V' * yk(:); self.modes.V' * Pyk(:)]';
-            elseif esn_dmd_only
+            elseif esn_only || dmd_only || esn_plus_dmd
                 u_in = [self.modes.V' * yk(:)]';
+            elseif corr_only
+                u_in = [self.modes.V' * Pyk(:)]';
             else
                 fprintf('no model active, doing nothing\n');
                 continue
             end
-            
+
             u_in      = esn.scaleInput(u_in);
             esn_state = esn.update(esn_state, u_in)';
             u_out     = esn.apply(esn_state, u_in);
             u_out     = esn.unscaleOutput(u_out);
-
             % transform ESN prediction back to the state space
             yk = self.modes.V * u_out(:);
 
@@ -141,13 +164,12 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
                 self.stopping_criterion(predY(i,:), testY(i,:));
         end
 
-
         if (mod(i,verbosity) == 0) || (i == Npred) || stop
             self.print(['prediction step %4d/%4d, Newton iterations %d,',...
-                        'error %1.2e, %s\n'], ...
-                       i, Npred, Nk, err(i), exp_type);
+                        'error %1.2e\n'], ...
+                       i, Npred, Nk, err(i));
         end
-        
+
         if stop
             break;
         end
