@@ -103,12 +103,18 @@ function [] = set_all_hyp_defaults(self)
     self.hyp.(name).default = 2;
 
     name = 'ModelConfig';
-    self.hyp.(name).opts = ... 
+    self.hyp.(name).opts = ...
         {'model_only', 'esn_only', 'dmd_only', ...
          'hybrid_esn', 'hybrid_dmd', 'corr_only', ...
          'esn_plus_dmd', 'hybrid_esn_dmd'};
-    
     self.hyp.(name).range   = [3];
     self.hyp.(name).descr   = ['MC', self.range2str(self.hyp.(name).range)];
     self.hyp.(name).default = 3;
+
+    name = 'ScaleSeparation';
+    self.hyp.(name).opts = ...
+        {'none', 'wavelet', 'dmd', 'pod'};
+    self.hyp.(name).range   = [1:4];
+    self.hyp.(name).descr   = ['MC', self.range2str(self.hyp.(name).range)];
+    self.hyp.(name).default = 1;
 end

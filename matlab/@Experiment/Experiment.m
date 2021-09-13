@@ -17,6 +17,9 @@ classdef Experiment < handle
         % Model configuration.
         model_config = 'hybrid_esn';
 
+        % Scale separation (modes)
+        scale_separation = 'none';
+
         store_state = 'final'; % which state to store: 'all', 'final'
 
         dimension = '1D'; % problem dimension: '1D' or '2D'
@@ -144,7 +147,7 @@ classdef Experiment < handle
             for j = 1:self.num_hyp_settings
 
                 [self.esn_pars, mod_pars] = self.distribute_params(j);
-                self.modes = Modes('wavelet', mod_pars);
+                self.modes = Modes(self.scale_separation, mod_pars, self.data);
 
                 self.print('transform input/output data with wavelet modes\n');
                 self.VX   = self.modes.V' * self.data.X;

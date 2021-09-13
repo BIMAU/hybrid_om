@@ -27,7 +27,7 @@ classdef Modes < handle
     end
 
     methods
-        function self = Modes(type, pars)
+        function self = Modes(type, pars, data)
         % constructor
 
             self.scale_separation = type;
@@ -39,6 +39,12 @@ classdef Modes < handle
                                             self.nun);
             elseif strcmp(self.scale_separation, 'pod')
                 error('not implemented (yet)')
+            elseif strcmp(self.scale_separation, 'dmd')
+                keyboard
+            elseif strcmp(self.scale_separation, 'none')
+                % return identity
+                keyboard
+                % self.V = speye(
             else
                 error('unexpected input')
             end

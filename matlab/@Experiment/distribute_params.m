@@ -22,7 +22,10 @@ function [esn_pars, mod_pars] = distribute_params(self, exp_idx)
     self.tr_samples = hyp_id2value('TrainingSamples');
 
     self.model_config = ...
-        self.hyp.ModelConfig.opts{hyp_id2value('ModelConfig')}
+        self.hyp.ModelConfig.opts{hyp_id2value('ModelConfig')};
+
+    self.scale_separation = ...
+        self.hyp.ScaleSeparation.opts{hyp_id2value('ScaleSeparation')};
 
     esn_pars.alpha = hyp_id2value('Alpha');
     esn_pars.rhoMax = hyp_id2value('RhoMax');
