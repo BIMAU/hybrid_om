@@ -125,7 +125,15 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
     verbosity = 100;
     for i = 1:Npred
         % model prediction of next time step
-        [Pyk, Nk] = self.model.step(yk, dt);
+        try
+            [Pyk, Nk] = self.model.step(yk, dt);
+        catch ME
+            % if a time step fails, stop this run and fill the error array
+            fprintf([ME.message, '\n']);
+            err(i:end) = 999;
+            i = Npred;
+            break;
+        end
 
         if model_only
             % result is not adapted
