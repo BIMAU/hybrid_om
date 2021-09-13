@@ -153,5 +153,10 @@ classdef KSmodel < handle
                 throw(ME);
             end
         end
+        
+        function [par] = control_param(self)
+        % return control parameter
+            par = self.epsilon;
+        end
     end
 end

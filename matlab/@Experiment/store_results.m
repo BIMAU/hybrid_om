@@ -5,9 +5,10 @@ function [dir] = store_results(self, pairs)
         run_type = 'serial';
     end
 
-    dir = sprintf([self.data.base_dir, '/data/experiments/%s/%s%s/'], ...
-                  self.ident, self.name, run_type);
-    
+    ctrlpar_str = sprintf('_param_%1.2e', self.model.control_param());
+    dir = sprintf([self.data.base_dir, '/data/experiments/%s/%s%s%s/'], ...
+                  self.ident, self.name, run_type, ctrlpar_str);
+
     syscall = sprintf('mkdir -p %s', dir);
     system(syscall);
 
@@ -17,6 +18,6 @@ function [dir] = store_results(self, pairs)
         fname = sprintf('%sresults.mat', dir);
     end
 
-    fprintf('  saving results to %s\n', fname);    
+    fprintf('  saving results to %s\n', fname);
     Utils.save_pairs(fname, pairs);
 end
