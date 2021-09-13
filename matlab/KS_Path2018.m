@@ -49,7 +49,7 @@ function [dir] = KS_Path2018(varargin)
     expObj.set_default_hyp('TrainingSamples', 20000);
     expObj.set_default_hyp('AverageDegree', 3);
     expObj.set_default_hyp('RhoMax', 0.4);
-    expObj.set_default_hyp('BlockSize', 1);
+    expObj.set_default_hyp('BlockSize', 8);
     expObj.set_default_hyp('InAmplitude', 1);
     expObj.set_default_hyp('SVDWaveletBlockSize', 1);
     expObj.set_default_hyp('SVDWaveletReduction', 1);
@@ -57,7 +57,14 @@ function [dir] = KS_Path2018(varargin)
     expObj.set_default_hyp('Lambda', 1e-6);
     expObj.set_default_hyp('TimeDelay', 0);
     expObj.set_default_hyp('TimeDelayShift', 100);
-    expObj.set_default_hyp('ScalingType', 1);
+    expObj.set_default_hyp('ScalingType', 3);
+
+    % Scale separation (modes) options:
+    % (1) none
+    % (2) wavelet
+    % (3) dmd
+    % (4) pod
+    expObj.set_default_hyp('ScaleSeparation',3);
 
     % Model configuration options:
     % (1) model_only
@@ -68,12 +75,14 @@ function [dir] = KS_Path2018(varargin)
     % (6) corr_only
     % (7) esn_plus_dmd
     % (8) hybrid_esn_dmd
-    expObj.set_default_hyp('ModelConfig', 5);
+    expObj.set_default_hyp('ModelConfig', 4);
 
-    expObj.add_experiment('TimeDelay', [0,1]);
+    expObj.add_experiment('ScaleSeparation', [3,2]);
+
+    % expObj.add_experiment('TimeDelay', [0,1]);
     % expObj.add_experiment('ReservoirSize', [200,400,800,1600,3200,6400]);
     %expObj.add_experiment('ReservoirSize', [250,500,1000]);
-    expObj.add_experiment('ScalingType', [1:5]);
+    % expObj.add_experiment('ScalingType', [1:5]);
 
     % run experiments
     dir = expObj.run();
