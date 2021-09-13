@@ -27,7 +27,7 @@ classdef Modes < handle
     end
 
     methods
-        function self = Modes(type, pars, data)
+        function self = Modes(type, pars, data, train_range)
         % constructor
 
             self.scale_separation = type;
@@ -38,13 +38,12 @@ classdef Modes < handle
                                             self.dimension,...
                                             self.nun);
             elseif strcmp(self.scale_separation, 'pod')
-                error('not implemented (yet)')
+                self.V = self.build_pod(data, train_range);
             elseif strcmp(self.scale_separation, 'dmd')
-                keyboard
+                self.V = self.build_dmd(data, train_range);
             elseif strcmp(self.scale_separation, 'none')
                 % return identity
-                keyboard
-                % self.V = speye(
+                self.V = speye(self.N, self.N);
             else
                 error('unexpected input')
             end
@@ -52,6 +51,21 @@ classdef Modes < handle
             if self.red_factor ~= 1
                 error('option not implemented (yet)');
             end
+        end
+        
+        function [Ph] = build_dmd(self, data, train_range)
+            X = data.X(:,train_range(1):train_range(end)-1);
+            Xp = data.X(:,train_range(2):train_range(end));
+            [U,S,V] = svd(X, 'econ');
+            invS = sparse(diag(1./diag(S)));
+            A = U'*Xp*V*invS;
+            [V,D] = eig(A);
+            V = V(:,1:16);
+            Ph = U*V;
+        end
+
+        function [U] = build_pod(self, data, train_range)
+            [U,S,V] = svd(data.X(:,train_range), 'econ');
         end
 
         function [] = set_parameters(self, pars)
@@ -191,10 +205,6 @@ classdef Modes < handle
                 dim = size(W,1);
             end
             W = sparse(W);
-        end
-
-        function build_pod(self)
-        %$#TODO
         end
     end
 end

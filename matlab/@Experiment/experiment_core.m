@@ -35,7 +35,7 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
     esn_plus_dmd = ( strcmp(self.model_config, 'esn_plus_dmd') );
     hybrid_esn_dmd = ( strcmp(self.model_config, 'hybrid_esn_dmd') );
 
-    % only with model_only the datadriven component ESN/DMD is inactive
+    % only with model_only is the datadriven component ESN/DMD inactive
     esn_dmd_active = ~model_only;
 
     if hybrid_esn || hybrid_dmd || hybrid_esn_dmd
@@ -70,7 +70,7 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
     end
 
     Npred = numel(self.test_range); % number of prediction steps
-    predY = zeros(Npred, dim); % full dimensional predictions
+    predY = zeros(Npred, size(self.modes.V,1)); % full dimensional predictions
     err   = zeros(Npred, 1); % error array
     esnX  = 0; % esn state snapshots
 
@@ -162,7 +162,6 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
             % combine ESN prediction with model prediction
             % yk = yk + Vc*(Vc'*Pyk); % TODO
         end
-
         % store result
         predY(i,:) = yk;
 

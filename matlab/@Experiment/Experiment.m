@@ -147,11 +147,6 @@ classdef Experiment < handle
             for j = 1:self.num_hyp_settings
 
                 [self.esn_pars, mod_pars] = self.distribute_params(j);
-                self.modes = Modes(self.scale_separation, mod_pars, self.data);
-
-                self.print('transform input/output data with wavelet modes\n');
-                self.VX   = self.modes.V' * self.data.X;
-                self.VPhi = self.modes.V' * self.data.Phi;
 
                 Nt = size(self.data.X, 2); % number of time steps in series
 
@@ -188,6 +183,18 @@ classdef Experiment < handle
 
                     self.train_range = (1:self.tr_samples) + tr_shifts(svec(i));
                     self.test_range  = self.train_range(end) + (1:self.max_preds);
+
+                    self.print('create scale separation modes: %s\n', ...
+                               self.scale_separation);
+
+                    self.modes = Modes(self.scale_separation, mod_pars, ...
+                                       self.data, self.train_range);
+
+                    self.print('transform input/output data with modes: %s\n', ...
+                               self.scale_separation);
+
+                    self.VX   = self.modes.V' * self.data.X;
+                    self.VPhi = self.modes.V' * self.data.Phi;
 
                     [predY, testY, err, esnX, damping] = self.experiment_core();
 
