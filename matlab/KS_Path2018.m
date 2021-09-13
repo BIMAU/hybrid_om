@@ -55,20 +55,26 @@ function [dir] = KS_Path2018(varargin)
     expObj.set_default_hyp('SVDWaveletReduction', 1);
     expObj.set_default_hyp('ReservoirSize', 128);
     expObj.set_default_hyp('Lambda', 1e-6);
-    expObj.set_default_hyp('TimeDelay', 1);
+    expObj.set_default_hyp('TimeDelay', 0);
     expObj.set_default_hyp('TimeDelayShift', 100);
-    expObj.set_default_hyp('ScalingType', 5);
-    
-    % Model configuration options: (1) model_only, (2) esn_only, (3)
-    % dmd_only, (4) hybrid_esn, (5) hybrid_dmd, (6) corr_only, (7)
-    % esn_plus_dmd, (8) hybrid_esn_dmd
+    expObj.set_default_hyp('ScalingType', 1);
 
+    % Model configuration options:
+    % (1) model_only
+    % (2) esn_only
+    % (3) dmd_only
+    % (4) hybrid_esn
+    % (5) hybrid_dmd
+    % (6) corr_only
+    % (7) esn_plus_dmd
+    % (8) hybrid_esn_dmd
     expObj.set_default_hyp('ModelConfig', 5);
 
-    % expObj.add_experiment('ReservoirSize', [200,400,800,1600,3200,6400]);
-
     expObj.add_experiment('TimeDelay', [0,1]);
-    
+    % expObj.add_experiment('ReservoirSize', [200,400,800,1600,3200,6400]);
+    %expObj.add_experiment('ReservoirSize', [250,500,1000]);
+    expObj.add_experiment('ScalingType', [1:5]);
+
     % run experiments
     dir = expObj.run();
 end

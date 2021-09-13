@@ -147,6 +147,7 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
             esn_state = esn.update(esn_state, u_in)';
             u_out     = esn.apply(esn_state, u_in);
             u_out     = esn.unscaleOutput(u_out);
+
             % transform ESN prediction back to the state space
             yk = self.modes.V * u_out(:);
 
