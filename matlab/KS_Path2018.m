@@ -3,7 +3,7 @@ function [dir] = KS_Path2018(varargin)
     [pid, procs] = Utils.input_handling(nargin, varargin);
 
     % epsilon
-    epsilon = 0.1;
+    epsilon = 1;
 
     % create and initialize two KS models
     L      = 35;
@@ -36,20 +36,19 @@ function [dir] = KS_Path2018(varargin)
     expObj.ident = 'Pathak2018repl';
 
     % experimental setup
-    expObj.shifts = 10;
+    expObj.shifts = 5;
     expObj.reps = 1;
     expObj.store_state = 'final';
     expObj.nrmse_windowsize = 50;
     expObj.err_tol = 0.5;
     expObj.max_preds = round(200 / dgen.dt_imp);
-    %expObj.max_preds = 200
 
     % adjust hyperparam defaults
     expObj.set_default_hyp('Alpha', 1);
     expObj.set_default_hyp('TrainingSamples', 20000);
     expObj.set_default_hyp('AverageDegree', 3);
     expObj.set_default_hyp('RhoMax', 0.4);
-    expObj.set_default_hyp('BlockSize', 8);
+    expObj.set_default_hyp('BlockSize', 1);
     expObj.set_default_hyp('InAmplitude', 1);
     expObj.set_default_hyp('SVDWaveletBlockSize', 1);
     expObj.set_default_hyp('SVDWaveletReduction', 1);
@@ -57,6 +56,13 @@ function [dir] = KS_Path2018(varargin)
     expObj.set_default_hyp('Lambda', 1e-6);
     expObj.set_default_hyp('TimeDelay', 0);
     expObj.set_default_hyp('TimeDelayShift', 100);
+
+    % Scaling of the data:
+    % (1) none
+    % (2) minMax1
+    % (3) minMax2
+    % (4) minMaxAll
+    % (5) standardize
     expObj.set_default_hyp('ScalingType', 3);
 
     % Scale separation (modes) options:
@@ -64,7 +70,7 @@ function [dir] = KS_Path2018(varargin)
     % (2) wavelet
     % (3) dmd
     % (4) pod
-    expObj.set_default_hyp('ScaleSeparation',3);
+    expObj.set_default_hyp('ScaleSeparation',1);
 
     % Model configuration options:
     % (1) model_only
@@ -75,14 +81,9 @@ function [dir] = KS_Path2018(varargin)
     % (6) corr_only
     % (7) esn_plus_dmd
     % (8) hybrid_esn_dmd
-    expObj.set_default_hyp('ModelConfig', 4);
+    expObj.add_experiment('ModelConfig', [1,2,4,5,6,8]);
 
-    expObj.add_experiment('ScaleSeparation', [3,2]);
-
-    % expObj.add_experiment('TimeDelay', [0,1]);
-    % expObj.add_experiment('ReservoirSize', [200,400,800,1600,3200,6400]);
-    %expObj.add_experiment('ReservoirSize', [250,500,1000]);
-    % expObj.add_experiment('ScalingType', [1:5]);
+    expObj.add_experiment('ReservoirSize', [200,400,800,1600,3200,6400]);
 
     % run experiments
     dir = expObj.run();
