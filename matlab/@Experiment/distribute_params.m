@@ -34,6 +34,7 @@ function [esn_pars, mod_pars] = distribute_params(self, exp_idx)
     esn_pars.inAmplitude = hyp_id2value('InAmplitude');
     esn_pars.avgDegree = hyp_id2value('AverageDegree');
     esn_pars.lambda = hyp_id2value('Lambda');
+    esn_pars.fCutoff = hyp_id2value('FilterCutoff');
     esn_pars.waveletReduction = hyp_id2value('SVDWaveletReduction');
     esn_pars.waveletBlockSize = hyp_id2value('SVDWaveletBlockSize');
     esn_pars.timeDelay = hyp_id2value('TimeDelay');
