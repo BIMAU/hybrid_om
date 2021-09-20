@@ -108,10 +108,12 @@ function [] = set_all_hyp_defaults(self)
     self.hyp.(name).default = 5;
 
     name = 'InputMatrixType';
-    self.hyp.(name).opts    = {'sparse', 'balancedSparse'};
+    self.hyp.(name).opts    = ...
+        {'sparse', 'sparseOnes', ...
+         'balancedSparse', 'full', 'identity'};
     self.hyp.(name).range   = [1, 2];
     self.hyp.(name).descr   = ['WI', self.range2str(self.hyp.(name).range)];
-    self.hyp.(name).default = 2;
+    self.hyp.(name).default = 3;
 
     name = 'ModelConfig';
     self.hyp.(name).opts = ...
