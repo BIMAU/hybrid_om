@@ -58,9 +58,9 @@ function [] = set_all_hyp_defaults(self)
     self.hyp.(name).default = 1e-1;
 
     name = 'FilterCutoff';
-    self.hyp.(name).range   = [1e-1];
+    self.hyp.(name).range   = [1e-2];
     self.hyp.(name).descr   = ['FC', self.range2str(self.hyp.(name).range)];
-    self.hyp.(name).default = 1e-1;
+    self.hyp.(name).default = 1e-2;
 
     name = 'SVDWaveletReduction';
     self.hyp.(name).range   = [1,2,4,8];
