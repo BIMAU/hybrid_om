@@ -1,16 +1,25 @@
-function [nums, mdat, preds, truths] = plot_experiment(self)
+function [nums, mdat, preds, truths] = plot_experiment(self, ignore_nans, flip_axes)
 %
 % gather data from experiment dir
+
+    if nargin < 3
+        flip_axes = false
+    end
+    if nargin < 2
+        ignore_nans = true;
+    end        
     
     [errs, nums, pids, mdat, preds, truths] = ...
         self.gather_data(self.dir);
-    
-    % Failed experiments (usually out of memory) give nans. The whole row
-    % is ignored.
-    plotIds = find(~isnan(sum(nums,2)));
-    if numel(plotIds) ~= size(nums,1)
-        fprintf('ignoring rows with nans\n');
-        nums = nums(plotIds,:);
+
+    if ignore_nans
+        % Failed experiments (usually out of memory) give nans. The whole row
+        % is ignored. 
+        plotIds = find(~isnan(sum(nums,2)));
+        if numel(plotIds) ~= size(nums,1)
+            fprintf('ignoring rows with nans\n');
+            nums = nums(plotIds,:);
+        end
     end
     
     [exp_ind, I] = sort( [mdat.exp_ind{:}] );
@@ -25,7 +34,12 @@ function [nums, mdat, preds, truths] = plot_experiment(self)
         xlab{i}    = mdat.xlab{I(i)};
     end
 
-    [~, I] = sort(Nvalues, 'descend');
+    if flip_axes
+        [~, I] = sort(Nvalues, 'ascend');
+    else
+        [~, I] = sort(Nvalues, 'descend');
+    end
+    
     xlab_index = I(1); % x label corresponds to parameter with largest number of values
     maxValues  = Nvalues(xlab_index);
     Ntotal     = size(nums,2);
