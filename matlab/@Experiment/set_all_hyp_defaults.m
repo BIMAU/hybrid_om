@@ -95,6 +95,12 @@ function [] = set_all_hyp_defaults(self)
     self.hyp.(name).descr   = ['RI', self.range2str(self.hyp.(name).range)];
     self.hyp.(name).default = 2;
 
+    name = 'RegressionSolver';
+    self.hyp.(name).opts    = {'pinv', 'TikhonovNormalEquations', 'TikhonovTSVD'};
+    self.hyp.(name).range   = [1, 2, 3];
+    self.hyp.(name).descr   = ['RS', self.range2str(self.hyp.(name).range)];
+    self.hyp.(name).default = 3;
+
     name = 'ScalingType';
     self.hyp.(name).opts    = {'none', 'minMax1', 'minMax2', 'minMaxAll', 'standardize'};
     self.hyp.(name).range   = [1:5];

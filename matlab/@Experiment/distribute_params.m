@@ -52,6 +52,9 @@ function [esn_pars, mod_pars] = distribute_params(self, exp_idx)
     esn_pars.scalingType = ...
         self.hyp.ScalingType.opts{hyp_id2value('ScalingType')};
 
+    esn_pars.regressionsolver = ...
+        self.hyp.RegressionSolver.opts{hyp_id2value('RegressionSolver')};
+
     % The ESN goes into pure DMD mode for the following model
     % configurations:
     esn_pars.dmdMode = ( strcmp(self.model_config, 'dmd_only') || ...
