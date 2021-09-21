@@ -10,13 +10,25 @@ function [description] = create_description(self, mdat)
         if has_opts
             value_start = mdat.hyp.(par_names{i}).opts{mdat.hyp_range(i, 1)};
             value_end   = mdat.hyp.(par_names{i}).opts{mdat.hyp_range(i, end)};
-            description = sprintf('%s\n%21s: %s-%s', description, ...
-                                  par_names{i}, value_start, value_end);
+
+            if strcmp(value_start, value_end)
+                description = sprintf('%s\n%21s: %s', description, ...
+                                      par_names{i}, value_start);
+            else                
+                description = sprintf('%s\n%21s: %s-%s', description, ...
+                                      par_names{i}, value_start, value_end);
+            end
         else
             value_start = mdat.hyp_range(i, 1);
             value_end   = mdat.hyp_range(i, end);
-            description = sprintf('%s\n%21s: %1.1d-%1.1d', description, ...
-                                  par_names{i}, value_start, value_end);
+
+            if value_start == value_end
+                description = sprintf('%s\n%21s: %1.1d', description, ...
+                                      par_names{i}, value_start);
+            else
+                description = sprintf('%s\n%21s: %1.1d-%1.1d', description, ...
+                                      par_names{i}, value_start, value_end);
+            end
         end
     end
 end
