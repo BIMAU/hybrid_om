@@ -72,7 +72,6 @@ function [errs, nums, pids, ...
             ind_vis = zeros(procs, ceil(n / procs));
             initialize = false;
         end
-
         for i = data.my_inds
             for j = 1:trials
                 errs{i, j} = data.errs{i, tr_range(j)};

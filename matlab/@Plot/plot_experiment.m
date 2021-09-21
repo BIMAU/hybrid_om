@@ -7,21 +7,21 @@ function [nums, mdat, preds, truths] = plot_experiment(self, ignore_nans, flip_a
     end
     if nargin < 2
         ignore_nans = true;
-    end        
-    
+    end
+
     [errs, nums, pids, mdat, preds, truths] = ...
         self.gather_data(self.dir);
 
     if ignore_nans
         % Failed experiments (usually out of memory) give nans. The whole row
-        % is ignored. 
+        % is ignored.
         plotIds = find(~isnan(sum(nums,2)));
         if numel(plotIds) ~= size(nums,1)
             fprintf('ignoring rows with nans\n');
             nums = nums(plotIds,:);
         end
     end
-    
+
     [exp_ind, I] = sort( [mdat.exp_ind{:}] );
     Nexp = numel(exp_ind);
 
@@ -39,7 +39,7 @@ function [nums, mdat, preds, truths] = plot_experiment(self, ignore_nans, flip_a
     else
         [~, I] = sort(Nvalues, 'descend');
     end
-    
+
     xlab_index = I(1); % x label corresponds to parameter with largest number of values
     maxValues  = Nvalues(xlab_index);
     Ntotal     = size(nums,2);
@@ -64,7 +64,7 @@ function [nums, mdat, preds, truths] = plot_experiment(self, ignore_nans, flip_a
             M = M';
             range1 = M(:);
         end
-        
+
     elseif Nexp > 2
         warning('undefined behaviour for Nexp = %d', Nexp);
     end
@@ -83,7 +83,7 @@ function [nums, mdat, preds, truths] = plot_experiment(self, ignore_nans, flip_a
     xticklabels(mdat.hyp_range(exp_ind(xlab_index), subrange));
     xtickangle(45);
     xlabel(xlab{xlab_index});
-    
+
     if isempty(self.ylab)
         ylabel(mdat.ylab);
     else
@@ -91,13 +91,23 @@ function [nums, mdat, preds, truths] = plot_experiment(self, ignore_nans, flip_a
     end
 
     % for combined experiments and multiple boxplots we need a legend
+    par_names = fieldnames(mdat.hyp);
     if Nexp >= 2
         str = cell(Nboxplots,1);
+        index = exp_ind(I(2));
+        par_name = par_names{index};
+        has_opts = isfield(mdat.hyp.(par_name), 'opts');
         for i = 1:Nboxplots
-            value = mdat.hyp_range(exp_ind(I(2)), range2(i));
-            str{i} = sprintf('%s: %1.1e', xlab{I(2)}, value);
+            value = mdat.hyp_range(index, range2(i));
+            if has_opts
+                opts_str = mdat.hyp.(par_name).opts{value};
+                str{i} = sprintf('%s: %s', xlab{I(2)}, opts_str);
+            else
+                str{i} = sprintf('%s: %1.1e', xlab{I(2)}, value);
+            end
+            fprintf('%s\n', str{i});
         end
-        legend([f{:}], str, 'location', 'north')
+        legend([f{:}], str, 'location', 'north','interpreter','none')
     end
 
     if self.description
