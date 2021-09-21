@@ -2,14 +2,14 @@ function [dir] = KS_Path2018(varargin)
     [pid, procs] = Utils.input_handling(nargin, varargin);
 
     % epsilon
-    epsilon = 0.01;
+    epsilon = 1;
 
     % create and initialize two KS models
     L      = 35;
     N      = 64;
-    ks_prf = KSmodel(L, N);
-    ks_imp = KSmodel(L, N);
-    ks_imp.epsilon = epsilon;
+    ks_prf = KSmodel(L, N); % perfect model
+    ks_imp = KSmodel(L, N); % imperfect model
+    ks_imp.epsilon = epsilon; % set perturbation parameter
     ks_prf.initialize();
     ks_imp.initialize();
 
@@ -35,7 +35,7 @@ function [dir] = KS_Path2018(varargin)
     expObj.ident = 'Pathak2018repl';
 
     % experimental setup
-    expObj.shifts = 25;
+    expObj.shifts = 100;
     expObj.reps = 1;
     expObj.store_state = 'final';
     expObj.nrmse_windowsize = 50;
@@ -52,18 +52,17 @@ function [dir] = KS_Path2018(varargin)
     expObj.set_default_hyp('SVDWaveletBlockSize', 1);
     expObj.set_default_hyp('SVDWaveletReduction', 1);
     expObj.set_default_hyp('ReservoirSize', 128);
-    expObj.set_default_hyp('Lambda', 1e-12);
     expObj.set_default_hyp('FilterCutoff', 0.0);
     expObj.set_default_hyp('TimeDelay', 0);
     expObj.set_default_hyp('TimeDelayShift', 100);
 
     % Input matrix type
-    % (1) sparse 
-    % (2) sparseOnes 
+    % (1) sparse
+    % (2) sparseOnes
     % (3) balancedSparse
     % (4) full
     % (5) identity
-    expObj.set_default_hyp('InputMatrixType', 5);
+    expObj.set_default_hyp('InputMatrixType', 3);
 
     % Scaling of the data:
     % (1) none
@@ -91,9 +90,11 @@ function [dir] = KS_Path2018(varargin)
     % (8) hybrid_esn_dmd
     expObj.set_default_hyp('ModelConfig', 4);
 
+    % Tikhonov regularization
+    expObj.set_default_hyp('Lambda', 1e-10);
 
     expObj.add_experiment('ReservoirSize', [200,400,800,1600,3200,6400]);
-    expObj.add_experiment('Lambda', [1e-6,1e-9,1e-12]);
+    expObj.add_experiment('ModelConfig', [1,2,4,5,6,8]);
 
     % run experiments
     dir = expObj.run();
