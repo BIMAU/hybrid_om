@@ -1,4 +1,4 @@
-function [dir] = KS_exp1(varargin)
+function [dir] = KS_GridExp(varargin)
 
     [pid, procs] = Utils.input_handling(nargin, varargin);
 
