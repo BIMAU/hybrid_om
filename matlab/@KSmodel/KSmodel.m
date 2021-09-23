@@ -18,6 +18,9 @@ classdef KSmodel < handle
 
         % damping parameter #TODO
         nu = 1
+        
+        % initial state
+        x_init
 
         % first derivative, central discretization
         D1
@@ -43,7 +46,7 @@ classdef KSmodel < handle
         % Optional modes
         V
 
-        initialized = false;
+        initialized = false;        
 
     end
 
@@ -54,6 +57,8 @@ classdef KSmodel < handle
             self.N  = N;
             self.dx = 1 / self.N;
             self.V  = speye(self.N);
+            self.x_init = zeros(self.N, 1);
+            self.x_init(1) = 1;
         end
 
         function initialize(self)

@@ -1,11 +1,10 @@
 function [dir] = KS_GridExp(varargin)
-
     [pid, procs] = Utils.input_handling(nargin, varargin);
 
-    % create and initialize two KS models
+    % create and initialize two KS models with different grids
     L      = 35;
-    N_prf  = 128;
-    N_imp  = 64;
+    N_prf  = 128; % fine grid size
+    N_imp  = 64;  % course grid size
     ks_prf = KSmodel(L, N_prf);
     ks_imp = KSmodel(L, N_imp);
 
@@ -18,10 +17,6 @@ function [dir] = KS_GridExp(varargin)
     % the grids are different so grid transfers are necessary
     dgen.dimension = '1D';
     dgen.build_grid_transfers('periodic');
-
-    % initial state
-    dgen.x_init_prf = zeros(N_prf, 1);
-    dgen.x_init_prf(1) = 1;
 
     % generate perfect model transient
     dgen.trunc = 30; % truncate period
@@ -38,7 +33,7 @@ function [dir] = KS_GridExp(varargin)
     expObj = Experiment(dgen, pid, procs);
 
     % add experiment identification
-    expObj.ident = 'KS_exp1';
+    expObj.ident = 'KS_GridExp';
 
     %
     expObj.shifts = 100;
@@ -55,15 +50,54 @@ function [dir] = KS_GridExp(varargin)
     expObj.set_default_hyp('RhoMax', 0.4);
     expObj.set_default_hyp('BlockSize', 1);
     expObj.set_default_hyp('InAmplitude', 1);
-    expObj.set_default_hyp('SVDWaveletBlockSize', 64);
+    expObj.set_default_hyp('SVDWaveletBlockSize', 1);
     expObj.set_default_hyp('SVDWaveletReduction', 1);
-    expObj.set_default_hyp('ReservoirSize', 1000);
-    expObj.set_default_hyp('Lambda', 1e-6);
+    expObj.set_default_hyp('ReservoirSize', 128);
+    expObj.set_default_hyp('FilterCutoff', 0.0);
+    expObj.set_default_hyp('TimeDelay', 0);
+    expObj.set_default_hyp('TimeDelayShift', 100);
 
-    % set experiments
+    % Input matrix type
+    % (1) sparse
+    % (2) sparseOnes
+    % (3) balancedSparse
+    % (4) full
+    % (5) identity
+    expObj.set_default_hyp('InputMatrixType', 3);
+
+    % Scaling of the data:
+    % (1) none
+    % (2) minMax1
+    % (3) minMax2
+    % (4) minMaxAll
+    % (5) standardize
+    expObj.set_default_hyp('ScalingType', 5);
+
+    % Scale separation (modes) options:
+    % (1) none
+    % (2) wavelet
+    % (3) dmd
+    % (4) pod
+    expObj.set_default_hyp('ScaleSeparation',1);
+
+    % Model configuration options:
+    % (1) model_only
+    % (2) esn_only
+    % (3) dmd_only
+    % (4) hybrid_esn
+    % (5) hybrid_dmd
+    % (6) corr_only
+    % (7) esn_plus_dmd
+    % (8) hybrid_esn_dmd
+    expObj.set_default_hyp('ModelConfig', 4);
+
+    % Tikhonov regularization
+    expObj.set_default_hyp('Lambda', 1e-10);
+
     expObj.add_experiment('ReservoirSize', [200,400,800,1600,3200,6400]);
-    expObj.add_experiment('ModelConfig', [1,2,3]);
+    expObj.add_experiment('ModelConfig', [1,2,4,5,6,8]);
 
     % run experiments
     dir = expObj.run();
+
 end

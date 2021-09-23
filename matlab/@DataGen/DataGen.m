@@ -63,8 +63,7 @@ classdef DataGen < handle
             self.N_prf = self.model_prf.N;
             self.N_imp = self.model_imp.N;
 
-            self.x_init_prf = zeros(self.N_prf, 1);
-            self.x_init_prf(1) = 1;
+            self.x_init_prf = self.model_prf.x_init;
 
             if self.N_prf ~= self.N_imp
                 fprintf('Grid transfer operators are required.\n')
