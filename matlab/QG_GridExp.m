@@ -26,5 +26,13 @@ function [dir] = QG_GridExp(varargin)
     qg_c.set_par(18, stir);  % stirring type: 0 = cos(5x), 1 = sin(16x)
 
     % create data generator for the two models
+    dgen = DataGen(qg_f, qg_c);
+    
+    % the grids are different so grid transfers are necessary
+    dgen.dimension = '2D';
+    dgen.build_grid_transfers('periodic');
+    
+    dgen
+    
     
 end

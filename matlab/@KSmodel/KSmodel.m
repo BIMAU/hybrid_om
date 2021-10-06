@@ -10,7 +10,7 @@ classdef KSmodel < handle
         % domain length parameter
         L  = 100
 
-        % number of grid points
+        % number of unknowns
         N  = 200
 
         % grid increment size
