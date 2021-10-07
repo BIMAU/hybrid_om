@@ -32,7 +32,4 @@ function [dir] = QG_GridExp(varargin)
     dgen.dimension = '2D';
     dgen.build_grid_transfers('periodic');
     
-    dgen
-    
-    
 end

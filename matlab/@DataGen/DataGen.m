@@ -240,6 +240,7 @@ classdef DataGen < handle
             % repeat operator for every unknown in the grid
             I = speye(nun);
             self.R = kron(self.R, I);
+            self.P = kron(self.P, I);
         end
     end
 end
