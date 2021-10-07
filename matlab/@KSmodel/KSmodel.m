@@ -10,15 +10,24 @@ classdef KSmodel < handle
         % domain length parameter
         L  = 100
 
-        % number of unknowns
+        % total number of grid points
         N  = 200
+
+        % grid points in the x-direction
+        nx
+
+        % grid points in the y-direction
+        ny  = 1; % not relevant but should be available
+
+        % number of unknowns
+        nun = 1 ;% not relevant but should be available
 
         % grid increment size
         dx
 
         % damping parameter #TODO
         nu = 1
-        
+
         % initial state
         x_init
 
@@ -46,7 +55,7 @@ classdef KSmodel < handle
         % Optional modes
         V
 
-        initialized = false;        
+        initialized = false;
 
     end
 
@@ -55,6 +64,7 @@ classdef KSmodel < handle
         % constructor
             self.L  = L;
             self.N  = N;
+            self.nx = N;
             self.dx = 1 / self.N;
             self.V  = speye(self.N);
             self.x_init = zeros(self.N, 1);
@@ -158,7 +168,7 @@ classdef KSmodel < handle
                 throw(ME);
             end
         end
-        
+
         function [par] = control_param(self)
         % return control parameter
             par = self.epsilon;
