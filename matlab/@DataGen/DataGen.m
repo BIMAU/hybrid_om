@@ -2,19 +2,17 @@ classdef DataGen < handle
 % Generates training data. Training data consists of a transient of a
 % perfect model (truth) and imperfect model predictions. When the two
 % models live on different grids, appropriate restriction and
-% prolongation operators are available. In that case we assume that
-% the resulting training data set lives on the coarse grid. In
-% addition this class generates the wavelet or pod modes that can be
-% used for scale separation of the training data.
+% prolongation operators are computed. In that case we assume that the
+% resulting training data set lives on the coarse grid.
 
     properties
         % models
         model_prf;  % perfect model
         model_imp;  % imperfect model
+
         N_prf; % size of the perfect model grid
         N_imp; % size of the imperfect model grid
         x_init_prf; % initial perfect model state
-
 
         % time stepping
         dt_prf = 0.1; % time step perfect model
@@ -43,12 +41,12 @@ classdef DataGen < handle
         % save the data to out_file in path
         out_file;
         out_file_path;
-        
+
         base_dir = '~/Projects/hybrid_om';
 
         % overwrite the data in out_file if true
         overwrite = false;
-        
+
         % output during transient and predictions
         verbosity = 500;
     end
@@ -73,7 +71,7 @@ classdef DataGen < handle
             self.out_file_path = sprintf([self.base_dir, '/data/%s/%d_%d/'], ...
                                          self.model_prf.name, ...
                                          self.N_prf, self.N_imp);
-            
+
             syscall = sprintf('mkdir -p %s', self.out_file_path);
             system(syscall);
         end
@@ -127,7 +125,7 @@ classdef DataGen < handle
                          {'Nt_prf', self.Nt_prf}, ...
                          {'T', self.T}};
                 Utils.save_pairs(out_file, pairs);
-            end            
+            end
             fprintf('Created time series with %d samples.\n', self.Nt_prf);
         end
 
@@ -177,7 +175,7 @@ classdef DataGen < handle
                 for i = 1:self.Nt_imp
                     [self.Phi(:,i), k] = self.model_imp.step(self.X(:,i), self.dt_imp);
                     avg_k = avg_k + k;
-                                        if mod(i, self.verbosity) == 0
+                    if mod(i, self.verbosity) == 0
                         fprintf(' step %4d/%4d, Newton iterations: %d\n',...
                                 i, self.Nt_imp, k);
                     end
@@ -193,17 +191,30 @@ classdef DataGen < handle
         end
 
         function build_grid_transfers(self, boundary)
-        % Computes grid transfers between a grid of size N_prf and another of
-        % size N_prf / 2
-
+        % Grid transfers between fine and coarse grids. The coarse grid is
+        % half the fine grid in all directions. We assume a square
+        % grid: nx = ny = nz.
+        %
+        % Computes grid transfers between a grid of size nx_prf
+        % and another of size nx_prf / 2 = nx_imp
+        %
+        % Operators are repeated for every unknown in the grid
+        %
         % boundary: empty or 'periodic'
-
+        %
         % R: weighted restriction operator
         % P: prolongation operator
 
-            assert(mod(self.N_prf,2) == 0);
+            nx_prf = self.model_prf.nx;
+            nx_imp = self.model_imp.nx;
+            nun = self.model_imp.nun;
 
-            Nc = self.N_prf / 2;
+            assert(nun == self.model_prf.nun, 'nun does not correspond between models');
+            assert(mod(nx_prf,2) == 0);
+
+            Nc = nx_prf / 2;
+            assert(Nc == nx_imp, 'imperfect model grid size is incorrect');
+
             ico = [];
             jco = [];
             co  = [];
@@ -217,8 +228,7 @@ classdef DataGen < handle
                 % fix periodicity
                 jco(end) = 1;
             end
-
-            self.R = sparse(ico, jco, co, Nc, self.N_prf);
+            self.R = sparse(ico, jco, co, Nc, nx_prf);
             self.P = 2*self.R';
 
             if strcmp(self.dimension, '2D')
@@ -226,6 +236,10 @@ classdef DataGen < handle
                 self.R = kron(self.R,self.R);
                 self.P = 4*self.R';
             end
+
+            % repeat operator for every unknown in the grid
+            I = speye(nun);
+            self.R = kron(self.R, I);
         end
     end
 end
