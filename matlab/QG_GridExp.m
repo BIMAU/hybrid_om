@@ -27,9 +27,23 @@ function [dir] = QG_GridExp(varargin)
 
     % create data generator for the two models
     dgen = DataGen(qg_f, qg_c);
-    
+
     % the grids are different so grid transfers are necessary
     dgen.dimension = '2D';
     dgen.build_grid_transfers('periodic');
-    
+
+    % load appropriate initial solution for QG
+    init_sol = load('../data/QGmodel/starting_solutions/equilibrium_nx64_Re1e3_ampl2_stir0_rot1.mat');
+
+    % check that what we got is ok
+    assert(init_sol.Re == Re_f);
+    assert(init_sol.nx == nx_f);
+    assert(init_sol.ny == ny_f);
+    assert(init_sol.ampl == ampl);
+    assert(init_sol.stir == stir);
+
+
+    dgen.x_init_prf = init_sol.x_init;
+
+    keyboard
 end
