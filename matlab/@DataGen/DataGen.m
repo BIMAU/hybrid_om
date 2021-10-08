@@ -232,7 +232,6 @@ classdef DataGen < handle
             self.P = 2*self.R';
 
             if strcmp(self.dimension, '2D')
-                fprintf('this is not implemented and tested yet\n');
                 self.R = kron(self.R,self.R);
                 self.P = 4*self.R';
             end
