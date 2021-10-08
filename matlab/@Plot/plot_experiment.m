@@ -1,4 +1,5 @@
-function [nums, mdat, preds, truths] = plot_experiment(self, ignore_nans, flip_axes)
+function [nums, mdat, preds, truths, Nboxplots] = ...
+        plot_experiment(self, ignore_nans, flip_axes)
 %
 % gather data from experiment dir
 
@@ -74,15 +75,23 @@ function [nums, mdat, preds, truths] = plot_experiment(self, ignore_nans, flip_a
     for i = 1:Nboxplots
         subrange = range1((i-1)*maxValues+1:i*maxValues);
         f{i} = self.my_boxplot(nums(:, subrange), {clrs(i,:), clrs(i,:)});
-        grid on;
         xticklabels([]);
         hold on
     end
     hold off
+    
+    if self.grid
+        grid on;
+    end
 
     xticklabels(mdat.hyp_range(exp_ind(xlab_index), subrange));
     xtickangle(45);
-    xlabel(xlab{xlab_index});
+
+    if isempty(self.xlab)
+        xlabel(xlab{xlab_index});
+    else
+        xlabel(self.xlab);
+    end
 
     if isempty(self.ylab)
         ylabel(mdat.ylab);
@@ -92,7 +101,7 @@ function [nums, mdat, preds, truths] = plot_experiment(self, ignore_nans, flip_a
 
     % for combined experiments and multiple boxplots we need a legend
     par_names = fieldnames(mdat.hyp);
-    if Nexp >= 2
+    if Nexp >= 2 && self.legend
         str = cell(Nboxplots,1);
         index = exp_ind(I(2));
         par_name = par_names{index};
@@ -118,7 +127,9 @@ function [nums, mdat, preds, truths] = plot_experiment(self, ignore_nans, flip_a
              'color', [0,0,0] , 'VerticalAlignment', 'top', ...
              'FontName', 'Monospaced', 'FontSize', 9,'Interpreter', 'none');
     end
-
-    title(sprintf('Experiment: %d training sets, %d par combinations', ...
-                  size(nums,1), size(nums,2)));
+    
+    if self.show_title
+        title(sprintf('Experiment: %d training sets, %d par combinations', ...
+                      size(nums,1), size(nums,2)));
+    end
 end
