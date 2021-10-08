@@ -25,6 +25,9 @@ function [dir] = QG_GridExp(varargin)
     qg_c.set_par(11, ampl);  % stirring amplitude
     qg_c.set_par(18, stir);  % stirring type: 0 = cos(5x), 1 = sin(16x)
 
+    % get QG nondimensionalization, which is the same for qg_f and qg_c
+    [Ldim, ~, Udim] = qg_f.get_nondim();
+
     % create data generator for the two models
     dgen = DataGen(qg_f, qg_c);
 
@@ -42,8 +45,19 @@ function [dir] = QG_GridExp(varargin)
     assert(init_sol.ampl == ampl);
     assert(init_sol.stir == stir);
 
-
+    % set initial solution in datagen
     dgen.x_init_prf = init_sol.x_init;
 
-    keyboard
+    % set the time step to one day
+    Tdim = Ldim / Udim; % in seconds
+    day  = 24*3600; % in seconds
+    year = day*365; % in seconds
+    dt_prf = day / Tdim;
+    dgen.dt_prf = dt_prf;
+
+    % compute 100 years, which should give 36500 snapshots
+    dgen.T = 100 * year / Tdim;
+    dgen.verbosity = 10;
+    dgen.generate_prf_transient();
+
 end
