@@ -4,9 +4,9 @@ function save_pairs(file, pairs)
         var = pairs{i}{1};
         eval([var, ' = pairs{i}{2};'])
         if (i == 1)
-            save(file, var)
+            save(file, var, '-v7.3')
         else
-            save(file, var, '-append')
+            save(file, var, '-append', '-v7.3')
         end
     end
 end
