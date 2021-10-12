@@ -6,7 +6,7 @@ function save_pairs(file, pairs)
         if (i == 1)
             save(file, var, '-v7.3')
         else
-            save(file, var, '-append', '-v7.3')
+            save(file, var, '-append')
         end
     end
 end
