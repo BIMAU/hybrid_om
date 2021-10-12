@@ -91,6 +91,7 @@ classdef DataGen < handle
                 self.Nt_prf = d.Nt_prf;
                 assert(d.T == self.T - self.trunc);
                 self.T = d.T;
+                fprintf('Obtained time series with %d samples.\n', self.Nt_prf);
             else
                 fprintf('Not existing: %s\n', out_file);
                 time = tic;
@@ -126,8 +127,8 @@ classdef DataGen < handle
                          {'Nt_prf', self.Nt_prf}, ...
                          {'T', self.T}};
                 Utils.save_pairs(out_file, pairs);
+                fprintf('Created time series with %d samples.\n', self.Nt_prf);
             end
-            fprintf('Created time series with %d samples.\n', self.Nt_prf);
         end
 
         function generate_imp_predictions(self)
@@ -166,6 +167,7 @@ classdef DataGen < handle
                 fprintf('Obtain predictions from file: \n %s \n', out_file);
                 d = load(out_file);
                 self.Phi = d.Phi;
+                fprintf('Obtained predictions: %d samples.\n', self.Nt_imp);
             else
                 fprintf('Not existing: %s\n', out_file);
                 self.Phi = zeros(self.N_imp, self.Nt_imp);
@@ -187,8 +189,8 @@ classdef DataGen < handle
                 fprintf('Average # Newton iterations: (%f)\n', avg_k / self.Nt_imp);
                 fprintf('Saving predictions to: \n %s \n', out_file);
                 Utils.save_pairs(out_file, {{'Phi', self.Phi}});
+                fprintf('Created predictions: %d samples.\n', self.Nt_imp);
             end
-            fprintf('Created predictions: %d samples.\n', self.Nt_imp);
         end
 
         function build_grid_transfers(self, boundary)
