@@ -37,6 +37,7 @@ classdef Experiment < handle
 
         % y-axis label
         ylab = 'samples';
+
     end
 
     properties (Access = private)
@@ -100,11 +101,17 @@ classdef Experiment < handle
         % A memory with a windowsize is needed to be able to compute a NRMSE
         nrmse_memory = struct();
 
+        % allow this class to perform syscalls
+        allow_syscall = true;
+
+        % output_directory
+        output_dir = '';
+
     end
 
     methods (Access = public)
 
-        function self = Experiment(data, pid, procs)
+        function self = Experiment(data, pid, procs, syscalls)
         % constructor
         %
         % data:     training data object
@@ -121,7 +128,13 @@ classdef Experiment < handle
               case 3
                 self.pid   = pid;
                 self.procs = procs;
+              case 4
+                self.pid   = pid;
+                self.procs = procs;
+                self.allow_syscall = syscalls;
             end
+
+            self.create_output_dir();
 
             % Seed the rng with time and pid
             now = clock;
@@ -237,10 +250,11 @@ classdef Experiment < handle
                               {'ESN_states', self.ESN_states}, ...
                               {'damping', self.damping} };
 
-                    dir = self.store_results(pairs);
+                    self.store_results(pairs);
                 end
             end
             self.print('done (%fs)\n', toc(time));
+            dir = self.output_dir;
         end
 
         function set_default_hyp(self, id, value)
@@ -282,11 +296,11 @@ classdef Experiment < handle
 
         [] = add_field_to_memory(self, name, field);
 
-
         [predY, testY, err, esnX, damping] = experiment_core(self);
 
         [stop_flag, err] = stopping_criterion(self, predY, testY);
 
+        [] = create_output_dir(self);
         [dir] = store_results(self, pairs);
 
     end

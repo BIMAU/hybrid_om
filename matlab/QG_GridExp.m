@@ -1,5 +1,5 @@
 function [dir] = QG_GridExp(varargin)
-    [pid, procs] = Utils.input_handling(nargin, varargin);
+    [pid, procs, syscalls] = Utils.input_handling(nargin, varargin);
     Utils.add_paths();
     
     % Create two QG models with different grids and different Reynolds
@@ -30,7 +30,7 @@ function [dir] = QG_GridExp(varargin)
     [Ldim, ~, Udim] = qg_f.get_nondim();
 
     % create data generator for the two models
-    dgen = DataGen(qg_f, qg_c);
+    dgen = DataGen(qg_f, qg_c, syscalls);
 
     % the grids are different so grid transfers are necessary
     dgen.dimension = '2D';
@@ -67,13 +67,13 @@ function [dir] = QG_GridExp(varargin)
     dgen.generate_imp_predictions();
 
     % create experiment class
-    expObj = Experiment(dgen, pid, procs);
+    expObj = Experiment(dgen, pid, procs, syscalls);
 
     % add experiment identification
     expObj.ident = 'QG_GridExp';
 
     %
-    expObj.shifts = 100;
+    expObj.shifts = 5;
     expObj.reps = 1;
     expObj.store_state = 'final';
     expObj.nrmse_windowsize = 50;
@@ -131,8 +131,9 @@ function [dir] = QG_GridExp(varargin)
     % Tikhonov regularization
     expObj.set_default_hyp('Lambda', 1e-10);
 
-    expObj.add_experiment('ReservoirSize', [200,400,800,1600,3200,6400,12800]);
-    expObj.add_experiment('ModelConfig', [1,2,4,5,6,8]);
+    % expObj.add_experiment('ReservoirSize', [200,400,800,1600,3200,6400,12800]);
+    expObj.add_experiment('ModelConfig', [4,8]);
+    expObj.set_default_hyp('ReservoirSize', 12800);
 
     % run experiments
     dir = expObj.run();

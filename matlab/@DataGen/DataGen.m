@@ -49,10 +49,13 @@ classdef DataGen < handle
 
         % output during transient and predictions
         verbosity = 500;
+
+        % allow this class to perform syscalls
+        allow_syscall = true;
     end
 
     methods
-        function self = DataGen(model_prf, model_imp)
+        function self = DataGen(model_prf, model_imp, syscalls)
             assert(strcmp(model_prf.name, model_imp.name));
 
             self.model_prf = model_prf;
@@ -73,7 +76,10 @@ classdef DataGen < handle
                                          self.N_prf, self.N_imp);
 
             syscall = sprintf('mkdir -p %s', self.out_file_path);
-            system(syscall);
+
+            if self.allow_syscall
+                system(syscall);
+            end
         end
 
         function generate_prf_transient(self);

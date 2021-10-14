@@ -7,24 +7,23 @@ fi
 
 # check for matlab compiler existence
 mcc_path=$(which mcc)
-on_cluster=0
-if [ -x "$mcc_path" ];
+ret_code=$?
+
+if [ $ret_code -eq 0 ];
 then
     echo "matlab compiler available at" $mcc_path
+    on_cluster=0
 else
     #assume we're on a cluster
     on_cluster=1
-    echo "loading matlab compiler module"
+    echo "loading matlab module"
     module load MATLAB/2018a
-    module load MCR/R2018a
 fi
-
 
 if [ $on_cluster -eq 1 ]
 then
-   export MCR_CACHE_ROOT=`mktemp -d /scratch-local/mcr.XXXXXX`
+    export MCR_CACHE_ROOT=`mktemp -d ~/scratch-local/mcr.XXXXXX`
 fi
-
 
 # check whether we need to recompile
 recompile=0
@@ -47,10 +46,10 @@ echo $m1 > $md5_tmp
 output_exec=run
 if ! [[ -s $2/$output_exec ]] || [ $recompile -eq 1 ]
 then
-mkdir -p $2
-mcc -R -singleCompThread -v -C -m $src_name -d $2 -a ../matlab \
-    -a ~/local/matlab -a ~/Projects/ESN/matlab/ESN.m \
-    -o $output_exec
+    mkdir -p $2
+    mcc -R -singleCompThread -v -C -m $src_name -d $2 -a ../matlab \
+        -a ~/local/matlab -a ~/Projects/ESN/matlab/ESN.m \
+        -o $output_exec
 else
     echo "found executable" $2/$output_exec
 fi
@@ -65,7 +64,14 @@ fi
 
 cd $2
 
+# compile the interface
 mpicxx -Wall $interface_src -o interface -lmpi
+ret_code=$?
+if [ $ret_code -eq 1 ]
+then
+   echo "compilation failed"
+   exit
+fi
 
 if [ $on_cluster -eq 1 ]
 then
