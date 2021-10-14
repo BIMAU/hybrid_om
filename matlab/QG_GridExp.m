@@ -1,6 +1,7 @@
 function [dir] = QG_GridExp(varargin)
     [pid, procs] = Utils.input_handling(nargin, varargin);
-
+    Utils.add_paths();
+    
     % Create two QG models with different grids and different Reynolds
     % numbers.
     Re_f = 1000;

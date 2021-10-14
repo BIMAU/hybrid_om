@@ -1,5 +1,6 @@
 function [dir] = KS_GridExp(varargin)
     [pid, procs] = Utils.input_handling(nargin, varargin);
+    Utils.add_paths();
 
     % create and initialize two KS models with different grids
     L      = 35;
@@ -95,7 +96,7 @@ function [dir] = KS_GridExp(varargin)
     expObj.set_default_hyp('Lambda', 1e-10);
 
     expObj.add_experiment('ReservoirSize', [200,400,800,1600,3200,6400]);
-    expObj.add_experiment('ModelConfig', [1,2,4,5,6,8]);
+    %expObj.add_experiment('ModelConfig', [1,2,4,5,6,8]);
 
     % run experiments
     dir = expObj.run();

@@ -1,5 +1,4 @@
 function [pid, procs] = input_handling(n_argin, var_argin)
-
     switch n_argin
       case 0
         pid   = 0;
