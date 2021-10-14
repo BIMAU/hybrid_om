@@ -59,12 +59,12 @@ function [dir] = QG_GridExp(varargin)
     dgen.T = round(100 * year / Tdim);
     dgen.verbosity = 10;
     dgen.generate_prf_transient();
-    
+
     % generate imperfect model predictions
     % imperfect model time step (should be an integer multiple of dt_prf)
     dgen.dt_imp = dgen.dt_prf;
     dgen.generate_imp_predictions();
-    
+
     % create experiment class
     expObj = Experiment(dgen, pid, procs);
 
@@ -77,7 +77,7 @@ function [dir] = QG_GridExp(varargin)
     expObj.store_state = 'final';
     expObj.nrmse_windowsize = 50;
     expObj.err_tol = 0.5;
-    expObj.max_preds = round(200 / dgen.dt_imp);
+    expObj.max_preds = 365;
 
     % adjust hyperparam defaults
     expObj.set_default_hyp('Alpha', 1);
@@ -130,7 +130,7 @@ function [dir] = QG_GridExp(varargin)
     % Tikhonov regularization
     expObj.set_default_hyp('Lambda', 1e-10);
 
-    expObj.add_experiment('ReservoirSize', [200,400,800,1600,3200,6400]);
+    expObj.add_experiment('ReservoirSize', [200,400,800,1600,3200,6400,12800]);
     expObj.add_experiment('ModelConfig', [1,2,4,5,6,8]);
 
     % run experiments
