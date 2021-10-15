@@ -134,8 +134,6 @@ classdef Experiment < handle
                 self.allow_syscall = syscalls;
             end
 
-            self.create_output_dir();
-
             % Seed the rng with time and pid
             now = clock;
             rng(round(100*self.pid*sqrt(now(end))));
@@ -148,8 +146,10 @@ classdef Experiment < handle
             self.set_all_hyp_defaults();
          end
 
-        function [dir] = run(self)
+         function [dir] = run(self)
             time = tic;
+
+            self.create_output_dir();
 
             assert(~isempty(self.exp_id), 'no experiment added');
 
