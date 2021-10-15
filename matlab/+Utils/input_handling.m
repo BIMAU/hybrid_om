@@ -12,7 +12,7 @@ function [pid, procs,syscalls] = input_handling(n_argin, var_argin)
 
     if pid == 0
         syscalls = true;
-        fprintf('syscalls enabled for pid %d', pid);
+        fprintf('syscalls enabled for pid %d\n', pid);
     else
         syscalls = false;
     end

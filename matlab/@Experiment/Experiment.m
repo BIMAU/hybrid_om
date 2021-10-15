@@ -149,13 +149,13 @@ classdef Experiment < handle
          function [dir] = run(self)
             time = tic;
 
-            self.create_output_dir();
 
             assert(~isempty(self.exp_id), 'no experiment added');
 
             self.create_descriptors();
             self.create_hyp_range();
             self.create_storage();
+            self.create_output_dir();
 
             for j = 1:self.num_hyp_settings
 
