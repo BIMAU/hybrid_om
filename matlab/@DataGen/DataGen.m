@@ -75,11 +75,7 @@ classdef DataGen < handle
                                          self.model_prf.name, ...
                                          self.N_prf, self.N_imp);
 
-            syscall = sprintf('mkdir -p %s', self.out_file_path);
-
-            if self.allow_syscall
-                system(syscall);
-            end
+            eval(['mkdir ', self.out_file_path]);
         end
 
         function generate_prf_transient(self);
