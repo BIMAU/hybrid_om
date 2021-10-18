@@ -38,6 +38,9 @@ classdef Experiment < handle
         % y-axis label
         ylab = 'samples';
 
+        % use the svd wavelet interface in ESN to average the data
+        svd_averaging = 1;
+
     end
 
     properties (Access = private)

@@ -103,6 +103,12 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
             self.esn_pars.ftRange     = 1:dim;
         end
 
+        % the svd averaging overwrites svd wavelet settings
+        if self.svd_averaging > 1
+            esn_pars.waveletReduction = self.svd_averaging;
+            esn_pars.waveletBlockSize = self.svd_averaging;
+        end
+
         % create ESN, train the ESN and save the final state
         esn = ESN(self.esn_pars.Nr, size(trainU,2), size(trainY,2));
         esn.setPars(self.esn_pars);
