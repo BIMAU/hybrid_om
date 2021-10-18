@@ -1,5 +1,5 @@
 function [dir] = KS_Path2018(varargin)
-    [pid, procs, syscalls] = Utils.input_handling(nargin, varargin);
+    [pid, procs] = Utils.input_handling(nargin, varargin);
     Utils.add_paths();
     
     % epsilon
@@ -15,7 +15,7 @@ function [dir] = KS_Path2018(varargin)
     ks_imp.initialize();
 
     % create data generator for the two models
-    dgen = DataGen(ks_prf, ks_imp, syscalls);
+    dgen = DataGen(ks_prf, ks_imp);
     dgen.dimension = '1D';
 
     % generate perfect model transient
@@ -30,7 +30,7 @@ function [dir] = KS_Path2018(varargin)
     dgen.generate_imp_predictions();
 
     % create experiment class
-    expObj = Experiment(dgen, pid, procs, syscalls);
+    expObj = Experiment(dgen, pid, procs);
 
     % add experiment identification
     expObj.ident = 'Pathak2018repl';

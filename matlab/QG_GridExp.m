@@ -1,5 +1,5 @@
 function [dir] = QG_GridExp(varargin)
-    [pid, procs, syscalls] = Utils.input_handling(nargin, varargin);
+    [pid, procs] = Utils.input_handling(nargin, varargin);
     Utils.add_paths();
     
     % Create two QG models with different grids and different Reynolds
@@ -30,7 +30,7 @@ function [dir] = QG_GridExp(varargin)
     [Ldim, ~, Udim] = qg_f.get_nondim();
 
     % create data generator for the two models
-    dgen = DataGen(qg_f, qg_c, syscalls);
+    dgen = DataGen(qg_f, qg_c);
 
     % the grids are different so grid transfers are necessary
     dgen.dimension = '2D';
@@ -67,7 +67,7 @@ function [dir] = QG_GridExp(varargin)
     dgen.generate_imp_predictions();
 
     % create experiment class
-    expObj = Experiment(dgen, pid, procs, syscalls);
+    expObj = Experiment(dgen, pid, procs);
 
     % add experiment identification
     expObj.ident = 'QG_GridExp';
@@ -87,8 +87,8 @@ function [dir] = QG_GridExp(varargin)
     expObj.set_default_hyp('RhoMax', 0.4);
     expObj.set_default_hyp('BlockSize', 1);
     expObj.set_default_hyp('InAmplitude', 1);
-    expObj.set_default_hyp('SVDWaveletBlockSize', 1);
-    expObj.set_default_hyp('SVDWaveletReduction', 1);
+    expObj.set_default_hyp('SVDWaveletBlockSize', 64);
+    expObj.set_default_hyp('SVDWaveletReduction', 4);
     expObj.set_default_hyp('ReservoirSize', 128);
     expObj.set_default_hyp('FilterCutoff', 0.0);
     expObj.set_default_hyp('TimeDelay', 0);
@@ -117,15 +117,9 @@ function [dir] = QG_GridExp(varargin)
     % (4) pod
     expObj.set_default_hyp('ScaleSeparation',1);
 
-    % Model configuration options:
-    % (1) model_only
-    % (2) esn_only
-    % (3) dmd_only
-    % (4) hybrid_esn
-    % (5) hybrid_dmd
-    % (6) corr_only
-    % (7) esn_plus_dmd
-    % (8) hybrid_esn_dmd
+    % Model configuration options: (1) model_only (2) esn_only (3)
+    % dmd_only (4) hybrid_esn (5) hybrid_dmd (6) corr_only (7)
+    % esn_plus_dmd (8) hybrid_esn_dmd
     expObj.set_default_hyp('ModelConfig', 4);
 
     % Tikhonov regularization

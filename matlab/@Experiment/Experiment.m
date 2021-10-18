@@ -101,9 +101,6 @@ classdef Experiment < handle
         % A memory with a windowsize is needed to be able to compute a NRMSE
         nrmse_memory = struct();
 
-        % allow this class to perform syscalls
-        allow_syscall = true;
-
         % output_directory
         output_dir = '';
 
@@ -111,7 +108,7 @@ classdef Experiment < handle
 
     methods (Access = public)
 
-        function self = Experiment(data, pid, procs, syscalls)
+        function self = Experiment(data, pid, procs)
         % constructor
         %
         % data:     training data object
@@ -128,10 +125,6 @@ classdef Experiment < handle
               case 3
                 self.pid   = pid;
                 self.procs = procs;
-              case 4
-                self.pid   = pid;
-                self.procs = procs;
-                self.allow_syscall = syscalls;
             end
 
             % Seed the rng with time and pid

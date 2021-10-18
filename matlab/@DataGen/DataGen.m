@@ -49,13 +49,10 @@ classdef DataGen < handle
 
         % output during transient and predictions
         verbosity = 500;
-
-        % allow this class to perform syscalls
-        allow_syscall = true;
     end
 
     methods
-        function self = DataGen(model_prf, model_imp, syscalls)
+        function self = DataGen(model_prf, model_imp)
             assert(strcmp(model_prf.name, model_imp.name));
 
             self.model_prf = model_prf;

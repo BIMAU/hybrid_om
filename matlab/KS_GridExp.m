@@ -1,5 +1,5 @@
 function [dir] = KS_GridExp(varargin)
-    [pid, procs, syscalls] = Utils.input_handling(nargin, varargin);
+    [pid, procs] = Utils.input_handling(nargin, varargin);
     Utils.add_paths();
 
     % create and initialize two KS models with different grids
@@ -13,7 +13,7 @@ function [dir] = KS_GridExp(varargin)
     ks_imp.initialize();
 
     % create data generator for the two models
-    dgen = DataGen(ks_prf, ks_imp, syscalls);
+    dgen = DataGen(ks_prf, ks_imp);
 
     % the grids are different so grid transfers are necessary
     dgen.dimension = '1D';
@@ -31,7 +31,7 @@ function [dir] = KS_GridExp(varargin)
     dgen.generate_imp_predictions();
 
     % create experiment class
-    expObj = Experiment(dgen, pid, procs, syscalls);
+    expObj = Experiment(dgen, pid, procs);
 
     % add experiment identification
     expObj.ident = 'KS_GridExp';

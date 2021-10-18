@@ -1,4 +1,3 @@
-
 exp_dirs = {'Pathak2018repl/NR_200-6400_MC_1-8_parallel_param_1.00e+00/', ...
             'Pathak2018repl/NR_200-6400_MC_1-8_parallel_param_1.00e-01/', ...
             'Pathak2018repl/NR_200-6400_MC_1-8_parallel_param_1.00e-02/'};
@@ -22,8 +21,7 @@ for k = 1:numel(exp_dirs)
     [nums, mdat, preds, truths, Nbox] = p.plot_experiment();
 
     output_dir = ['~/Projects/doc/mlqg/figs/', exp_dirs{k}];
-    system(['mkdir -vp ', output_dir]);
-
+    eval(['mkdir ', output_dir]);
     exportfig([output_dir, '/fig.eps'], 12, [18,14])
 end
 
