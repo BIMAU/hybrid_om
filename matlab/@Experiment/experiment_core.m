@@ -104,9 +104,9 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
         end
 
         % the svd averaging overwrites svd wavelet settings
-        if self.svd_averaging > 1
-            esn_pars.waveletReduction = self.svd_averaging;
-            esn_pars.waveletBlockSize = self.svd_averaging;
+        if self.svd_averaging > 1            
+            self.esn_pars.waveletReduction = self.svd_averaging;
+            self.esn_pars.waveletBlockSize = self.svd_averaging;
         end
 
         % create ESN, train the ESN and save the final state
