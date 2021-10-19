@@ -39,8 +39,7 @@ function [esn_pars, mod_pars] = distribute_params(self, exp_idx)
     esn_pars.waveletReduction = hyp_id2value('SVDWaveletReduction');
     esn_pars.waveletBlockSize = hyp_id2value('SVDWaveletBlockSize');
 
-    self.svd_averaging = ...
-        self.hyp.SVDAveraging.opts{hyp_id2value('SVDAveraging')};
+    self.svd_averaging = hyp_id2value('SVDAveraging');
 
     esn_pars.timeDelay = hyp_id2value('TimeDelay');
     esn_pars.timeDelayShift = hyp_id2value('TimeDelayShift');
