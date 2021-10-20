@@ -133,6 +133,6 @@ function [] = set_all_hyp_defaults(self)
     self.hyp.(name).opts = ...
         {'none', 'wavelet', 'dmd', 'pod'};
     self.hyp.(name).range   = [1:4];
-    self.hyp.(name).descr   = ['MC', self.range2str(self.hyp.(name).range)];
+    self.hyp.(name).descr   = ['SC', self.range2str(self.hyp.(name).range)];
     self.hyp.(name).default = 1;
 end

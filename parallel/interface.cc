@@ -2,12 +2,12 @@
 #include <iostream>
 #include <sstream>
 #include <cstdlib>
+#include <cassert>
 
 int main(int argc, char **argv)
 {
-
     MPI_Init(NULL, NULL);
-    
+
     int numProcs;
     MPI_Comm_size(MPI_COMM_WORLD, &numProcs);
 
@@ -24,6 +24,8 @@ int main(int argc, char **argv)
     std::cout << command.str() << std::endl;
     std::system(command.str().c_str());
 
+    MPI_Barrier(MPI_COMM_WORLD);
+    std::cout << command.str() << " (done)" << std::endl;
     MPI_Finalize();
 
     return 0;

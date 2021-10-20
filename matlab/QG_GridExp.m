@@ -1,7 +1,7 @@
 function [dir] = QG_GridExp(varargin)
     [pid, procs] = Utils.input_handling(nargin, varargin);
     Utils.add_paths();
-    
+
     % Create two QG models with different grids and different Reynolds
     % numbers.
     Re_f = 1000;
@@ -73,7 +73,7 @@ function [dir] = QG_GridExp(varargin)
     expObj.ident = 'QG_GridExp';
 
     %
-    expObj.shifts = 5;
+    expObj.shifts = 16;
     expObj.reps = 1;
     expObj.store_state = 'final';
     expObj.nrmse_windowsize = 50;
@@ -82,17 +82,20 @@ function [dir] = QG_GridExp(varargin)
 
     % adjust hyperparam defaults
     expObj.set_default_hyp('Alpha', 1);
-    expObj.set_default_hyp('TrainingSamples', 20000);
+    expObj.set_default_hyp('TrainingSamples', 5000);
     expObj.set_default_hyp('AverageDegree', 3);
     expObj.set_default_hyp('RhoMax', 0.4);
     expObj.set_default_hyp('BlockSize', 1);
     expObj.set_default_hyp('InAmplitude', 1);
-    expObj.set_default_hyp('SVDWaveletBlockSize', 64);
-    expObj.set_default_hyp('SVDWaveletReduction', 4);
+    expObj.set_default_hyp('SVDWaveletBlockSize', 1);
+    expObj.set_default_hyp('SVDWaveletReduction', 1);
     expObj.set_default_hyp('ReservoirSize', 128);
     expObj.set_default_hyp('FilterCutoff', 0.0);
     expObj.set_default_hyp('TimeDelay', 0);
     expObj.set_default_hyp('TimeDelayShift', 100);
+
+    % Tikhonov regularization
+    expObj.set_default_hyp('Lambda', 1e-10);
 
     % Input matrix type
     % (1) sparse
@@ -110,24 +113,29 @@ function [dir] = QG_GridExp(varargin)
     % (5) standardize
     expObj.set_default_hyp('ScalingType', 5);
 
-    % Scale separation (modes) options:
+    % Spatial scale separation (modes) options:
     % (1) none
     % (2) wavelet
     % (3) dmd
     % (4) pod
     expObj.set_default_hyp('ScaleSeparation',1);
 
-    % Model configuration options: (1) model_only (2) esn_only (3)
-    % dmd_only (4) hybrid_esn (5) hybrid_dmd (6) corr_only (7)
-    % esn_plus_dmd (8) hybrid_esn_dmd
+    % Model configuration options:
+    % (1) model_only
+    % (2) esn_only
+    % (3) dmd_only
+    % (4) hybrid_esn
+    % (5) hybrid_dmd
+    % (6) corr_only
+    % (7) esn_plus_dmd
+    % (8) hybrid_esn_dmd
     expObj.set_default_hyp('ModelConfig', 4);
 
-    % Tikhonov regularization
-    expObj.set_default_hyp('Lambda', 1e-10);
-
-    % expObj.add_experiment('ReservoirSize', [200,400,800,1600,3200,6400,12800]);
-    expObj.add_experiment('ModelConfig', [4,8]);
-    expObj.set_default_hyp('ReservoirSize', 12800);
+    expObj.add_experiment('ReservoirSize', [200,400,800,1600,3200,6400,12800]);
+    % expObj.add_experiment('ModelConfig', [1,2,4,5,6,8]);
+    % expObj.add_experiment('Lambda', [1e-1,1e-6,1e-10]);
+    % expObj.add_experiment('TrainingSamples', [15000,10000,5000]);
+    expObj.add_experiment('ScaleSeparation', [1,2,3,4]);
 
     % run experiments
     dir = expObj.run();
