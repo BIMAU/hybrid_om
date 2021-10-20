@@ -79,7 +79,7 @@ function [nums, mdat, preds, truths, Nboxplots] = ...
         hold on
     end
     hold off
-    
+
     if self.grid
         grid on;
     end
@@ -123,11 +123,14 @@ function [nums, mdat, preds, truths, Nboxplots] = ...
         % create description
         descr = self.create_description(mdat);
         ylim([min(ylim), 1.4*max(ylim)])
-        text(min(xlim), max(ylim), descr, ...
-             'color', [0,0,0] , 'VerticalAlignment', 'top', ...
-             'FontName', 'Monospaced', 'FontSize', 9,'Interpreter', 'none');
+
+        tx = text(min(xlim), max(ylim), descr, ...
+                  'color', [0.7,0.7,0.7] , 'VerticalAlignment', 'top', ...
+                  'FontName', 'Monospaced', 'FontSize', 9,'Interpreter', 'none');
+        uistack(tx, 'bottom')
+
     end
-    
+
     if self.show_title
         title(sprintf('Experiment: %d training sets, %d par combinations', ...
                       size(nums,1), size(nums,2)));
