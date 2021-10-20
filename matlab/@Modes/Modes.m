@@ -4,19 +4,19 @@ classdef Modes < handle
 % equal size in both dimensions.
 
     properties
-        
+
         N; % state size
-        
-        V; % stores the modes        
+
+        V; % stores the modes
 
         red_factor = 1; % reduction factor for order reduction
-        
+
         % scale separation options
         scale_separation = 'wavelet'; % options: 'wavelet', 'pod'
 
         % Size of the wavelet blocks inside a wavelet transform matrix. For a
         % 2D wavelet the block size has an integer sqrt.
-        blocksize = 8;
+        blocksize = 16;
 
         dimension = '1D'; % selects a wavelet for a 1D field or a
                           % wavelet for a 2D field in column
@@ -47,12 +47,12 @@ classdef Modes < handle
             else
                 error('unexpected input')
             end
-            
+
             if self.red_factor ~= 1
                 error('option not implemented (yet)');
             end
         end
-        
+
         function [Ph] = build_dmd(self, data, train_range)
             X = data.X(:,train_range(1):train_range(end)-1);
             Xp = data.X(:,train_range(2):train_range(end));
@@ -102,12 +102,12 @@ classdef Modes < handle
             Nw = round(self.N / bs); % number of wavelet blocks
             assert(Nw == (self.N / bs), ...
                    'bs should be a divisor of N');
-            
+
             % build wavelet block
             if strcmp(dim, '1D')
                 % 1D wavelet transform for a state of size bs
-                W = self.haarmat(bs);            
-                
+                W = self.haarmat(bs);
+
             elseif strcmp(dim, '2D')
                 assert( round(sqrt(bs)) == sqrt(bs), ...
                         'in 2D bs should have an integer sqrt');
@@ -116,7 +116,7 @@ classdef Modes < handle
                 % 2D wavelet transform for a field of size sqrt(bs) x sqrt(bs) in
                 % column major ordering (:)
                 W = kron(W,W);
-                
+
             else
                 error('invalid dim option')
             end
@@ -128,28 +128,28 @@ classdef Modes < handle
             % create a reordering matrix with the block size
             P1 = speye(self.N);
             id = [];
-            
+
             for i = 1:bs
                 id = [id, (i:bs:self.N)];
             end
             P1(:,id) = P1(:,1:self.N);
-            
+
             if strcmp(dim, '2D')
                 % create a nested reordering matrix within the block
                 Pn = speye(bs);
                 id = [];
-                
+
                 for i = 1:sqrt(bs)
                     id = [id, (i:sqrt(bs):bs)];
                 end
                 Pn(:,id) = Pn(:,1:bs);
-                
+
                 % duplicate for all blocks
                 Pn = kron(I, Pn);
-                
+
                 % adjust P1 with this nested reordering
                 P1 = P1*Pn;
-            end                
+            end
 
             % create a block permutation matrix
             if strcmp(dim, '2D')

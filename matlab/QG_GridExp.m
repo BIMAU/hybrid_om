@@ -85,7 +85,7 @@ function [dir] = QG_GridExp(varargin)
     expObj.set_default_hyp('TrainingSamples', 5000);
     expObj.set_default_hyp('AverageDegree', 3);
     expObj.set_default_hyp('RhoMax', 0.4);
-    expObj.set_default_hyp('BlockSize', 1);
+    expObj.set_default_hyp('BlockSize', 16);
     expObj.set_default_hyp('InAmplitude', 1);
     expObj.set_default_hyp('SVDWaveletBlockSize', 1);
     expObj.set_default_hyp('SVDWaveletReduction', 1);
@@ -135,7 +135,7 @@ function [dir] = QG_GridExp(varargin)
     % expObj.add_experiment('ModelConfig', [1,2,4,5,6,8]);
     % expObj.add_experiment('Lambda', [1e-1,1e-6,1e-10]);
     % expObj.add_experiment('TrainingSamples', [15000,10000,5000]);
-    expObj.add_experiment('ScaleSeparation', [1,2,3,4]);
+    expObj.add_experiment('ScaleSeparation', [2,3,4,1]);
 
     % run experiments
     dir = expObj.run();
