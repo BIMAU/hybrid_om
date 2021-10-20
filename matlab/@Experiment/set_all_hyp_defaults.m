@@ -18,7 +18,7 @@ function [] = set_all_hyp_defaults(self)
     self.hyp.(name).default = 4000;
 
     name = 'ReductionFactor';
-    self.hyp.(name).range   = [16, 32];
+    self.hyp.(name).range   = [1, 3/4, 2/4, 1/4];
     self.hyp.(name).descr   = ['RF', self.range2str(self.hyp.(name).range)];
     self.hyp.(name).default = 1;
 
