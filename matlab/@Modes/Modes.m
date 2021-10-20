@@ -108,6 +108,11 @@ classdef Modes < handle
                 % 1D wavelet transform for a state of size bs
                 W = self.haarmat(bs);
 
+                % reduce the core wavelet if red_factor ~= 1
+                rf = self.red_factor;
+                nr = round(rf * size(W,1));
+                W = W(1:nr, :);
+
             elseif strcmp(dim, '2D')
                 assert( round(sqrt(bs)) == sqrt(bs), ...
                         'in 2D bs should have an integer sqrt');
@@ -125,43 +130,17 @@ classdef Modes < handle
             I  = speye(Nw);
             H  = kron(I, W);
 
-            % create a reordering matrix with the block size
-            P1 = speye(self.N);
-            id = [];
-
-            for i = 1:bs
-                id = [id, (i:bs:self.N)];
-            end
-            P1(:,id) = P1(:,1:self.N);
-
-            if strcmp(dim, '2D')
-                % create a nested reordering matrix within the block
-                Pn = speye(bs);
-                id = [];
-
-                for i = 1:sqrt(bs)
-                    id = [id, (i:sqrt(bs):bs)];
-                end
-                Pn(:,id) = Pn(:,1:bs);
-
-                % duplicate for all blocks
-                Pn = kron(I, Pn);
-
-                % adjust P1 with this nested reordering
-                P1 = P1*Pn;
-            end
-
             % create a block permutation matrix
             if strcmp(dim, '2D')
                 n  = sqrt(self.N / nun);
                 m  = sqrt(self.N / nun);
-                P2 = self.build_block_permutation(n, m, nun, sqrt(bs));
+                P = self.build_block_permutation(n, m, nun, sqrt(bs));
             else
-                P2 = speye(self.N);
+                P = speye(self.N);
             end
 
             % complete wavelet operator
-            V = P2'*H'*P1';
+            V = P'*H';
         end
 
         function [P] = build_block_permutation(self, n, m, nun, bs)
