@@ -68,6 +68,7 @@ function [esn_pars, mod_pars] = distribute_params(self, exp_idx)
     % finish the modes parameters
     mod_pars.N = self.model.N;
     mod_pars.dimension = self.dimension;
+    mod_pars.nun = self.model.nun;
 end
 
 function [pars_out] = default_esn_parameters()
