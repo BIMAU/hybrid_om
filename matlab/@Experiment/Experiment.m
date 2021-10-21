@@ -202,8 +202,8 @@ classdef Experiment < handle
                     self.print('transform input/output data with modes: %s\n', ...
                                self.scale_separation);
 
-                    self.VX   = self.modes.V' * self.data.X;
-                    self.VPhi = self.modes.V' * self.data.Phi;
+                    self.VX   = self.modes.Vinv * self.data.X;
+                    self.VPhi = self.modes.Vinv * self.data.Phi;
 
                     [predY, testY, err, esnX, damping] = self.experiment_core();
 

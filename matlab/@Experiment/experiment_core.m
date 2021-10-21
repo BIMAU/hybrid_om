@@ -104,7 +104,7 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
         end
 
         % the svd averaging overwrites svd wavelet settings
-        if self.svd_averaging > 1            
+        if self.svd_averaging > 1
             self.esn_pars.waveletReduction = self.svd_averaging;
             self.esn_pars.waveletBlockSize = self.svd_averaging;
         end
@@ -125,7 +125,6 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
     end
 
     clear trainU trainY
-
     % reset memory for nrmse
     self.nrmse_memory = struct();
     verbosity = 100;
@@ -147,11 +146,11 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
         else
             % create an input vector for the ESN
             if hybrid_esn || hybrid_dmd || hybrid_esn_dmd
-                u_in = [self.modes.V' * yk(:); self.modes.V' * Pyk(:)]';
+                u_in = [self.modes.Vinv * yk(:); self.modes.Vinv * Pyk(:)]';
             elseif esn_only || dmd_only || esn_plus_dmd
-                u_in = [self.modes.V' * yk(:)]';
+                u_in = [self.modes.Vinv * yk(:)]';
             elseif corr_only
-                u_in = [self.modes.V' * Pyk(:)]';
+                u_in = [self.modes.Vinv * Pyk(:)]';
             else
                 fprintf('no model active, doing nothing\n');
                 continue
