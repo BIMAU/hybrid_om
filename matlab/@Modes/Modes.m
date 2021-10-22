@@ -11,6 +11,11 @@ classdef Modes < handle
 
         Vinv; % inverse of the modes
 
+        Vc; % stores the complement modes
+
+        Vcinv; % inverse of the complement modes
+
+
         red_factor = 1; % reduction factor for order reduction
 
         % scale separation options
@@ -36,48 +41,75 @@ classdef Modes < handle
             self.set_parameters(pars);
 
             if strcmp(self.scale_separation, 'wavelet')
-                [self.V, self.Vinv] = self.build_wavelet(self.blocksize,...
-                                                         self.dimension,...
-                                                         self.nun);
+                [self.V, self.Vinv, self.Vc, self.Vcinv] = ...
+                    self.build_wavelet(self.blocksize, ...
+                                       self.dimension,...
+                                       self.nun);
             elseif strcmp(self.scale_separation, 'pod')
-                [self.V, self.Vinv] = self.build_pod(data, train_range);
+                [self.V, self.Vinv, self.Vc, self.Vcinv] = ...
+                    self.build_pod(data, train_range);
 
             elseif strcmp(self.scale_separation, 'dmd')
-                [self.V, self.Vinv] = self.build_dmd(data, train_range);
+                [self.V, self.Vinv, self.Vc, self.Vcinv] = ...
+                    self.build_dmd(data, train_range);
 
             elseif strcmp(self.scale_separation, 'none')
                 % return identity
                 self.V = speye(self.N, self.N);
                 self.Vinv = speye(self.N, self.N);
+                self.Vc = 0;
+                self.Vcinv = 0;
             else
                 error('unexpected input')
             end
-
         end
 
-        function [Ph, Phinv] = build_dmd(self, data, train_range)
+        function [Phr, Phrinv, Phc, Phcinv] = build_dmd(self, data, train_range)
             X = data.X(:,train_range(1):train_range(end)-1);
             Xp = data.X(:,train_range(2):train_range(end));
             [U,S,V] = svd(X, 'econ');
 
             r = round(self.red_factor*size(U,2));
-            U = U(:,1:r); S = S(1:r,1:r); V = V(:,1:r);
 
-            invS = sparse(diag(1./diag(S)));
-            A = U'*Xp*V*invS;
-            [W,D] = eig(A);
-            Ph = real(U*W(:,1:2:end));
-            Phinv = pinv(Ph);
+            Ur = U(:,1:r); Sr = S(1:r,1:r); Vr = V(:,1:r);
+            invSr = sparse(diag(1./diag(Sr)));
+            Ar = Ur'*Xp*Vr*invSr;
+            [Wr,Dr] = eig(Ar);
+            Phr = real(Ur*Wr(:,1:2:end));
+            Phrinv = pinv(Phr);
+
+            % create complement
+            if self.red_factor < 1
+                Uc = U(:,r+1:end); Sc = S(r+1:end,r+1:end); Vc = V(:,r+1:end);
+                invSc = sparse(diag(1./diag(Sc)));
+                Ac = Uc'*Xp*Vc*invSc;
+                [Wc,Dc] = eig(Ac);
+                Phc = real(Uc*Wc(:,1:2:end));
+                Phcinv = pinv(Phc);
+            else
+                Phc = 0;
+                Phcinv = 0;
+            end
         end
 
-        function [U, Uinv] = build_pod(self, data, train_range)
+        function [U, Uinv, Uc, Ucinv] = build_pod(self, data, train_range)
             [U,S,V] = svd(data.X(:,train_range), 'econ');
-            r = round(self.red_factor*size(U,2));
-            U = U(:,1:r);
-            Uinv = U';
+
+            % reduces rows so we obtain the transpose/inverse
+            [Uinv, Ucinv] = self.reduce(U');
+            U = Uinv';
+            Uc = Ucinv';
+
             maxdiff = max(max(abs(speye(size(U,2))-Uinv*U)));
             assert(maxdiff < 1e-14, "POD U not orthogonal");
 
+            if ~isempty(Uc)
+                maxdiff = max(max(abs(speye(size(Uc,2))-Ucinv*Uc)));
+                assert(maxdiff < 1e-14, "POD U not orthogonal");
+            else
+                Uc = 0;
+                Ucinv = 0;
+            end
         end
 
         function [] = set_parameters(self, pars)
@@ -92,7 +124,7 @@ classdef Modes < handle
             assert(self.red_factor > 0, "Invalid reduction factor");
         end
 
-        function [V, Vinv] = build_wavelet(self, bs, dim, nun)
+        function [V, Vinv, Vc, Vcinv] = build_wavelet(self, bs, dim, nun)
         % Build a wavelet matrix to represent a state of size N_imp in wavelet
         % coordinates: x = H*xc, with state x and coordinates xc. The
         % wavelet is ordered form large to small scales and is applied
@@ -122,25 +154,26 @@ classdef Modes < handle
             if strcmp(dim, '1D')
                 % 1D wavelet transform for a state of size bs
                 W = self.haarmat(bs);
-                W = self.reduce(W);
+                [W, Wc] = self.reduce(W);
 
             elseif strcmp(dim, '2D')
                 assert( round(sqrt(bs)) == sqrt(bs), ...
                         'in 2D bs should have an integer sqrt');
                 W = self.haarmat(sqrt(bs));
-                W = self.reduce(W);
+                [W, Wc] = self.reduce(W);
 
                 % 2D wavelet transform for a field of size sqrt(bs) x sqrt(bs) in
                 % column major ordering (:)
                 W = kron(W,W);
-
+                Wc = kron(Wc,Wc);
             else
                 error('invalid dim option')
             end
 
             % create block diagonal wavelet matrix
-            I  = speye(Nw);
-            H  = kron(I, W);
+            I = speye(Nw);
+            H = kron(I, W);
+            Hc = kron(I, Wc);
 
             % create a block permutation matrix
             if strcmp(dim, '2D')
@@ -155,9 +188,20 @@ classdef Modes < handle
             V = P'*H';
             Vinv = V';
 
-            % check that its orthogonal
+            % check that all modes are orthogonal
             maxdiff = max(max(abs(speye(size(V,2))-Vinv*V)));
             assert(maxdiff < 1e-14, "Wavelet modes V not orthogonal");
+
+            % create complement
+            if ~isempty(Hc)
+                Vc = P'*Hc';
+                Vcinv = Vc';
+                maxdiff = max(max(abs(speye(size(Vc,2))-Vcinv*Vc)));
+                assert(maxdiff < 1e-14, "Wavelet modes Vc not orthogonal");
+            else
+                Vc = 0;
+                Vcinv = 0;
+            end
         end
 
         function [P] = build_block_permutation(self, n, m, nun, bs)
@@ -203,14 +247,17 @@ classdef Modes < handle
             W = sparse(W);
         end
 
-        function [Vout] = reduce(self, Vin)
+        function [Vout, Vcout] = reduce(self, Vin)
         % reduce the rows of the input matrix Vin with red_factor
+        % return also the complement Vc
             rf = self.red_factor;
             if rf == 1
                 Vout = Vin;
+                Vcout = [];
             else
-                nr = round(rf * size(Vin,1));
+                nr = round(rf * size(Vin, 1));
                 Vout = Vin(1:nr, :);
+                Vcout = Vin(nr+1:end, :);
             end
         end
     end

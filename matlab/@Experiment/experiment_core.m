@@ -19,9 +19,7 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
 
     % There are several different model configurations based on settings
     % model_only, esn_only, dmd_only, hybrid_esn, hybrid_dmd,
-    % corr_only, esn_plus_dmd. DMD is part of ESN so from the point of
-    % view of experiment_core there are four basic types: hybrid,
-    % esn_or_dmd_only, model_only, corr_only.
+    % corr_only, esn_plus_dmd.
 
     hybrid_esn = ( strcmp(self.model_config, 'hybrid_esn') );
     hybrid_dmd = ( strcmp(self.model_config, 'hybrid_dmd') );
@@ -120,7 +118,6 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
         else
             esn_state = [];
         end
-
         damping = esn.TikhonovDamping;
     end
 
@@ -165,7 +162,7 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
             yk = self.modes.V * u_out(:);
 
             % combine ESN prediction with model prediction
-            % yk = yk + Vc*(Vc'*Pyk); % TODO
+            yk = yk + self.modes.Vc*(self.modes.Vcinv*Pyk);
         end
         % store result
         predY(i,:) = yk;
