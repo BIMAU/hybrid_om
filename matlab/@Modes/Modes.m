@@ -49,14 +49,10 @@ classdef Modes < handle
                 % return identity
                 self.V = speye(self.N, self.N);
                 self.Vinv = speye(self.N, self.N);
-
             else
                 error('unexpected input')
             end
 
-            if self.red_factor ~= 1
-                error('option not implemented (yet)');
-            end
         end
 
         function [Ph, Phinv] = build_dmd(self, data, train_range)
@@ -91,6 +87,9 @@ classdef Modes < handle
             for k = 1:numel(names)
                 self.(names{k}) = pars.(names{k});
             end
+            % check bounds on red_factor
+            assert(self.red_factor <= 1, "Invalid reduction factor");
+            assert(self.red_factor > 0, "Invalid reduction factor");
         end
 
         function [V, Vinv] = build_wavelet(self, bs, dim, nun)
