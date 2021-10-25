@@ -133,7 +133,6 @@ classdef Modes < handle
 
         % dim: dimension, options:  '1D' or '2D'
         % bs:  block size. In 2D bs should have an integer sqrt
-
             switch nargin
               case 1
                 bs  = self.blocksize;
@@ -160,12 +159,15 @@ classdef Modes < handle
                 assert( round(sqrt(bs)) == sqrt(bs), ...
                         'in 2D bs should have an integer sqrt');
                 W = self.haarmat(sqrt(bs));
-                [W, Wc] = self.reduce(W);
-
-                % 2D wavelet transform for a field of size sqrt(bs) x sqrt(bs) in
-                % column major ordering (:)
                 W = kron(W,W);
-                Wc = kron(Wc,Wc);
+
+                % reorder rows, order in increasing detail
+                id = reshape(1:bs,sqrt(bs),sqrt(bs))';
+                id = id(:);
+                W = W(id,:);
+
+                % reduce
+                [W, Wc] = self.reduce(W);
             else
                 error('invalid dim option')
             end
@@ -198,8 +200,12 @@ classdef Modes < handle
                 Vcinv = Vc';
                 maxdiff = max(max(abs(speye(size(Vc,2))-Vcinv*Vc)));
                 assert(maxdiff < 1e-14, "Wavelet modes Vc not orthogonal");
+
+                % mutual orthogonality
+                mutorth = max(max(abs(Vcinv*V)));
+                assert(mutorth < 1e-14, "Wavelet modes Vc not orthogonal");
             else
-                Vc = 0;
+                 Vc = 0;
                 Vcinv = 0;
             end
         end
