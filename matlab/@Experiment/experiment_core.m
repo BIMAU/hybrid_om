@@ -185,7 +185,6 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
         end
 
         if stop
-            keyboard
             break;
         end
     end
