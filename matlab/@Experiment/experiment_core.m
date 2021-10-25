@@ -162,7 +162,11 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
             yk = self.modes.V * u_out(:);
 
             % combine ESN prediction with model prediction
-            yk = yk + self.modes.Vc*(self.modes.Vcinv*Pyk);
+            if ( strcmp(self.add_details, 'from_model') );
+                yk = yk + self.modes.Vc*(self.modes.Vcinv*Pyk);
+            else
+                % todo
+            end
         end
         % store result
         predY(i,:) = yk;
@@ -181,6 +185,7 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
         end
 
         if stop
+            keyboard
             break;
         end
     end

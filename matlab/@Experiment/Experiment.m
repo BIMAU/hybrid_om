@@ -20,6 +20,9 @@ classdef Experiment < handle
         % Scale separation (modes)
         scale_separation = 'none';
 
+        % How to add details
+        add_details = 'from_model';
+
         store_state = 'final'; % which state to store: 'all', 'final'
 
         dimension = '1D'; % problem dimension: '1D' or '2D'

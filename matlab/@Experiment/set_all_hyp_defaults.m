@@ -120,6 +120,12 @@ function [] = set_all_hyp_defaults(self)
     self.hyp.(name).descr   = ['WI', self.range2str(self.hyp.(name).range)];
     self.hyp.(name).default = 5;
 
+    name = 'AddDetails';
+    self.hyp.(name).opts = {'disabled', 'from_model'};
+    self.hyp.(name).range   = [1];
+    self.hyp.(name).descr   = ['DE', self.range2str(self.hyp.(name).range)];
+    self.hyp.(name).default = 3;
+
     name = 'ModelConfig';
     self.hyp.(name).opts = ...
         {'model_only', 'esn_only', 'dmd_only', ...

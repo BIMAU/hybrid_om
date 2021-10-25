@@ -81,15 +81,16 @@ function [dir] = QG_GridExp(varargin)
     expObj.max_preds = 365;
 
     % adjust hyperparam defaults
-    expObj.set_default_hyp('Alpha', 1);
-    expObj.set_default_hyp('TrainingSamples', 5000);
+    expObj.set_default_hyp('Alpha', 0.2);
+    expObj.set_default_hyp('TrainingSamples', 10000);
     expObj.set_default_hyp('AverageDegree', 3);
     expObj.set_default_hyp('RhoMax', 0.4);
-    expObj.set_default_hyp('BlockSize', 16);
+    expObj.set_default_hyp('BlockSize', 64);
+    expObj.set_default_hyp('ReductionFactor', 1);
     expObj.set_default_hyp('InAmplitude', 1);
     expObj.set_default_hyp('SVDWaveletBlockSize', 1);
     expObj.set_default_hyp('SVDWaveletReduction', 1);
-    expObj.set_default_hyp('ReservoirSize', 128);
+    expObj.set_default_hyp('ReservoirSize', 3200);
     expObj.set_default_hyp('FilterCutoff', 0.0);
     expObj.set_default_hyp('TimeDelay', 0);
     expObj.set_default_hyp('TimeDelayShift', 100);
@@ -120,6 +121,11 @@ function [dir] = QG_GridExp(varargin)
     % (4) pod
     expObj.set_default_hyp('ScaleSeparation',1);
 
+    % Add details
+    % (1) disabled
+    % (2) from model
+    expObj.set_default_hyp('AddDetails',2);
+
     % Model configuration options:
     % (1) model_only
     % (2) esn_only
@@ -131,11 +137,8 @@ function [dir] = QG_GridExp(varargin)
     % (8) hybrid_esn_dmd
     expObj.set_default_hyp('ModelConfig', 4);
 
-    expObj.add_experiment('ReservoirSize', [200,400,800,1600,3200,6400,12800]);
-    % expObj.add_experiment('ModelConfig', [1,2,4,5,6,8]);
-    % expObj.add_experiment('Lambda', [1e-1,1e-6,1e-10]);
-    % expObj.add_experiment('TrainingSamples', [15000,10000,5000]);
-    expObj.add_experiment('ScaleSeparation', [2,3,4,1]);
+    expObj.add_experiment('ScaleSeparation', [2, 4]);
+    expObj.add_experiment('ReductionFactor', [1:-0.125:0.125]);
 
     % run experiments
     dir = expObj.run();

@@ -21,6 +21,9 @@ function [esn_pars, mod_pars] = distribute_params(self, exp_idx)
 
     self.tr_samples = hyp_id2value('TrainingSamples');
 
+    self.add_details = ...
+        self.hyp.AddDetails.opts{hyp_id2value('AddDetails')};
+
     self.model_config = ...
         self.hyp.ModelConfig.opts{hyp_id2value('ModelConfig')};
 
