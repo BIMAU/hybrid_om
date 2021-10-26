@@ -18,8 +18,8 @@ classdef Modes < handle
 
         red_factor = 1; % reduction factor for order reduction
 
-        % scale separation options
-        scale_separation = 'wavelet'; % options: 'wavelet', 'pod'
+        % scale separation options: 'wavelet', 'pod', 'local_pod', 'dmd'
+        scale_separation = 'wavelet';
 
         % Size of the wavelet blocks inside a wavelet transform matrix. For a
         % 2D wavelet the block size has an integer sqrt.
@@ -45,9 +45,14 @@ classdef Modes < handle
                     self.build_wavelet(self.blocksize, ...
                                        self.dimension,...
                                        self.nun);
+
             elseif strcmp(self.scale_separation, 'pod')
                 [self.V, self.Vinv, self.Vc, self.Vcinv] = ...
                     self.build_pod(data, train_range);
+
+            elseif strcmp(self.scale_separation, 'local_pod')
+                [self.V, self.Vinv, self.Vc, self.Vcinv] = ...
+                    self.build_local_pod(data, train_range);
 
             elseif strcmp(self.scale_separation, 'dmd')
                 [self.V, self.Vinv, self.Vc, self.Vcinv] = ...
@@ -109,6 +114,56 @@ classdef Modes < handle
             else
                 Uc = 0;
                 Ucinv = 0;
+            end
+        end
+
+        function [V, Vinv, Vc, Vcinv] = build_local_pod(self, data, train_range)
+            bs = self.blocksize;
+            if strcmp(self.dimension, '2D')
+                n  = sqrt(self.N / self.nun);
+                m  = sqrt(self.N / self.nun);
+                P = self.build_block_permutation(n, m, self.nun, sqrt(bs));
+            else
+                P = speye(self.N);
+            end
+
+            nBlocks = self.N / bs;
+            assert(round(nBlocks) == nBlocks, ...
+                   "chosen block size is not a divisor of N");
+
+            rf = self.red_factor;
+            assert(rf*self.N == round(rf*self.N), ...
+                   "reduction factor gives non-integers");
+
+            % reduced block size
+            bsr = rf*bs;
+            bsc = bs - bsr;
+            assert(bsr == round(bsr), ...
+                   "reduction factor gives non-integers");
+
+            U = sparse(self.N, rf*self.N);
+            Uc = sparse(self.N, (1-rf)*self.N);
+            for i = 1:nBlocks
+                range_i = (i-1)*bs+1:i*bs;
+                range_j = (i-1)*bsr+1:i*bsr;
+                range_jc = (i-1)*bsc+1:i*bsc;
+
+                [Ui,~,~] = svd(P(range_i,:)*data.X(:,train_range), 'econ');
+                [Ui, Uic] = self.reduce(Ui');
+                U(range_i, range_j) = Ui';
+                if ~isempty(Uic)
+                    Uc(range_i, range_jc) = Uic';
+                end
+            end
+
+            V = P'*U;
+            Vinv = V';
+            if ~isempty(Uc)
+                Vc = P'*Uc;
+                Vcinv = Vc';
+            else
+                Vc = 0;
+                Vcinv = 0;
             end
         end
 
