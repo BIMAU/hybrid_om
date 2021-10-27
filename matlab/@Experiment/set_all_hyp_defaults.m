@@ -137,7 +137,7 @@ function [] = set_all_hyp_defaults(self)
 
     name = 'ScaleSeparation';
     self.hyp.(name).opts = ...
-        {'none', 'wavelet', 'dmd', 'pod', 'local_pod'};
+        {'none', 'wavelet', 'dmd', 'pod', 'local_pod', 'wav+pod'};
     self.hyp.(name).range   = [1:5];
     self.hyp.(name).descr   = ['SC', self.range2str(self.hyp.(name).range)];
     self.hyp.(name).default = 1;

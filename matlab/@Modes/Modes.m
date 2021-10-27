@@ -54,6 +54,10 @@ classdef Modes < handle
                 [self.V, self.Vinv, self.Vc, self.Vcinv] = ...
                     self.build_local_pod(data, train_range);
 
+            elseif strcmp(self.scale_separation, 'wav+pod')
+                [self.V, self.Vinv, self.Vc, self.Vcinv] = ...
+                    self.build_wavpod(data, train_range);
+
             elseif strcmp(self.scale_separation, 'dmd')
                 [self.V, self.Vinv, self.Vc, self.Vcinv] = ...
                     self.build_dmd(data, train_range);
@@ -69,32 +73,23 @@ classdef Modes < handle
             end
         end
 
-        function [Phr, Phrinv, Phc, Phcinv] = build_dmd(self, data, train_range)
-            X = data.X(:,train_range(1):train_range(end)-1);
-            Xp = data.X(:,train_range(2):train_range(end));
-            [U,S,V] = svd(X, 'econ');
+        function [V, Vinv, Vc, Vcinv] = build_wavpod(self, data, train_range)
 
-            r = round(self.red_factor*size(U,2));
+        % build wavelet
+            [H, Hinv, Hc, Hcinv] = ...
+                self.build_wavelet(self.blocksize, ...
+                                   self.dimension,...
+                                   self.nun);
 
-            Ur = U(:,1:r); Sr = S(1:r,1:r); Vr = V(:,1:r);
-            invSr = sparse(diag(1./diag(Sr)));
-            Ar = Ur'*Xp*Vr*invSr;
-            [Wr,Dr] = eig(Ar);
-            Phr = real(Ur*Wr(:,1:2:end));
-            Phrinv = pinv(Phr);
+            % build POD on (reduced) wavelet coordinates
+            Xr = Hinv*data.X(:,train_range);
+            [U,~,~] = svd(Xr, 'econ');
 
-            % create complement
-            if self.red_factor < 1
-                Uc = U(:,r+1:end); Sc = S(r+1:end,r+1:end); Vc = V(:,r+1:end);
-                invSc = sparse(diag(1./diag(Sc)));
-                Ac = Uc'*Xp*Vc*invSc;
-                [Wc,Dc] = eig(Ac);
-                Phc = real(Uc*Wc(:,1:2:end));
-                Phcinv = pinv(Phc);
-            else
-                Phc = 0;
-                Phcinv = 0;
-            end
+            V = H*U;
+            Vinv = V';
+
+            Vc = Hc;
+            Vcinv = Hcinv;
         end
 
         function [U, Uinv, Uc, Ucinv] = build_pod(self, data, train_range)
@@ -116,6 +111,7 @@ classdef Modes < handle
                 Ucinv = 0;
             end
         end
+
 
         function [V, Vinv, Vc, Vcinv] = build_local_pod(self, data, train_range)
             bs = self.blocksize;
@@ -307,6 +303,36 @@ classdef Modes < handle
             end
             W = sparse(W);
         end
+
+        function [Phr, Phrinv, Phc, Phcinv] = build_dmd(self, data, train_range)
+            X = data.X(:,train_range(1):train_range(end)-1);
+            Xp = data.X(:,train_range(2):train_range(end));
+            [U,S,V] = svd(X, 'econ');
+
+            r = round(self.red_factor*size(U,2));
+
+            Ur = U(:,1:r); Sr = S(1:r,1:r); Vr = V(:,1:r);
+            invSr = sparse(diag(1./diag(Sr)));
+            Ar = Ur'*Xp*Vr*invSr;
+            [Wr,Dr] = eig(Ar);
+            Phr = real(Ur*Wr(:,1:2:end));
+            Phrinv = pinv(Phr);
+
+            % create complement
+            if self.red_factor < 1
+                Uc = U(:,r+1:end); Sc = S(r+1:end,r+1:end); Vc = V(:,r+1:end);
+                invSc = sparse(diag(1./diag(Sc)));
+                Ac = Uc'*Xp*Vc*invSc;
+                [Wc,Dc] = eig(Ac);
+                Phc = real(Uc*Wc(:,1:2:end));
+                Phcinv = pinv(Phc);
+            else
+                Phc = 0;
+                Phcinv = 0;
+            end
+        end
+
+
 
         function [Vout, Vcout] = reduce(self, Vin)
         % reduce the rows of the input matrix Vin with red_factor
