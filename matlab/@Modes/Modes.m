@@ -112,13 +112,13 @@ classdef Modes < handle
             end
         end
 
-
         function [V, Vinv, Vc, Vcinv] = build_local_pod(self, data, train_range)
             bs = self.blocksize;
             if strcmp(self.dimension, '2D')
-                n  = sqrt(self.N / self.nun);
-                m  = sqrt(self.N / self.nun);
-                P = self.build_block_permutation(n, m, self.nun, sqrt(bs));
+                n = sqrt(self.N / self.nun);
+                m = sqrt(self.N / self.nun);
+                P = self.build_block_permutation(n, m, self.nun, ...
+                                                 sqrt(bs), false);
             else
                 P = speye(self.N);
             end
@@ -232,7 +232,8 @@ classdef Modes < handle
             if strcmp(dim, '2D')
                 n  = sqrt(self.N / nun);
                 m  = sqrt(self.N / nun);
-                P = self.build_block_permutation(n, m, nun, sqrt(bs));
+                P = self.build_block_permutation(n, m, nun, ...
+                                                 sqrt(bs), false);
             else
                 P = speye(self.N);
             end
@@ -256,12 +257,17 @@ classdef Modes < handle
                 mutorth = max(max(abs(Vcinv*V)));
                 assert(mutorth < 1e-14, "Wavelet modes Vc not orthogonal");
             else
-                 Vc = 0;
+                Vc = 0;
                 Vcinv = 0;
             end
         end
 
-        function [P] = build_block_permutation(self, n, m, nun, bs)
+        function [P] = build_block_permutation(self, n, m, nun, bs, sep_un)
+            if nargin < 6
+                % separate unknowns is the default behaviour
+                sep_un = true;
+            end
+
             dim = n*m*nun;
             assert(dim == self.N, 'inconsistent dimensions');
             P   = sparse(dim,dim);
@@ -270,12 +276,24 @@ classdef Modes < handle
                 rangej = posj+1:posj+bs;
                 for posi = 0:bs:m-bs
                     rangei = posi+1:posi+bs;
-                    for xx = 1:nun
+                    if sep_un % separate unknowns, xx as outer iteration
+                        for xx = 1:nun
+                            for j = rangej
+                                for i = rangei
+                                    k = k + 1;
+                                    col = nun*(n*(j-1)+(i-1))+xx;
+                                    P(k,col) = 1;
+                                end
+                            end
+                        end
+                    else % keep unknowns together, xx as inner iteration
                         for j = rangej
                             for i = rangei
-                                k = k + 1;
-                                col = nun*(n*(j-1)+(i-1))+xx;
-                                P(k,col) = 1;
+                                for xx = 1:nun
+                                    k = k + 1;
+                                    col = nun*(n*(j-1)+(i-1))+xx;
+                                    P(k,col) = 1;
+                                end
                             end
                         end
                     end
