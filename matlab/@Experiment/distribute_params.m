@@ -18,6 +18,7 @@ function [esn_pars, mod_pars] = distribute_params(self, exp_idx)
 
     mod_pars.blocksize = hyp_id2value('BlockSize');
     mod_pars.red_factor = hyp_id2value('ReductionFactor');
+    mod_pars.separate_unknowns = hyp_id2value('SeparateUnknowns');
 
     self.tr_samples = hyp_id2value('TrainingSamples');
 

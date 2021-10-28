@@ -31,6 +31,9 @@ classdef Modes < handle
 
         nun = 1; % number of independent unknowns a wavelet needs to
                  % act on
+
+        % flag that controls the ordering in build_block_permutation
+        separate_unknowns = false;
     end
 
     methods
@@ -117,11 +120,12 @@ classdef Modes < handle
             if strcmp(self.dimension, '2D')
                 n = sqrt(self.N / self.nun);
                 m = sqrt(self.N / self.nun);
-                P = self.build_block_permutation(n, m, self.nun, ...
-                                                 sqrt(bs), false);
+                P = self.build_block_permutation(n, m, self.nun, sqrt(bs));
             else
                 P = speye(self.N);
             end
+
+            bs = 2*bs;
 
             nBlocks = self.N / bs;
             assert(round(nBlocks) == nBlocks, ...
@@ -232,8 +236,7 @@ classdef Modes < handle
             if strcmp(dim, '2D')
                 n  = sqrt(self.N / nun);
                 m  = sqrt(self.N / nun);
-                P = self.build_block_permutation(n, m, nun, ...
-                                                 sqrt(bs), false);
+                P = self.build_block_permutation(n, m, nun, sqrt(bs));
             else
                 P = speye(self.N);
             end
@@ -262,11 +265,7 @@ classdef Modes < handle
             end
         end
 
-        function [P] = build_block_permutation(self, n, m, nun, bs, sep_un)
-            if nargin < 6
-                % separate unknowns is the default behaviour
-                sep_un = true;
-            end
+        function [P] = build_block_permutation(self, n, m, nun, bs)
 
             dim = n*m*nun;
             assert(dim == self.N, 'inconsistent dimensions');
@@ -276,7 +275,8 @@ classdef Modes < handle
                 rangej = posj+1:posj+bs;
                 for posi = 0:bs:m-bs
                     rangei = posi+1:posi+bs;
-                    if sep_un % separate unknowns, xx as outer iteration
+                    if self.separate_unknowns
+                        % separate unknowns, xx as outer iteration
                         for xx = 1:nun
                             for j = rangej
                                 for i = rangei
