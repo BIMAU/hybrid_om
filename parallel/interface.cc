@@ -21,6 +21,7 @@ int main(int argc, char **argv)
     std::stringstream command;
     command << "./" << argv[1] << " " <<  pid << " " << numProcs;
 
+    MPI_Barrier(MPI_COMM_WORLD);
     std::cout << command.str() << std::endl;
     std::system(command.str().c_str());
 
