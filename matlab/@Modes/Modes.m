@@ -207,7 +207,7 @@ classdef Modes < handle
                 W = kron(W,W);
 
                 % reorder rows, order in increasing detail
-                id = reshape(1:bs,sqrt(bs),sqrt(bs))';
+                id = reshape(1:bs, sqrt(bs), sqrt(bs))';
                 id = id(:);
                 W = W(id,:);
 
@@ -224,8 +224,8 @@ classdef Modes < handle
 
             % create a block permutation matrix
             if strcmp(dim, '2D')
-                n  = sqrt(self.N / nun);
-                m  = sqrt(self.N / nun);
+                n = sqrt(self.N / nun);
+                m = sqrt(self.N / nun);
                 P = self.build_block_permutation(n, m, nun, sqrt(bs));
             else
                 P = speye(self.N);
@@ -245,7 +245,6 @@ classdef Modes < handle
                 Vcinv = Vc';
                 maxdiff = max(max(abs(speye(size(Vc,2))-Vcinv*Vc)));
                 assert(maxdiff < 1e-14, "Wavelet modes Vc not orthogonal");
-
                 % mutual orthogonality
                 mutorth = max(max(abs(Vcinv*V)));
                 assert(mutorth < 1e-14, "Wavelet modes Vc not orthogonal");
@@ -261,6 +260,12 @@ classdef Modes < handle
             assert(dim == self.N, 'inconsistent dimensions');
             P   = sparse(dim,dim);
             k   = 0;
+
+            if ~self.separate_unknowns
+                % make smaller blocks
+                bs = bs / nun;
+            end
+
             for posj = 0:bs:n-bs
                 rangej = posj+1:posj+bs;
                 for posi = 0:bs:m-bs
