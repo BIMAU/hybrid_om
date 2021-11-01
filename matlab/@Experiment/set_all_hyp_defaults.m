@@ -22,6 +22,11 @@ function [] = set_all_hyp_defaults(self)
     self.hyp.(name).descr   = ['RF', self.range2str(self.hyp.(name).range)];
     self.hyp.(name).default = 1;
 
+    name = 'SeparateUnknowns';
+    self.hyp.(name).range   = [false, true];
+    self.hyp.(name).descr   = ['SU', self.range2str(self.hyp.(name).range)];
+    self.hyp.(name).default = 1;
+
     name = 'Alpha';
     self.hyp.(name).range   = [0.2,1.0];
     self.hyp.(name).descr   = ['AP', self.range2str(self.hyp.(name).range)];

@@ -31,6 +31,9 @@ classdef Modes < handle
 
         nun = 1; % number of independent unknowns a wavelet needs to
                  % act on
+
+        % flag that controls the ordering in build_block_permutation
+        separate_unknowns = false;
     end
 
     methods
@@ -42,9 +45,7 @@ classdef Modes < handle
 
             if strcmp(self.scale_separation, 'wavelet')
                 [self.V, self.Vinv, self.Vc, self.Vcinv] = ...
-                    self.build_wavelet(self.blocksize, ...
-                                       self.dimension,...
-                                       self.nun);
+                    self.build_wavelet(data, train_range);
 
             elseif strcmp(self.scale_separation, 'pod')
                 [self.V, self.Vinv, self.Vc, self.Vcinv] = ...
@@ -77,9 +78,7 @@ classdef Modes < handle
 
         % build wavelet
             [H, Hinv, Hc, Hcinv] = ...
-                self.build_wavelet(self.blocksize, ...
-                                   self.dimension,...
-                                   self.nun);
+                self.build_wavelet(data, train_range);
 
             % build POD on (reduced) wavelet coordinates
             Xr = Hinv*data.X(:,train_range);
@@ -117,11 +116,13 @@ classdef Modes < handle
             if strcmp(self.dimension, '2D')
                 n = sqrt(self.N / self.nun);
                 m = sqrt(self.N / self.nun);
-                P = self.build_block_permutation(n, m, self.nun, ...
-                                                 sqrt(bs), false);
+                P = self.build_block_permutation(n, m, self.nun, sqrt(bs));
             else
                 P = speye(self.N);
             end
+
+            % increasing the blocksize.
+            % bs = 2*bs;
 
             nBlocks = self.N / bs;
             assert(round(nBlocks) == nBlocks, ...
@@ -175,7 +176,7 @@ classdef Modes < handle
             assert(self.red_factor > 0, "Invalid reduction factor");
         end
 
-        function [V, Vinv, Vc, Vcinv] = build_wavelet(self, bs, dim, nun)
+        function [V, Vinv, Vc, Vcinv] = build_wavelet(self, data, train_range)
         % Build a wavelet matrix to represent a state of size N_imp in wavelet
         % coordinates: x = H*xc, with state x and coordinates xc. The
         % wavelet is ordered form large to small scales and is applied
@@ -184,17 +185,10 @@ classdef Modes < handle
 
         % dim: dimension, options:  '1D' or '2D'
         % bs:  block size. In 2D bs should have an integer sqrt
-            switch nargin
-              case 1
-                bs  = self.blocksize;
-                dim = self.dimension;
-                nun = self.nun;
-              case 2
-                dim = self.dimension;
-                nun = self.nun;
-              case 3
-                nun = self.nun;
-            end
+
+            bs  = self.blocksize;
+            dim = self.dimension;
+            nun = self.nun;
 
             Nw = round(self.N / bs); % number of wavelet blocks
             assert(Nw == (self.N / bs), ...
@@ -213,7 +207,7 @@ classdef Modes < handle
                 W = kron(W,W);
 
                 % reorder rows, order in increasing detail
-                id = reshape(1:bs,sqrt(bs),sqrt(bs))';
+                id = reshape(1:bs, sqrt(bs), sqrt(bs))';
                 id = id(:);
                 W = W(id,:);
 
@@ -230,10 +224,9 @@ classdef Modes < handle
 
             % create a block permutation matrix
             if strcmp(dim, '2D')
-                n  = sqrt(self.N / nun);
-                m  = sqrt(self.N / nun);
-                P = self.build_block_permutation(n, m, nun, ...
-                                                 sqrt(bs), false);
+                n = sqrt(self.N / nun);
+                m = sqrt(self.N / nun);
+                P = self.build_block_permutation(n, m, nun, sqrt(bs));
             else
                 P = speye(self.N);
             end
@@ -252,7 +245,6 @@ classdef Modes < handle
                 Vcinv = Vc';
                 maxdiff = max(max(abs(speye(size(Vc,2))-Vcinv*Vc)));
                 assert(maxdiff < 1e-14, "Wavelet modes Vc not orthogonal");
-
                 % mutual orthogonality
                 mutorth = max(max(abs(Vcinv*V)));
                 assert(mutorth < 1e-14, "Wavelet modes Vc not orthogonal");
@@ -262,21 +254,24 @@ classdef Modes < handle
             end
         end
 
-        function [P] = build_block_permutation(self, n, m, nun, bs, sep_un)
-            if nargin < 6
-                % separate unknowns is the default behaviour
-                sep_un = true;
-            end
+        function [P] = build_block_permutation(self, n, m, nun, bs)
 
             dim = n*m*nun;
             assert(dim == self.N, 'inconsistent dimensions');
             P   = sparse(dim,dim);
             k   = 0;
+
+            if ~self.separate_unknowns
+                % make smaller blocks
+                bs = bs / nun;
+            end
+
             for posj = 0:bs:n-bs
                 rangej = posj+1:posj+bs;
                 for posi = 0:bs:m-bs
                     rangei = posi+1:posi+bs;
-                    if sep_un % separate unknowns, xx as outer iteration
+                    if self.separate_unknowns
+                        % separate unknowns, xx as outer iteration
                         for xx = 1:nun
                             for j = rangej
                                 for i = rangei
