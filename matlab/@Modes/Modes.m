@@ -45,9 +45,7 @@ classdef Modes < handle
 
             if strcmp(self.scale_separation, 'wavelet')
                 [self.V, self.Vinv, self.Vc, self.Vcinv] = ...
-                    self.build_wavelet(self.blocksize, ...
-                                       self.dimension,...
-                                       self.nun);
+                    self.build_wavelet(data, train_range);
 
             elseif strcmp(self.scale_separation, 'pod')
                 [self.V, self.Vinv, self.Vc, self.Vcinv] = ...
@@ -80,9 +78,7 @@ classdef Modes < handle
 
         % build wavelet
             [H, Hinv, Hc, Hcinv] = ...
-                self.build_wavelet(self.blocksize, ...
-                                   self.dimension,...
-                                   self.nun);
+                self.build_wavelet(data, train_range);
 
             % build POD on (reduced) wavelet coordinates
             Xr = Hinv*data.X(:,train_range);
@@ -125,7 +121,8 @@ classdef Modes < handle
                 P = speye(self.N);
             end
 
-            bs = 2*bs;
+            % increasing the blocksize.
+            % bs = 2*bs;
 
             nBlocks = self.N / bs;
             assert(round(nBlocks) == nBlocks, ...
@@ -179,7 +176,7 @@ classdef Modes < handle
             assert(self.red_factor > 0, "Invalid reduction factor");
         end
 
-        function [V, Vinv, Vc, Vcinv] = build_wavelet(self, bs, dim, nun)
+        function [V, Vinv, Vc, Vcinv] = build_wavelet(self, data, train_range)
         % Build a wavelet matrix to represent a state of size N_imp in wavelet
         % coordinates: x = H*xc, with state x and coordinates xc. The
         % wavelet is ordered form large to small scales and is applied
@@ -188,17 +185,10 @@ classdef Modes < handle
 
         % dim: dimension, options:  '1D' or '2D'
         % bs:  block size. In 2D bs should have an integer sqrt
-            switch nargin
-              case 1
-                bs  = self.blocksize;
-                dim = self.dimension;
-                nun = self.nun;
-              case 2
-                dim = self.dimension;
-                nun = self.nun;
-              case 3
-                nun = self.nun;
-            end
+
+            bs  = self.blocksize;
+            dim = self.dimension;
+            nun = self.nun;
 
             Nw = round(self.N / bs); % number of wavelet blocks
             assert(Nw == (self.N / bs), ...
