@@ -1,4 +1,4 @@
-function [dir] = QG_GridExp(varargin)
+function [dir] = QG_transient(varargin)
     [pid, procs] = Utils.input_handling(nargin, varargin);
     Utils.add_paths();
 
@@ -70,15 +70,15 @@ function [dir] = QG_GridExp(varargin)
     expObj = Experiment(dgen, pid, procs);
 
     % add experiment identification
-    expObj.ident = 'QG_Nr';
+    expObj.ident = 'QG_transient';
 
     %
-    expObj.shifts = 100;
+    expObj.shifts = 1;
     expObj.reps = 1;
-    expObj.store_state = 'final';
+    expObj.store_state = 'all';
     expObj.nrmse_windowsize = 50;
     expObj.err_tol = 0.5;
-    expObj.max_preds = 365;
+    expObj.max_preds = 100*365;
 
     % adjust hyperparam defaults
     expObj.set_default_hyp('Alpha', 0.2);
@@ -140,16 +140,8 @@ function [dir] = QG_GridExp(varargin)
     % (8) hybrid_esn_dmd
     expObj.set_default_hyp('ModelConfig', 8);
 
-    expObj.add_experiment('ReservoirSize', [200,400,800,1600,3200,6400,12800]);
-    % expObj.add_experiment('FilterCutoff', [0.5, 0.1, 0.01, 0.0]);
-
     expObj.add_experiment('ModelConfig', [1:8]);
-
-    % expObj.add_experiment('ScaleSeparation', [2, 4, 5] );
-    % expObj.add_experiment('ReductionFactor', [1/4,1/8,1/16,1/32,1/64]);
-    % expObj.add_experiment('ModelConfig', [1, 2, 4, 5, 6, 8] );
-    % expObj.add_experiment('BlockSize', [32*32,16*16,8*8,4*4]);
-
+    
     % run experiments
     dir = expObj.run();
 end

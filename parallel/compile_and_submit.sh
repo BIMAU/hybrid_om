@@ -20,10 +20,10 @@ else
     module load MATLAB/2018a
 fi
 
-if [ $on_cluster -eq 1 ]
-then
-    export MCR_CACHE_ROOT=`mktemp -d ~/scratch-local/mcr.XXXXXX`
-fi
+#if [ $on_cluster -eq 1 ]
+#then
+#    export MCR_CACHE_ROOT=`mktemp -d ~/scratch-local/mcr.XXXXXX`
+#fi
 
 # check whether we need to recompile
 recompile=0
@@ -50,6 +50,7 @@ then
     mcc -R -singleCompThread -v -C -m $src_name -d $2 -a ../matlab \
         -a ~/local/matlab -a ~/Projects/ESN/matlab/ESN.m \
         -o $output_exec
+    sleep 1
 else
     echo "found executable" $2/$output_exec
 fi
@@ -66,6 +67,7 @@ cd $2
 
 # compile the interface
 mpicxx -Wall $interface_src -o interface -lmpi
+sleep 1
 ret_code=$?
 if [ $ret_code -eq 1 ]
 then
@@ -76,6 +78,7 @@ fi
 if [ $on_cluster -eq 1 ]
 then
     sbatch submit_mpi_experiment.sh $output_exec
+    sleep 1
 else
     mpirun --oversubscribe -np 4 ./interface $output_exec
 fi
