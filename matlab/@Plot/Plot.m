@@ -42,7 +42,7 @@ classdef Plot < handle
         end
 
         [nums, mdat, preds, truths] = plot_experiment(self, ignore_nans, flip_axes);
-        [nums, mdat, preds, truths] = plot_transient(self);
+        [nums, mdat, preds, truths] = plot_qg_transient(self, opts);
     end
 
     methods (Access = private)
