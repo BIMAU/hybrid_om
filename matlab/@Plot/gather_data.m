@@ -50,7 +50,12 @@ function [errs, nums, pids, ...
         if strcmp(fileNames{d}, 'failedproc')
             continue;
         end
+
+        tic
+        fprintf('loading %s\n', fileNames{d});
         data = load(fileNames{d});
+        time = toc;
+        fprintf('loading %s done (%fs) \n', fileNames{d}, time);
 
         if initialize
             trials  = size(data.num_predicted, 2);
