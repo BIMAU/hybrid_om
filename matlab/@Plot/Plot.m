@@ -42,7 +42,9 @@ classdef Plot < handle
         end
 
         [nums, mdat, preds, truths] = plot_experiment(self, ignore_nans, flip_axes);
-        [nums, mdat, preds, truths] = plot_qg_transient(self, opts);
+        [nums, mdat, preds, truths, s] = plot_qg_transient(self, opts);
+        [stats] = get_qg_statistics(self, qg, data, opts);
+        [] = movie_qg(self, data, opts);
     end
 
     methods (Access = private)
@@ -54,5 +56,17 @@ classdef Plot < handle
         [description] = create_description(self, mdat);
         
         [f] = my_boxplot(self, varargin);
+        
+        function [out] = compute_qg_enstrophy(self, field)
+        % assume QG ordering
+            nun = 2;    
+            out = sum(field(1:nun:end).^2);    
+        end
+        
+        function [out] = compute_qg_energy(self, field)
+        % assume QG ordering
+            nun = 2;    
+            out = sum(field(1:nun:end).*field(2:nun:end));
+        end
     end
 end
