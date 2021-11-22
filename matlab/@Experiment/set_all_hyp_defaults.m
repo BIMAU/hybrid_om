@@ -5,7 +5,7 @@ function [] = set_all_hyp_defaults(self)
     name = 'ReservoirSize';
     self.hyp.(name).range   = [3000];
     self.hyp.(name).descr   = ['NR', self.range2str(self.hyp.(name).range)];
-    self.hyp.(name).default = 8000;
+    self.hyp.(name).default = 1000;
 
     name = 'BlockSize';
     self.hyp.(name).range   = [1,16];
@@ -55,7 +55,7 @@ function [] = set_all_hyp_defaults(self)
     name = 'AverageDegree';
     self.hyp.(name).range   = [5,10,20,30];
     self.hyp.(name).descr   = ['AD', self.range2str(self.hyp.(name).range)];
-    self.hyp.(name).default = 10;
+    self.hyp.(name).default = 3;
 
     name = 'Lambda';
     self.hyp.(name).range   = [1e-8, 1e-6, 1e-4, 1e-1];
@@ -121,15 +121,15 @@ function [] = set_all_hyp_defaults(self)
     self.hyp.(name).opts    = ...
         {'sparse', 'sparseOnes', ...
          'balancedSparse', 'full', 'identity'};
-    self.hyp.(name).range   = [1, 2];
+    self.hyp.(name).range   = [1, 2, 3];
     self.hyp.(name).descr   = ['WI', self.range2str(self.hyp.(name).range)];
-    self.hyp.(name).default = 5;
+    self.hyp.(name).default = 3;
 
     name = 'AddDetails';
     self.hyp.(name).opts = {'disabled', 'from_model'};
     self.hyp.(name).range   = [1];
     self.hyp.(name).descr   = ['DE', self.range2str(self.hyp.(name).range)];
-    self.hyp.(name).default = 3;
+    self.hyp.(name).default = 2;
 
     name = 'ModelConfig';
     self.hyp.(name).opts = ...
