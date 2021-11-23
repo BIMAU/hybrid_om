@@ -97,7 +97,7 @@ function [dir] = QG_transient(varargin)
     expObj.set_default_hyp('SeparateUnknowns', false);
 
     % Tikhonov regularization
-    expObj.set_default_hyp('Lambda', 1e-10);
+    expObj.set_default_hyp('Lambda', 1e2);
 
     % Input matrix type
     % (1) sparse
@@ -139,7 +139,8 @@ function [dir] = QG_transient(varargin)
     % (6) corr_only
     % (7) esn_plus_dmd
     % (8) hybrid_esn_dmd
-    expObj.add_experiment('ModelConfig', [3]);
+    expObj.add_experiment('ModelConfig', [1:8]);
+    expObj.add_experiment('Lambda', 1e2);
     
     % run experiments
     dir = expObj.run();
