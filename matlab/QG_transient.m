@@ -76,6 +76,7 @@ function [dir] = QG_transient(varargin)
     expObj.shifts = 1;
     expObj.reps = 1;
     expObj.store_state = 'all';
+    expObj.testing_on = false;
     expObj.nrmse_windowsize = 50;
     expObj.err_tol = 0.5;
     expObj.max_preds = 100*365;
@@ -138,9 +139,7 @@ function [dir] = QG_transient(varargin)
     % (6) corr_only
     % (7) esn_plus_dmd
     % (8) hybrid_esn_dmd
-    expObj.set_default_hyp('ModelConfig', 8);
-
-    expObj.add_experiment('ModelConfig', [1:8]);
+    expObj.add_experiment('ModelConfig', [3]);
     
     % run experiments
     dir = expObj.run();

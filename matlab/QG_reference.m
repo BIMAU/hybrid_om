@@ -70,7 +70,8 @@ function [dir] = QG_reference(varargin)
     dgen.generate_prf_transient();
     
     % for the reference run we do not use imperfect model predictions
-    dgen.Phi = [];
+    dgen.Phi = dgen.X;
+    dgen.dt_imp = dt_prf;
     
     % create experiment class
     expObj = Experiment(dgen, pid, procs);
@@ -87,6 +88,8 @@ function [dir] = QG_reference(varargin)
     expObj.err_tol = 0.5;
     expObj.max_preds = 100*365;
 
+    expObj.set_default_hyp('TrainingSamples', 10000);
+    
     % Model configuration options:
     % (1) model_only
     % (2) esn_only

@@ -42,7 +42,7 @@ classdef Plot < handle
         end
 
         [nums, mdat, preds, truths] = plot_experiment(self, ignore_nans, flip_axes);
-        [nums, mdat, preds, truths, s] = plot_qg_transient(self, opts);
+        [nums, mdat, preds, truths, s] = get_qg_transient_data(self, opts);
         [stats] = get_qg_statistics(self, qg, data, opts);
         [] = movie_qg(self, data, opts);
     end

@@ -19,7 +19,7 @@ function [stats] = get_qg_statistics(self, qg, states, opts)
 
     T    = size(states, 2); % number of samples
     assert(T > wsize, '   T <= wsize... not good.');
-    assert(nx*ny*nun == size(states,1), 'input states are probably transposed');
+    assert(nx*ny*nun == size(states,1), 'input states are possibly transposed');
 
     stats = struct();
 
@@ -55,33 +55,33 @@ function [stats] = get_qg_statistics(self, qg, states, opts)
         end
     end
 
-    stats.Zvar  = zeros(T-wsize-1, 1);
-    stats.Zmean = zeros(T-wsize-1, 1);
-    stats.Evar  = zeros(T-wsize-1, 1);
-    stats.Emean = zeros(T-wsize-1, 1);
-    stats.Ke    = zeros(T-wsize-1, 1);
-    stats.Km    = zeros(T-wsize-1, 1);
+    stats.Zvar  = zeros(T-wsize+1, 1);
+    stats.Zmean = zeros(T-wsize+1, 1);
+    stats.Evar  = zeros(T-wsize+1, 1);
+    stats.Emean = zeros(T-wsize+1, 1);
+    stats.Ke    = zeros(T-wsize+1, 1);
+    stats.Km    = zeros(T-wsize+1, 1);
 
     if track_points
-        stats.PSvar  = zeros(T-wsize-1, 2);
-        stats.PSmean = zeros(T-wsize-1, 2);
-        stats.STvar  = zeros(T-wsize-1, 2);
-        stats.STmean = zeros(T-wsize-1, 2);
+        stats.PSvar  = zeros(T-wsize+1, 2);
+        stats.PSmean = zeros(T-wsize+1, 2);
+        stats.STvar  = zeros(T-wsize+1, 2);
+        stats.STmean = zeros(T-wsize+1, 2);
     end
 
-    stats.dZdt = stats.Z(2:end) - stats.Z(1:end-1);
-    stats.dEdt = stats.E(2:end) - stats.E(1:end-1);
-    for t = 1:T-wsize-1
-        window        = t:t+wsize;
+    % stats.dZdt = stats.Z(2:end) - stats.Z(1:end-1);
+    % stats.dEdt = stats.E(2:end) - stats.E(1:end-1);
+    for t = 1:T-wsize+1
+        window        = t:t+wsize-1;
 
         stats.Zvar(t)     = var(stats.Z(window));
         stats.Zmean(t)    = mean(stats.Z(window));
         stats.Evar(t)     = var(stats.E(window));
         stats.Emean(t)    = mean(stats.E(window));
-        stats.dZdtvar(t)  = var(stats.dZdt(window));
-        stats.dZdtmean(t) = mean(stats.dZdt(window));
-        stats.dEdtvar(t)  = var(stats.dEdt(window));
-        stats.dEdtmean(t) = mean(stats.dEdt(window));
+        % stats.dZdtvar(t)  = var(stats.dZdt(window));
+        % stats.dZdtmean(t) = mean(stats.dZdt(window));
+        % stats.dEdtvar(t)  = var(stats.dEdt(window));
+        % stats.dEdtmean(t) = mean(stats.dEdt(window));
 
         % Ke
         u2m = mean(u(:,window).^2,2);
