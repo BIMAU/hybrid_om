@@ -72,7 +72,7 @@ function [errs, nums, pids, ...
         end
 
         for i = data.my_inds
-            for j = data.my_hyps
+            for j = j_range
                 errs{i, j} = data.errs{i, j};
                 pids{i, j} = d;
 
