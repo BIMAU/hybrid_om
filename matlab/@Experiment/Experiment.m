@@ -272,6 +272,7 @@ classdef Experiment < handle
 
         function set_default_hyp(self, id, value)
         % adjust the default value of a hyperparameter
+            assert(isfield(self.hyp, id), ['id ', id, ' is not a hyperparameter']);
             self.hyp.(id).default = value;
         end
 
