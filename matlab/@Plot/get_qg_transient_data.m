@@ -1,6 +1,7 @@
 function [nums, mdat, preds, truths, s] = get_qg_transient_data(self, opts)
     [errs, nums, pids, mdat, preds, truths] = ...
         self.gather_data(self.dir);
+
     [T,n] = size(preds{1,1});
 
     % When we compute coarse quantities with fine data:

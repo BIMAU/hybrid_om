@@ -23,17 +23,8 @@ function [nums, mdat, preds, truths, Nboxplots] = ...
         end
     end
 
-    [exp_ind, I] = sort( [mdat.exp_ind{:}] );
+    [labels, Nvalues, xlab, exp_ind, I] = self.unpack_metadata(mdat);
     Nexp = numel(exp_ind);
-
-    labels  = [];
-    Nvalues = [];
-
-    for i = 1:Nexp
-        labels{i}  = mdat.hyp_range(exp_ind(i), :);
-        Nvalues(i) = numel(unique(labels{i}));
-        xlab{i}    = mdat.xlab{I(i)};
-    end
 
     if flip_axes
         [~, I] = sort(Nvalues, 'ascend');
@@ -122,7 +113,7 @@ function [nums, mdat, preds, truths, Nboxplots] = ...
     if self.description
         % create description
         descr = self.create_description(mdat);
-        ylim([min(ylim), 1.4*max(ylim)])
+        % ylim([min(ylim), 1.4*max(ylim)])
 
         tx = text(min(xlim), max(ylim), descr, ...
                   'color', [0.7,0.7,0.7] , 'VerticalAlignment', 'top', ...

@@ -53,6 +53,7 @@ classdef Plot < handle
         [description] = create_description(self, mdat);
         [rPrf, C, maxr, sumCoefs] = get_qg_spectrum(self, qg, x);
         [f, Pm, Pv] = plot_qg_mean_spectrum(self, qg, states, opts, varargin);
+        [labels, Nvalues, xlab, exp_ind, I, opts_str] = unpack_metadata(self, mdat);
     end
 
     methods (Access = private)

@@ -88,60 +88,95 @@ p = Plot(dir);
 [~, exp_mdat, preds, ~, stats] = p.get_qg_transient_data(opts);
 
 
+[~, ~, ~, ~, ~, opts_str] = p.unpack_metadata(exp_mdat)    
+
 %%--------------------------------------------
 % in several plots we ignore initial transient (20 years)
 trunc = 20*365;
 
 %subplot(3,2,1)
-cols = [0,0,0; lines(16)];
+cols = [0,0,0; lines(20)];
 
 start_idx = [opts.windowsize, opts.windowsize, 1];
 quantity = {'Km', 'Ke', 'Z'};
-for idx = 1:3
+
+
+idx = 1
+figure(idx)
+
+plot_reference(trange_0, stats_0, trange, ref_stats, '-', 'color', cols(1,:));
+
+% reference plot
+subplot(3,1,1)
+
+trange_0 = (start_idx(idx):size(X,2)) / 365;
+plot(trange_0, stats_0.(quantity{idx}), '-', 'color', cols(1,:));
+hold on;
+
+trange = (size(X,2)+start_idx(idx):size(X,2)+size(preds{1,1}, 1)) / 365;
+
+plot(trange, ref_stats{1,1}.(quantity{idx}), '-', 'color', cols(1,:)); hold on;
+
+% plot confidence interval
+conf_hi = ...
+    repmat(mean(ref_stats{1,1}.(quantity{idx})) + ...
+           2*sqrt(var(ref_stats{1,1}.(quantity{idx}))), ... 
+           1, numel(ref_stats{1,1}.(quantity{idx})));
+
+conf_lo = ...
+    repmat(mean(ref_stats{1,1}.(quantity{idx})) - ...
+           2*sqrt(var(ref_stats{1,1}.(quantity{idx}))), ... 
+           1, numel(ref_stats{1,1}.(quantity{idx})));
+
+plot(trange, conf_hi, '--', 'color', cols(1,:));
+plot(trange, conf_lo, '--', 'color', cols(1,:));
+
+
+for idx = 1:1
     figure(idx)
     subplot(3,1,1)
 
     trange = (start_idx(idx):size(X,2)) / 365;
-    plot(trange, stats_0.(quantity{idx}), '.-', 'markersize', 1, 'color', cols(1,:)); 
+    plot(trange, stats_0.(quantity{idx}), '.-', 'color', cols(1,:));
     hold on;
 
     trange = (size(X,2)+start_idx(idx):size(X,2)+size(preds{1,1}, 1)) / 365;
-    plot(trange, ref_stats{1,1}.(quantity{idx}), '.-', 'markersize', 1, 'color', cols(1,:)); hold on;
+    plot(trange, ref_stats{1,1}.(quantity{idx}), '.-', 'color', cols(1,:)); hold on;
     plot(trange, ...
          repmat(mean(ref_stats{1,1}.(quantity{idx}))+2*sqrt(var(ref_stats{1,1}.(quantity{idx}))),1,numel(ref_stats{1,1}.(quantity{idx}))), ...
-         '--', 'markersize', 1, 'color', cols(1,:));
+         '--', 'color', cols(1,:));
     plot(trange, ...
          repmat(mean(ref_stats{1,1}.(quantity{idx}))-2*sqrt(var(ref_stats{1,1}.(quantity{idx}))),1,numel(ref_stats{1,1}.(quantity{idx}))), ...
-         '--', 'markersize', 1, 'color', cols(1,:));
+         '--', 'color', cols(1,:));
 
-    
+
     [n_shifts, n_hyp] = size(preds);
     trange = (size(X,2)+start_idx(idx):size(X,2)+size(preds{1,1}, 1)) / 365;
     for j = 1:n_hyp
         for i = 1:n_shifts
-            plot(trange, stats{i,j}.(quantity{idx}), '.-', 'markersize', 1, 'color', cols(j+1,:)); hold on;
+            plot(trange, stats{i,j}.(quantity{idx}), '.-', 'color', cols(j+1,:)); hold on;
         end
     end
     hold off
-    
+
     title(exp_dir,'interpreter','none');
 
     legend('reference run', 'reference run','reference run','reference run', ...
            'model_only', 'esn_only', 'dmd_only', ...
            'hybrid_esn', 'hybrid_dmd', 'corr_only', ...
            'esn_plus_dmd', 'hybrid_esn_dmd','interpreter','none','location','bestoutside')
+
     % legend('reference run', 'reference run','reference run','reference run', ...
     %        'model_only', 'esn_only',  ...
     %        'hybrid_esn', 'hybrid_dmd', 'corr_only', ...
     %        'hybrid_esn_dmd','interpreter','none','location','bestoutside')
 
     ylabel(quantity{idx})
-    xlabel('years') 
+    xlabel('years')
 
     ymin = mean(ref_stats{1,1}.(quantity{idx}))-20*sqrt(var(ref_stats{1,1}.(quantity{idx})));
     ymax = mean(ref_stats{1,1}.(quantity{idx}))+20*sqrt(var(ref_stats{1,1}.(quantity{idx})));
     ylim([ymin,ymax])
-
     %%
 
     subplot(3,2,3)
@@ -201,7 +236,7 @@ for j = [1,2,4,6,8]
     hold on
     opts.conf_int = false;
     [f, Pm, Pv] = p.plot_qg_mean_spectrum(qg_c, preds{1,j}', opts, 'color', cols(j+1,:));
-    
+
     diff_Pm = norm(log(Pm(id_pos))-log(Pm_ref(id_pos)));
     diff_Pv = norm(log(Pv(id_pos))-log(Pv_ref(id_pos)));
     diff_P = [diff_P; [j, diff_Pm, diff_Pv] ];
