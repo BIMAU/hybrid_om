@@ -83,12 +83,13 @@ stats_0 = p.get_qg_statistics(qg_c, X, opts);
 
 %%------------------------------------------------------------------
 exp_dir = 'QG_transient/MC_1-8_SC_1-5_parallel_param_5.00e+02/';
+exp_dir = 'QG_transient_LB_0.01/MC_1-8_SC_1-5_parallel_param_5.00e+02/';
+
 dir = [base_dir, exp_dir, '/'];
 p = Plot(dir);
 [~, exp_mdat, preds, ~, stats] = p.get_qg_transient_data(opts);
 
-
-[~, ~, ~, ~, ~, opts_str] = p.unpack_metadata(exp_mdat)    
+[labels, Nvalues, par_names, exp_ind, I, opts_str] = p.unpack_metadata(exp_mdat)
 
 %%--------------------------------------------
 % in several plots we ignore initial transient (20 years)
@@ -100,129 +101,89 @@ cols = [0,0,0; lines(20)];
 start_idx = [opts.windowsize, opts.windowsize, 1];
 quantity = {'Km', 'Ke', 'Z'};
 
+%-----------------------------------------------
 
 idx = 1
 figure(idx)
-
-plot_reference(trange_0, stats_0, trange, ref_stats, '-', 'color', cols(1,:));
 
 % reference plot
 subplot(3,1,1)
 
 trange_0 = (start_idx(idx):size(X,2)) / 365;
-plot(trange_0, stats_0.(quantity{idx}), '-', 'color', cols(1,:));
+trange   = (size(X,2)+start_idx(idx):size(X,2)+size(preds{1,1}, 1)) / 365;
+
+time_series = [stats_0.(quantity{idx})', ref_stats{1,1}.(quantity{idx})'];
+
+f_ref = plot([trange_0, trange], time_series, '-', 'color', cols(1,:));
 hold on;
 
-trange = (size(X,2)+start_idx(idx):size(X,2)+size(preds{1,1}, 1)) / 365;
-
-plot(trange, ref_stats{1,1}.(quantity{idx}), '-', 'color', cols(1,:)); hold on;
 
 % plot confidence interval
-conf_hi = ...
-    repmat(mean(ref_stats{1,1}.(quantity{idx})) + ...
-           2*sqrt(var(ref_stats{1,1}.(quantity{idx}))), ... 
-           1, numel(ref_stats{1,1}.(quantity{idx})));
+extr_factor = 50;
 
-conf_lo = ...
-    repmat(mean(ref_stats{1,1}.(quantity{idx})) - ...
-           2*sqrt(var(ref_stats{1,1}.(quantity{idx}))), ... 
-           1, numel(ref_stats{1,1}.(quantity{idx})));
+conf_hi = mean(time_series) + 2*sqrt(var(time_series));
+extr_hi = mean(time_series) + extr_factor*sqrt(var(time_series));
+conf_lo = mean(time_series) - 2*sqrt(var(time_series));
+extr_lo = mean(time_series) - extr_factor*sqrt(var(time_series));
 
-plot(trange, conf_hi, '--', 'color', cols(1,:));
-plot(trange, conf_lo, '--', 'color', cols(1,:));
+plot([trange_0, trange], repmat(conf_hi, 1, numel(time_series)), '--', 'color', cols(1,:));
+plot([trange_0, trange], repmat(conf_lo, 1, numel(time_series)), '--', 'color', cols(1,:));
 
+[n_shifts, n_hyp] = size(preds);
+trange = (size(X,2)+start_idx(idx):size(X,2)+size(preds{1,1}, 1)) / 365;
 
-for idx = 1:1
-    figure(idx)
-    subplot(3,1,1)
-
-    trange = (start_idx(idx):size(X,2)) / 365;
-    plot(trange, stats_0.(quantity{idx}), '.-', 'color', cols(1,:));
-    hold on;
-
-    trange = (size(X,2)+start_idx(idx):size(X,2)+size(preds{1,1}, 1)) / 365;
-    plot(trange, ref_stats{1,1}.(quantity{idx}), '.-', 'color', cols(1,:)); hold on;
-    plot(trange, ...
-         repmat(mean(ref_stats{1,1}.(quantity{idx}))+2*sqrt(var(ref_stats{1,1}.(quantity{idx}))),1,numel(ref_stats{1,1}.(quantity{idx}))), ...
-         '--', 'color', cols(1,:));
-    plot(trange, ...
-         repmat(mean(ref_stats{1,1}.(quantity{idx}))-2*sqrt(var(ref_stats{1,1}.(quantity{idx}))),1,numel(ref_stats{1,1}.(quantity{idx}))), ...
-         '--', 'color', cols(1,:));
-
-
-    [n_shifts, n_hyp] = size(preds);
-    trange = (size(X,2)+start_idx(idx):size(X,2)+size(preds{1,1}, 1)) / 365;
-    for j = 1:n_hyp
-        for i = 1:n_shifts
-            plot(trange, stats{i,j}.(quantity{idx}), '.-', 'color', cols(j+1,:)); hold on;
-        end
+j_keep = [];
+f = cell(1, n_hyp);
+leg = cell(1, n_hyp);
+for j = 1:n_hyp
+    time_series = stats{1,j}.(quantity{idx});
+    
+    if (max(time_series) < extr_hi) && (min(time_series) > extr_lo)
+        j_keep = [j_keep, j];
+        f{1,j} = plot(trange, stats{1,j}.(quantity{idx}), '-', 'color', cols(j+1,:)); hold on;
+        leg{1,j} = [opts_str{:,j}];
     end
-    hold off
-
-    title(exp_dir,'interpreter','none');
-
-    legend('reference run', 'reference run','reference run','reference run', ...
-           'model_only', 'esn_only', 'dmd_only', ...
-           'hybrid_esn', 'hybrid_dmd', 'corr_only', ...
-           'esn_plus_dmd', 'hybrid_esn_dmd','interpreter','none','location','bestoutside')
-
-    % legend('reference run', 'reference run','reference run','reference run', ...
-    %        'model_only', 'esn_only',  ...
-    %        'hybrid_esn', 'hybrid_dmd', 'corr_only', ...
-    %        'hybrid_esn_dmd','interpreter','none','location','bestoutside')
-
-    ylabel(quantity{idx})
-    xlabel('years')
-
-    ymin = mean(ref_stats{1,1}.(quantity{idx}))-20*sqrt(var(ref_stats{1,1}.(quantity{idx})));
-    ymax = mean(ref_stats{1,1}.(quantity{idx}))+20*sqrt(var(ref_stats{1,1}.(quantity{idx})));
-    ylim([ymin,ymax])
-    %%
-
-    subplot(3,2,3)
-    histogram(ref_stats{1,1}.(quantity{idx})(trunc+1:end),50, 'facecolor', cols(1,:),'edgecolor', cols(1,:))
-    xlabel(quantity{idx})
-    hold on
-    for j = [2,4]
-        i = 1;
-        histogram(stats{i,j}.(quantity{idx})(trunc+1:end),50, 'facecolor', cols(j+1,:),'edgecolor', cols(j+1,:))
-        title('esn only and hybrid esn');
-        hold on
-    end
-    hold off
-    xlabel(quantity{idx})
-
-    subplot(3,2,5)
-    histogram(ref_stats{1,1}.(quantity{idx})(trunc+1:end),50, 'facecolor', cols(1,:),'edgecolor', cols(1,:))
-    xlabel(quantity{idx})
-    hold on
-    for j = [4,8]
-        i = 1;
-        histogram(stats{i,j}.(quantity{idx})(trunc+1:end),50, 'facecolor', cols(j+1,:),'edgecolor', cols(j+1,:))
-        title('model only');
-        title('hybrid esn + dmd and hybrid esn');
-        hold on
-    end
-    hold off
-    xlabel(quantity{idx})
-
-    subplot(3,2,6)
-    histogram(ref_stats{1,1}.(quantity{idx})(trunc+1:end),50, 'facecolor', cols(1,:),'edgecolor', cols(1,:))
-    xlabel(quantity{idx})
-    hold on
-    for j = [6]
-        i = 1;
-        histogram(stats{i,j}.(quantity{idx})(trunc+1:end),50, 'facecolor', cols(j+1,:),'edgecolor', cols(j+1,:))
-        title('correction only');
-        hold on
-    end
-    hold off
-    xlabel(quantity{idx})
 end
+hold off
+
+legend([f_ref, f{j_keep}], 'reference solution', leg{j_keep}, ...
+       'location', 'bestoutside', 'interpreter','none')
+
+description = p.create_description(exp_mdat);
+
+ylabel(quantity{idx})
+xlabel('years')
+
+ymin = mean(ref_stats{1,1}.(quantity{idx}))-20*sqrt(var(ref_stats{1,1}.(quantity{idx})));
+ymax = mean(ref_stats{1,1}.(quantity{idx}))+20*sqrt(var(ref_stats{1,1}.(quantity{idx})));
+ylim([ymin,ymax])
 
 %%
+subplot(3,2,3)
+histogram(ref_stats{1,1}.(quantity{idx})(trunc+1:end),50, 'facecolor', cols(1,:),'edgecolor', cols(1,:))
+xlabel(quantity{idx})
+hold on
+for j = j_keep(2:4)
+    i = 1;
+    histogram(stats{i,j}.(quantity{idx})(trunc+1:end),50, 'facecolor', cols(j+1,:),'edgecolor', cols(j+1,:))
+    hold on
+end
+hold off
+xlabel(quantity{idx})
 
-figure(1)
+subplot(3,2,5)
+histogram(ref_stats{1,1}.(quantity{idx})(trunc+1:end),50, 'facecolor', cols(1,:),'edgecolor', cols(1,:))
+xlabel(quantity{idx})
+hold on
+for j = j_keep(7:end)
+    i = 1;
+    histogram(stats{i,j}.(quantity{idx})(trunc+1:end),50, 'facecolor', cols(j+1,:),'edgecolor', cols(j+1,:))
+    hold on
+end
+hold off
+xlabel(quantity{idx})
+
+
 subplot(3,2,4)
 opts.trunc = trunc;
 opts.skip = 90;
@@ -232,7 +193,7 @@ opts.T = size(ref_preds{1,1},1);
 id_pos = logical(Pm_ref > 0);
 
 diff_P = [];
-for j = [1,2,4,6,8]
+for j = j_keep(1:4)
     hold on
     opts.conf_int = false;
     [f, Pm, Pv] = p.plot_qg_mean_spectrum(qg_c, preds{1,j}', opts, 'color', cols(j+1,:));
@@ -243,3 +204,61 @@ for j = [1,2,4,6,8]
     drawnow
 end
 hold off
+
+subplot(3,2,6)
+opts.trunc = trunc;
+opts.skip = 90;
+opts.conf_int = false;
+opts.T = size(ref_preds{1,1},1);
+[f, Pm_ref, Pv_ref] = p.plot_qg_mean_spectrum(qg_c, opts.R*ref_preds{1,1}', opts, 'color', cols(1,:));
+id_pos = logical(Pm_ref > 0);
+
+diff_P = [];
+for j = j_keep(7:end)
+    hold on
+    opts.conf_int = false;
+    [f, Pm, Pv] = p.plot_qg_mean_spectrum(qg_c, preds{1,j}', opts, 'color', cols(j+1,:));
+
+    diff_Pm = norm(log(Pm(id_pos))-log(Pm_ref(id_pos)));
+    diff_Pv = norm(log(Pv(id_pos))-log(Pv_ref(id_pos)));
+    diff_P = [diff_P; [j, diff_Pm, diff_Pv] ];
+    drawnow
+end
+hold off
+
+
+
+
+
+
+
+
+subplot(3,2,5)
+histogram(ref_stats{1,1}.(quantity{idx})(trunc+1:end),50, 'facecolor', cols(1,:),'edgecolor', cols(1,:))
+xlabel(quantity{idx})
+hold on
+for j = [4,8]
+    i = 1;
+    histogram(stats{i,j}.(quantity{idx})(trunc+1:end),50, 'facecolor', cols(j+1,:),'edgecolor', cols(j+1,:))
+    title('model only');
+    title('hybrid esn + dmd and hybrid esn');
+    hold on
+end
+hold off
+xlabel(quantity{idx})
+
+subplot(3,2,6)
+histogram(ref_stats{1,1}.(quantity{idx})(trunc+1:end),50, 'facecolor', cols(1,:),'edgecolor', cols(1,:))
+xlabel(quantity{idx})
+hold on
+for j = [6]
+    i = 1;
+    histogram(stats{i,j}.(quantity{idx})(trunc+1:end),50, 'facecolor', cols(j+1,:),'edgecolor', cols(j+1,:))
+    title('correction only');
+    hold on
+end
+hold off
+xlabel(quantity{idx})
+
+
+
