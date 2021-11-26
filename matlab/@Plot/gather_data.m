@@ -65,6 +65,12 @@ function [errs, nums, pids, ...
             initialize = false;
         end
 
+        if isfield(data, 'my_hyps')
+            j_range = data.my_hyps;
+        else
+            j_range = 1:n_hyps;
+        end
+
         for i = data.my_inds
             for j = data.my_hyps
                 errs{i, j} = data.errs{i, j};
