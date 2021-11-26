@@ -44,6 +44,8 @@ classdef Experiment < handle
         % use the svd wavelet interface in ESN to average the data
         svd_averaging = 1;
 
+        % flag to parallelize hyperparams instead of data shifts.
+        parallel_hyps = false;
     end
 
     properties (Access = private)
@@ -156,7 +158,13 @@ classdef Experiment < handle
             self.create_storage();
             self.create_output_dir();
 
-            for j = 1:self.num_hyp_settings
+            if self.parallel_hyps
+                my_hyps = self.my_indices(self.pid, self.procs, self.num_hyp_settings);
+            else
+                my_hyps = 1:self.num_hyp_settings;
+            end
+
+            for j = my_hyps
 
                 [self.esn_pars, mod_pars] = self.distribute_params(j);
 
@@ -184,7 +192,11 @@ classdef Experiment < handle
                 Ni   = numel(svec); % number of indices
 
                 % domain decomposition
-                my_inds = self.my_indices(self.pid, self.procs, Ni);
+                if ~self.parallel_hyps
+                    my_inds = self.my_indices(self.pid, self.procs, Ni);
+                else
+                    my_inds = 1:Ni;
+                end
 
                 for i = my_inds
                     self.print_hyperparams(j);
@@ -231,7 +243,9 @@ classdef Experiment < handle
 
                     % name-value pairs:
                     % add whatever is useful here and use a meaningful name
-                    pairs = { {'my_inds', my_inds}, {'hyp_range', self.hyp_range}, ...
+                    pairs = { {'my_inds', my_inds}, ...
+                              {'my_hyps', my_hyps}, ...
+                              {'hyp_range', self.hyp_range}, ...
                               {'hyp', self.hyp}, ...
                               {'exp_id', self.exp_id}, ...
                               {'exp_ind', self.exp_ind}, ...
