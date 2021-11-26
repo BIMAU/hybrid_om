@@ -51,6 +51,8 @@ classdef Plot < handle
          truths] = gather_data(self, varargin);
 
         [description] = create_description(self, mdat);
+        [rPrf, C, maxr, sumCoefs] = get_qg_spectrum(self, qg, x);
+        [f, Pm, Pv] = plot_qg_mean_spectrum(self, qg, states, opts, varargin);
     end
 
     methods (Access = private)

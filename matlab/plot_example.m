@@ -157,7 +157,11 @@ exp_dir = 'QG_blocksizecomp_1600/SC_1-5_BS_1024-16_parallel_param_5.00e+02/';
 exp_dir = 'QG_blocksizecomp_6400/SC_1-5_BS_1024-16_parallel_param_5.00e+02/';
 
 exp_dir = 'QG_reductionfactors_6400/SC_2-5_RF_0.25-0.015625_parallel_param_5.00e+02/';
+
+exp_dir = 'QG_GridExp_Lambda1e2/NR_200-12800_MC_1-8_parallel_param_5.00e+02/';
 exp_dir = 'QG_Nr/NR_200-12800_MC_1-8_parallel_param_5.00e+02/';
+
+exp_dir = 'QG_GridExp_Lambda1e-2/NR_200-12800_MC_1-8_parallel_param_5.00e+02/';
 
 base_dir = '~/Projects/hybrid_om/data/experiments/';
 
