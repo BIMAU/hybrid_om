@@ -74,21 +74,22 @@ dir = [base_dir, exp_dir, '/'];
 p = Plot(dir);
 training_samples = 10000;
 X = opts.R*dgen.X(:,1:training_samples);
-stats_0 = p.get_qg_statistics(qg_c, X, opts);
 
 opts.windowsize = 10;
+
+stats_0 = p.get_qg_statistics(qg_c, X, opts);
+
 [~, ~, ref_preds, ~, ref_stats] = p.get_qg_transient_data(opts);
 
 %%------------------------------------------------------------------
-exp_dir = 'QG_transient/MC_1-8_serial_param_5.00e+02/';
-exp_dir = 'QG_transient/MC_1-8_LB_10-10_serial_param_5.00e+02/';
+exp_dir = 'QG_transient/MC_1-8_SC_1-5_parallel_param_5.00e+02/';
 dir = [base_dir, exp_dir, '/'];
 p = Plot(dir);
 [~, exp_mdat, preds, ~, stats] = p.get_qg_transient_data(opts);
 
 
 %%--------------------------------------------
-% in several plots we ignore initial transient (10 years)
+% in several plots we ignore initial transient (20 years)
 trunc = 20*365;
 
 %subplot(3,2,1)

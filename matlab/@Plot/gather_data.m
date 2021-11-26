@@ -16,11 +16,6 @@ function [errs, nums, pids, ...
         dir = varargin{1};
         procs = varargin{2};
 
-      case 4
-        dir = varargin{1};
-        procs = varargin{2};
-        tr_range = varargin{3};
-
       otherwise
         error('Unexpected input');
     end
@@ -58,34 +53,27 @@ function [errs, nums, pids, ...
         fprintf('loading %s done (%fs) \n', fileNames{d}, time);
 
         if initialize
-            trials  = size(data.num_predicted, 2);
+            [n_ens, n_hyps] = size(data.num_predicted);
 
-            if exist('tr_range', 'var')
-                trials = numel(tr_range);
-            else
-                tr_range = 1:trials;
-            end
+            errs = cell(n_ens, n_hyps);
+            pids = cell(n_ens, n_hyps);
 
-            n       = size(data.num_predicted, 1); % ensemble size
-            errs    = cell(procs, trials);
-            pids    = cell(procs, trials);
+            predictions = cell(n_ens, n_hyps);
+            truths = cell(n_ens, n_hyps);
+            nums = nan(n_ens, n_hyps);
 
-            predictions = cell(procs, trials);
-            truths      = cell(procs, trials);
-
-            nums    = nan(n, trials);
-            ind_vis = zeros(procs, ceil(n / procs));
             initialize = false;
         end
+
         for i = data.my_inds
-            for j = 1:trials
-                errs{i, j} = data.errs{i, tr_range(j)};
+            for j = data.my_hyps
+                errs{i, j} = data.errs{i, j};
                 pids{i, j} = d;
 
                 predictions{i, j} = data.predictions{i, j};
                 truths{i, j}      = data.truths{i, j};
 
-                num = data.num_predicted(i, tr_range(j));
+                num = data.num_predicted(i, j);
                 if num > 0
                     nums(i, j) = num;
                 end
