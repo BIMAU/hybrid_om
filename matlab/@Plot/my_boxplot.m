@@ -67,7 +67,7 @@ function [f] = my_boxplot(self, varargin)
     xticks([x_index]);
 
     if ylimMax > 0
-         ylim([0,ylimMax]);
+        % ylim([0,ylimMax]);
     end
 
     hold off

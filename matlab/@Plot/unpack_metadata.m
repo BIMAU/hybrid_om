@@ -17,6 +17,8 @@ function [labels, Nvalues, par_names, exp_ind, I, opts_str] = unpack_metadata(se
             value = labels{i}(j);
             if has_opts
                 opts_str{i,j} = [par_names{i}, ':', mdat.hyp.(par_name).opts{value}, ' '];
+            else
+                opts_str{i,j} = [par_names{i}, ':', num2str(value), ' '];
             end
         end
     end

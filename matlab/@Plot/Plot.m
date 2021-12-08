@@ -41,7 +41,7 @@ classdef Plot < handle
             self.dir = dir;
         end
 
-        [nums, mdat, preds, truths] = plot_experiment(self, ignore_nans, flip_axes);
+        [nums, mdat, preds, truths, f] = plot_experiment(self, ignore_nans, flip_axes);
         [nums, mdat, preds, truths, s] = get_qg_transient_data(self, opts);
         [stats] = get_qg_statistics(self, qg, data, opts);
         [] = movie_qg(self, data, opts);
@@ -52,7 +52,7 @@ classdef Plot < handle
 
         [description] = create_description(self, mdat);
         [rPrf, C, maxr, sumCoefs] = get_qg_spectrum(self, qg, x);
-        [f, Pm, Pv] = plot_qg_mean_spectrum(self, qg, states, opts, varargin);
+        [f, Pm, Pv, g] = plot_qg_mean_spectrum(self, qg, states, opts, varargin);
         [labels, Nvalues, xlab, exp_ind, I, opts_str] = unpack_metadata(self, mdat);
     end
 

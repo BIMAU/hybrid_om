@@ -1,3 +1,5 @@
+addpath('../')
+
 dir = '~/Projects/hybrid_om/data/experiments/Pathak2018repl/MC_1-8_NR_200-6400_parallel_param_1.00e+00/';
 dir = '~/Projects/hybrid_om/data/experiments/Pathak2018repl/MC_1-8_NR_200-6400_parallel_param_1.00e-01/';
 dir = '~/Projects/hybrid_om/data/experiments/Pathak2018repl/MC_1-8_NR_200-6400_parallel_param_1.00e-02/';
@@ -79,7 +81,6 @@ exp_dir = 'QG_GridExp/NR_200-12800_AP_0.2-1_parallel_param_5.00e+02/';
 exp_dir = 'QG_GridExp/NR_200-12800_AP_0.1-1_parallel_param_5.00e+02/';
 
 
-exp_dir = 'QG_GridExp/NR_200-12800_MC_1-8_parallel_param_5.00e+02/';
 
 exp_dir = 'QG_GridExp/SC_1-4_RF_1-0.25_parallel_param_5.00e+02/';
 exp_dir = 'KS_GridExp/SC_1-4_RF_1-0.25_serial_param_0.00e+00/';
@@ -97,7 +98,6 @@ exp_dir = 'QG_GridExp/NR_200-12800_SC_2-4_parallel_param_5.00e+02/';
 exp_dir = 'QG_GridExp/SC_5-2_serial_param_5.00e+02/';
 
 exp_dir = 'QG_GridExp/SC_1-5_RF_1-0.125_parallel_param_5.00e+02/';
-exp_dir = 'QG_GridExp/NR_200-12800_SC_1-5_parallel_param_5.00e+02/';
 
 exp_dir = 'QG_RedFac/NR_200-12800_SC_1-5_parallel_param_5.00e+02/';
 exp_dir = 'QG_ScaleSep2/SC_2-5_BS_256-4_parallel_param_5.00e+02/';
@@ -151,18 +151,28 @@ exp_dir = 'QG_allmodels_vs_scalesep0.25_6400/MC_1-8_SC_1-5_parallel_param_5.00e+
 
 exp_dir = 'QG_ScaleSep100/SC_1-5_RF_1-0.125_parallel_param_5.00e+02/';
 exp_dir = 'QG_allmodels_vs_scalesep0.25_1600/MC_1-8_SC_1-5_parallel_param_5.00e+02/';
-exp_dir = 'QG_NR_ScaleSep_T10000/NR_200-12800_SC_1-5_parallel_param_5.00e+02/';
 
 exp_dir = 'QG_blocksizecomp_1600/SC_1-5_BS_1024-16_parallel_param_5.00e+02/';
 exp_dir = 'QG_blocksizecomp_6400/SC_1-5_BS_1024-16_parallel_param_5.00e+02/';
 
-exp_dir = 'QG_reductionfactors_6400/SC_2-5_RF_0.25-0.015625_parallel_param_5.00e+02/';
 
 exp_dir = 'QG_GridExp_Lambda1e2/NR_200-12800_MC_1-8_parallel_param_5.00e+02/';
-exp_dir = 'QG_Nr/NR_200-12800_MC_1-8_parallel_param_5.00e+02/';
 
 exp_dir = 'QG_GridExp_Lambda1e-2/NR_200-12800_MC_1-8_parallel_param_5.00e+02/';
 
+exp_dir = 'QG_GridExp_Lambda/NR_400-6400_LB_1-1e-08_parallel_param_5.00e+02';
+
+exp_dir = 'QG_GridExp/NR_400-6400_RH_0.2-1.2_parallel_param_5.00e+02/';
+exp_dir = 'QG_Nr/NR_200-12800_MC_1-8_parallel_param_5.00e+02/';
+
+
+exp_dir = 'QG_GridExp/NR_200-12800_MC_1-8_parallel_param_5.00e+02/';
+
+exp_dir = 'QG_GridExp/NR_200-12800_SC_1-5_parallel_param_5.00e+02/';
+
+exp_dir = 'QG_reductionfactors_6400/SC_2-5_RF_0.25-0.015625_parallel_param_5.00e+02/';
+
+exp_dir = 'QG_NR_ScaleSep_T10000/NR_200-12800_SC_1-5_parallel_param_5.00e+02/';
 base_dir = '~/Projects/hybrid_om/data/experiments/';
 
 dir = [base_dir, exp_dir, '/'];
@@ -173,7 +183,7 @@ p.ylab = 'Predicted days';
 p.plot_mean = false;
 p.plot_scatter = false;
 
- [nums, mdat, preds, truths] = p.plot_experiment(false, true);
+ [nums, mdat, preds, truths] = p.plot_experiment(false, false);
 %subplot(2,3,2)
 %imagesc(preds{1}'); colorbar
 %subplot(2,3,3)

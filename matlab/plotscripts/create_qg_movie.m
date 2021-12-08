@@ -1,34 +1,20 @@
-if 1
-    base_dir = '~/Projects/hybrid_om/data/experiments/';
-    ref_dir  = 'QG_reference_transient/MC_1-1_serial_param_1.00e+03/';
-    exp_dir  = 'QG_transient/MC_1-8_serial_param_5.00e+02/';
-    exp_dir  = 'QG_transient/MC_1-8_LB_10-10_serial_param_5.00e+02/';
-    exp_dir  = 'QG_transient/MC_1-8_LB_100-100_serial_param_5.00e+02/';
-
-    exp_dir = [base_dir, exp_dir, '/'];
-    ref_dir = [base_dir, ref_dir, '/'];
-
-    p = Plot(ref_dir);
-    [~, ~, ~, ~, ref_states,~] = ...
-        p.gather_data(ref_dir);
-    p = Plot(exp_dir);
-    [errs, nums, pids, ...
-     mdat, preds, ...
-     truths] =  ...
-        p.gather_data(exp_dir);
+addpath('../');
+    
+if ~exist('preds4', 'var') || ~exist('ref_preds', 'var') || ~exist('preds', 'var')
+    load_qg_data    
 end
 
-fname = [exp_dir, '/movie2.avi'];
+fname = ['movie.avi'];
 
 fprintf([fname, '\n'])
 writerObj = VideoWriter(fname, 'Motion JPEG AVI');
 writerObj.FrameRate = 16;
-writerObj.Quality = 100;
+writerObj.Quality = 90;
 open(writerObj);
 set(0,'DefaultFigureWindowStyle','normal')
-fhandle = figure('units','pixels','position',[100,100,900,700]);
+fhandle = figure('units','pixels','position',[100,100,1200,700]);
 set(gca,'position',[0.05 0.1 .92 0.85],'units','normalized');
-set(gca,'color','w','fontsize',15);
+set(gca,'color','w','fontsize',12);
 
 crange = [-0.3,0.3];
 
@@ -42,6 +28,7 @@ ny_c = nx_c;
 ampl = 2; % stirring amplitude
 stir = 0; % stirring type: 0 = cos(5x), 1 = sin(16x)
 
+opts = [];
 opts.nun = 2;
 opts.nx = nx_c;
 opts.ny = ny_c;
@@ -78,10 +65,10 @@ R = dgen.R;
 
 map = my_colmap();
 
-T = size(ref_states{1,1},1);
+T = size(preds{1,1},1);
 
-skip   = 10;
-period = 1*365;
+skip   = 5;
+period = 3*365;
 steady = T-period+1:skip:T;
 spinup = 1:skip:period;
 
@@ -89,67 +76,76 @@ i_range = steady;
 
 for i = i_range
     % plot restricted reference
-    subplot(3,3,1)    
-    plotQG(nx_f, ny_f, 1, scaling*ref_states{1,1}(i,:)', true);
-    tstr = sprintf('reference,   day %2d', i);
-    title(tstr);
+    subplot(2,3,1)    
+    plotQG(nx_f, ny_f, 1, scaling*ref_preds{1,1}(i,:)', true);
+    tstr = sprintf('Reference,   day %2d', i);
+    title(tstr,'interpreter','latex');
     colormap(map);
     colorbar
     caxis(crange)
+    invertcolors()
+    axis off
     
-    subplot(3,3,2)    
+    subplot(2,3,2)    
     plotQG(nx_c, ny_c, 1, scaling*preds{1,1}(i,:)', true);
-    tstr = sprintf('model only');
-    title(tstr);
+    tstr = sprintf('Imperfect model');
+    title(tstr,'interpreter','latex');
     colormap(map);
     colorbar
     caxis(crange)
+    invertcolors()
+    axis off
 
-    subplot(3,3,3)    
+    subplot(2,3,3)    
     plotQG(nx_c, ny_c, 1, scaling*preds{1,2}(i,:)', true);
-    tstr = sprintf('esn only');
-    title(tstr);
+    tstr = sprintf('ESN');
+    title(tstr,'interpreter','latex');
     colormap(map);
     colorbar
     caxis(crange)
+    invertcolors()
+    axis off
 
-    subplot(3,3,4)    
+    subplot(2,3,4)    
     plotQG(nx_c, ny_c, 1, scaling*preds{1,3}(i,:)', true);
-    tstr = sprintf('dmd only');
-    tstr = sprintf('hybrid esn');
-    title(tstr);
+    tstr = sprintf('ESNc');
+    title(tstr,'interpreter','latex');
     colormap(map);
     colorbar
     caxis(crange)
+    invertcolors()
+    axis off
 
-    subplot(3,3,5)    
-    plotQG(nx_c, ny_c, 1, scaling*preds{1,4}(i,:)', true);
-    tstr = sprintf('hybrid esn');
-    tstr = sprintf('hybrid dmd');
-    title(tstr);
-    colormap(map);
-    colorbar
-    caxis(crange)
-
-    subplot(3,3,6)    
-    plotQG(nx_c, ny_c, 1, scaling*preds{1,5}(i,:)', true);
-    tstr = sprintf('hybrid dmd');
-    tstr = sprintf('correction only');
-    title(tstr);
-    colormap(map);
-    colorbar
-    caxis(crange)
-
-    subplot(3,3,7)    
+    subplot(2,3,5)    
     plotQG(nx_c, ny_c, 1, scaling*preds{1,6}(i,:)', true);
-    tstr = sprintf('correction only');
-    tstr = sprintf('hybrid esn plus dmd');
-    title(tstr);
+    tstr = sprintf('ESN + DMDc');
+    title(tstr,'interpreter','latex');
     colormap(map);
     colorbar
     caxis(crange)
+    invertcolors()
+    axis off
 
-    % subplot(3,3,8)    
+    subplot(2,3,6)    
+    plotQG(nx_c, ny_c, 1, scaling*preds4{1,2}(i,:)', true);
+    tstr = sprintf('DMDc');
+    title(tstr,'interpreter','latex');
+    colormap(map);
+    colorbar
+    caxis(crange)
+    invertcolors()
+    axis off
+
+    % subplot(2,3,7)    
+    % plotQG(nx_c, ny_c, 1, scaling*preds{1,6}(i,:)', true);
+    % tstr = sprintf('correction only');
+    % tstr = sprintf('hybrid esn plus dmd');
+    % title(tstr);
+    % colormap(map);
+    % colorbar
+    % caxis(crange)
+
+    % subplot(2,3,8)    
     % plotQG(nx_c, ny_c, 1, scaling*preds{1,7}(i,:)', true);
     % tstr = sprintf('esn plus dmd');
     % title(tstr);
@@ -157,7 +153,7 @@ for i = i_range
     % colorbar
     % caxis(crange)
 
-    % subplot(3,3,9)    
+    % subplot(2,3,9)    
     % plotQG(nx_c, ny_c, 1, scaling*preds{1,8}(i,:)', true);
     % tstr = sprintf('hybrid esn plus dmd');
     % title(tstr);

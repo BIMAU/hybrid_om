@@ -89,7 +89,7 @@ function [dir] = QG_transient(varargin)
     expObj.set_default_hyp('BlockSize', 64);
     expObj.set_default_hyp('InAmplitude', 1);
     expObj.set_default_hyp('SVDWaveletBlockSize', 1);
-    expObj.set_default_hyp('SVDWaveleRteduction', 1);
+    expObj.set_default_hyp('SVDWaveletReduction', 1);
     expObj.set_default_hyp('ReservoirSize', 6400);
     expObj.set_default_hyp('FilterCutoff', 0.01);
     expObj.set_default_hyp('TimeDelay', 0);
