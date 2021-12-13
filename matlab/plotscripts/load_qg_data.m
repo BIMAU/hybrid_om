@@ -16,6 +16,7 @@ opts.ny = ny_c;
 opts.Re = Re_c;
 opts.ampl = ampl;
 opts.stir = stir;
+opts.windowsize = 10;
 
 % fine QG with periodic bdc
 qg_f = QG(nx_f, ny_f, 1);
@@ -79,7 +80,6 @@ p = Plot(ref_dir);
 training_samples = 10000;
 X = opts.R*dgen.X(:,1:training_samples);
 
-opts.windowsize = 10;
 
 stats_0 = p.get_qg_statistics(qg_c, X, opts);
 [~, ~, ref_preds, ~, ref_stats] = p.get_qg_transient_data(opts);
@@ -106,19 +106,19 @@ gridexp_p = Plot([base_dir, gridexp_dir, '/']);
 exp_dir2 = 'QG_transient/MC_5-6_LB_10-10_serial_param_5.00e+02/'
 p2 = Plot([base_dir, exp_dir2, '/']);
 [~, exp_mdat2, preds2, ~, stats2] = p2.get_qg_transient_data(opts);
-[~, ~, ~, ~, ~, opts_str2] = p.unpack_metadata(exp_mdat2)
+[~, ~, ~, ~, ~, opts_str2] = p2.unpack_metadata(exp_mdat2)
 
 %%
 exp_dir3 = 'QG_transient/MC_5-5_LB_100-0.39062_parallel_param_5.00e+02/';
 p3 = Plot([base_dir, exp_dir3, '/']);
 [~, exp_mdat3, preds3, ~, stats3] = p3.get_qg_transient_data(opts);
-[~, ~, ~, ~, ~, opts_str3] = p.unpack_metadata(exp_mdat3);
+[~, ~, ~, ~, ~, opts_str3] = p3.unpack_metadata(exp_mdat3);
 
 %%
 exp_dir4 = 'QG_transient/MC_5-5_LB_25-45_parallel_param_5.00e+02';
 p4 = Plot([base_dir, exp_dir4, '/']);
 [~, exp_mdat4, preds4, ~, stats4] = p4.get_qg_transient_data(opts);
-[~, ~, ~, ~, ~, opts_str4] = p.unpack_metadata(exp_mdat4);
+[~, ~, ~, ~, ~, opts_str4] = p4.unpack_metadata(exp_mdat4);
 
 %%
 romexp_dir = 'QG_NR_ScaleSep_T10000/NR_200-12800_SC_1-5_parallel_param_5.00e+02/';

@@ -6,7 +6,8 @@ end
 exportdir_pres = '~/Projects/doc/presentations/kitp2021/';
 exportdir_papr = '~/Projects/doc/mlqg/figs/presentation/';
 
-present_mode = false;
+present_mode = true;
+rom_plots = false;
 if present_mode
     invert = true; % invert colors for white on black presentation
     exportdir = exportdir_pres;
@@ -26,8 +27,6 @@ end
 %-----------------------------------------------------------------------------
 %-----------------------------------------------------------------------------
 % % DRAW FIELDS
-figure(1)
-
 if present_mode
     fs = 14;
     dims = [14,12];
@@ -40,51 +39,44 @@ map = my_colmap(); % colormap
 crange = [-0.3,0.3];
 
 if 1
-    % possibility to draw multiple for an animation
-    sk = 5;
-    T = size(ref_preds{1,1},1);
-    range = round(T/2):sk:round(T/2)+sk*400;
+    figure(1)
+    fields = {ref_preds{1,1}(round(T/2),:)', ...
+              preds{1,1}(round(T/2),:)', ...
+              preds{1,2}(round(T/2),:)', ...
+              preds{1,3}(round(T/2),:)', ...
+              preds{1,6}(round(T/2),:)'};
 
-    for i = 1
+    titles = {'perfect model, vorticity (day$^{-1}$)', ...
+              'imperfect model, vorticity (day$^{-1}$)', ...
+              'ESN prediction, vorticity (day$^{-1}$)', ...
+              'ESNc prediction, vorticity (day$^{-1}$)', ...
+              'ESN+DMDc prediction, vorticity (day$^{-1}$)'};
 
-        fields = {ref_preds{1,1}(range(i),:)', ...
-                  preds{1,1}(range(i),:)', ...
-                  preds{1,2}(range(i),:)', ...
-                  preds{1,3}(range(i),:)', ...
-                  preds{1,6}(range(i),:)'};
+    state_dims = {[nx_f, ny_f], ...
+                  [nx_c, ny_c]};
 
-        titles = {'perfect model, vorticity (day$^{-1}$)', ...
-                  'imperfect model, vorticity (day$^{-1}$)', ...
-                  'ESN prediction, vorticity (day$^{-1}$)', ...
-                  'ESNc prediction, vorticity (day$^{-1}$)', ...
-                  'ESN+DMDc prediction, vorticity (day$^{-1}$)'};
-        
-        state_dims = {[nx_f, ny_f], ...
-                [nx_c, ny_c]};
+    fnames = {[exportdir, 'perfect_vort', '.eps'], ...
+              [exportdir, 'imperfect_vort', '.eps'], ...
+              [exportdir, 'ESN_vort', '.eps'], ...
+              [exportdir, 'ESNc_vort', '.eps'], ...
+              [exportdir, 'ESN+DMDc_vort', '.eps']};
 
-        fnames = {[exportdir, 'perfect_vort-', num2str(i), '.eps'], ...
-                  [exportdir, 'imperfect_vort-', num2str(i), '.eps'], ...
-                  [exportdir, 'ESN_vort-', num2str(i), '.eps'], ...
-                  [exportdir, 'ESNc_vort-', num2str(i), '.eps'], ...
-                  [exportdir, 'ESN+DMDc_vort-', num2str(i), '.eps']};
-
-        for j = 1:numel(fields)
-            nx = state_dims{min(2,j)}(1);
-            ny = state_dims{min(2,j)}(2);
-            plotQG(nx, ny, 1, scaling*fields{1,j}, true);
-            colormap(map);
-            colorbar
-            caxis(crange)
-            if present_mode
-                axis off
-                title(titles{j},'interpreter','latex')
-            end
-            exportfig(fnames{j}, fs, dims, invert)
-            clf
+    for j = 1:numel(fields)
+        nx = state_dims{min(2,j)}(1);
+        ny = state_dims{min(2,j)}(2);
+        plotQG(nx, ny, 1, scaling*fields{1,j}, true);
+        colormap(map);
+        colorbar
+        caxis(crange)
+        if present_mode
+            axis off
+            title(titles{j},'interpreter','latex')
         end
+        exportfig(fnames{j}, fs, dims, invert)
+        clf
     end
-end
 
+end
 
 %-----------------------------------------------------------------------------
 %-----------------------------------------------------------------------------
@@ -95,7 +87,7 @@ if 1
 
     fs = 12;
     dims = [16,10];
-    rom_plots = false;
+
 
     spec_opts = [];
     spec_opts.windowsize = 10;
@@ -118,12 +110,15 @@ if 1
            'interpreter','latex', ...
            'location', 'southwest')
 
-    title('average (equilibrium) energy spectrum','interpreter','latex');
+    if present_mode
+        title('average (equilibrium) energy spectrum','interpreter','latex');
+    end
     xlabel('wavenumber $\|\vec{k}\|_2$','interpreter','latex');
     set(gca,'yticklabels',[])
     set(gca,'xtick',[(3:10),15])
     ylim([1e-4,1e3])
     grid on
+
     exportfig([exportdir, 'motivating_powerspec.eps'], fs, dims, invert)
 
     %-------------------------------------------------------------------------
@@ -156,10 +151,9 @@ if 1
         [f_corr, ~, ~, ~] = p.plot_qg_mean_spectrum(qg_c, preds2{1,2}(trunc:end,:)', ...
                                                     spec_opts,  '.-', 'color', cols(6,:));
     end
-
     hold off
-    grid on
 
+    grid on
     if rom_plots
         legend([f_p, f_{range(1)}, f_{range(2)}, f_{range(3)}, f_{range(4)}, g], ...
                'perfect model', 'imperfect model', 'ESN, local POD', 'ESNc, local POD' , ...
@@ -178,7 +172,9 @@ if 1
     set(gca,'xtick',[(3:10),15])
     grid on
     ylim([1e-4,1e3])
-    title('average (equilibrium) energy spectrum','interpreter','latex');
+    if present_mode
+        title('average (equilibrium) energy spectrum','interpreter','latex');
+    end
     if rom_plots
         exportfig([exportdir, 'results_powerspec_rom.eps'], fs, dims, invert)
     else
@@ -189,13 +185,12 @@ end
 %%-----------------------------------------------------------------------------
 % % DRAW TRANSIENTS
 if 1
-    figure(4)
+    fh4 = figure(4);
+    fh4.Position = [100,100,1000,900];
 
     dims = [24,15];
     fs  = 9;
     bins = 20;
-    rom_plots = true
-
 
     clf
     start_idx = [1, 1, spec_opts.windowsize, spec_opts.windowsize, 1];
@@ -230,13 +225,14 @@ if 1
     xlim([xmin,xmax])
     % xlabel('time (years)','interpreter', 'latex')
     ylabel('$K_m$','interpreter', 'latex')
-    title('mean kinetic energy $K_m$', 'interpreter', 'latex')
+    if present_mode
+        title('mean kinetic energy $K_m$', 'interpreter', 'latex')
+    end
     set(gca, 'ytick', [])
     ylim('auto')
     ylm = ylim();
 
     exportfig([exportdir, 'motivating_transientplot.eps'], fs, dims,  invert, ylm)
-
     %--------------
     subplot(2,2,2)
     p1_2 = plotpdf(time_series0(trunc:end), bins, '.-', 'color', cols(1,:));
@@ -250,7 +246,9 @@ if 1
     ylabel('$K_m$','interpreter', 'latex')
     legend([p1_2,p2_2], 'perfect model', 'imperfect model', ...
            'interpreter', 'latex','location','east')
-    title('equilibrium pdf estimate','interpreter', 'latex')
+    if present_mode
+        title('equilibrium pdf estimate','interpreter', 'latex')
+    end
 
     exportfig([exportdir, 'motivating_transientplot.eps'], fs, dims,  invert, ylm)
 
@@ -285,12 +283,13 @@ if 1
     xlim([xmin,xmax])
     xlabel('time (years)','interpreter','latex')
     ylabel('$K_e$','interpreter','latex')
-    title('eddy kinetic energy $K_e$','interpreter','latex')
+    if present_mode
+        title('eddy kinetic energy $K_e$','interpreter','latex')
+    end
     ylim('auto')
     ylm = ylim();
     set(gca, 'ytick', [])
     exportfig([exportdir, 'motivating_transientplot.eps'], fs, dims, invert, ylm)
-
 
     subplot(2,2,4)
     [hc, edg] = histcounts(time_series0(trunc:end), bins, 'normalization', 'pdf');
@@ -304,9 +303,11 @@ if 1
 
     ylabel('$K_e$','interpreter','latex')
     ylim(ylm);
-    set(gca, 'xtick', [])
-    set(gca, 'ytick', [])
-    title('equilibrium pdf estimate','interpreter', 'latex')
+    set(gca, 'xtick', []);
+    set(gca, 'ytick', []);
+    if present_mode
+        title('equilibrium pdf estimate','interpreter', 'latex');
+    end
 
     exportfig([exportdir, 'motivating_transientplot.eps'], fs, dims, invert, ylm)
 
@@ -326,7 +327,7 @@ if 1
 
     hold off
 
-    ylim('auto')
+    ylim('auto');
     ylm = ylim();
 
     if rom_plots
@@ -337,6 +338,15 @@ if 1
 
     subplot(2,2,2)
     ylim(ylm);
+
+    % factorize... todo
+    % rom_stats = {stats{1,14}.(quantity{idx})(trunc:end), ...
+    %              stats{1,15}.(quantity{idx})(trunc:end), ...
+    %              stats{1,18}.(quantity{idx})(trunc:end)};
+
+    % rom_cols = {cols(3,:), ...
+    %             cols(4,:), ...
+    %             cols(7,:)};
 
     if rom_plots
         hold on;
@@ -400,11 +410,11 @@ if 1
 
     if rom_plots
         hold on
-        time_series1 = stats{1,18}.(quantity{idx})
+        time_series1 = stats{1,18}.(quantity{idx});
         f_esnc = plot(trange, time_series1, '-', 'color', cols(7,:)); hold on;
     else
         hold on
-        time_series1 = stats{1,3}.(quantity{idx})
+        time_series1 = stats{1,3}.(quantity{idx});
         f_esnc = plot(trange, time_series1, '-', 'color', cols(4,:)); hold on;
     end
 
@@ -463,6 +473,8 @@ if 1
     if rom_plots
         exportfig([exportdir, 'results_transientplot_rom.eps'], fs, dims, invert)
     else
+        exportfig([exportdir, 'results_transientplot_all.eps'], fs, dims, invert)
+
         set(p6_2,'visible','off')
         set(p7_2,'visible','off')
         set(p6_4,'visible','off')
@@ -483,6 +495,11 @@ if 1
         exportfig([exportdir, 'results_transientplot2.eps'], fs, dims, invert)
     end
 end
+
+
+%-----------------------------------------------------------------------------
+%-----------------------------------------------------------------------------
+% % DRAW
 
 if 1
     figure(5)

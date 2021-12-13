@@ -79,15 +79,15 @@ function [nums, mdat, preds, truths, f] = ...
     xtickangle(45);
 
     if isempty(self.xlab)
-        xlabel(xlab{xlab_index});
+        xlabel(xlab{xlab_index}, 'interpreter', 'latex');
     else
-        xlabel(self.xlab);
+        xlabel(self.xlab, 'interpreter', 'latex');
     end
 
     if isempty(self.ylab)
-        ylabel(mdat.ylab);
+        ylabel(mdat.ylab, 'interpreter', 'latex');
     else
-        ylabel(self.ylab);
+        ylabel(self.ylab, 'interpreter', 'latex');
     end
 
     % for combined experiments and multiple boxplots we need a legend
