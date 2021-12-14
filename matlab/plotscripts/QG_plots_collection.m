@@ -6,7 +6,7 @@ end
 exportdir_pres = '~/Projects/doc/presentations/kitp2021/';
 exportdir_papr = '~/Projects/doc/mlqg/figs/presentation/';
 
-present_mode = true;
+present_mode = false;
 rom_plots = false;
 if present_mode
     invert = true; % invert colors for white on black presentation
@@ -38,7 +38,7 @@ end
 map = my_colmap(); % colormap
 crange = [-0.3,0.3];
 
-if 1
+if 0
     figure(1)
     fields = {ref_preds{1,1}(round(T/2),:)', ...
               preds{1,1}(round(T/2),:)', ...
@@ -73,7 +73,6 @@ if 1
             title(titles{j},'interpreter','latex')
         end
         exportfig(fnames{j}, fs, dims, invert)
-        clf
     end
 
 end
@@ -81,7 +80,7 @@ end
 %-----------------------------------------------------------------------------
 %-----------------------------------------------------------------------------
 % % DRAW SPECTRUM
-if 1
+if 0
     figure(3)
     trunc = 20*365; % truncate initial spinup
 
@@ -188,16 +187,22 @@ if 1
     fh4 = figure(4);
     fh4.Position = [100,100,1000,900];
 
-    dims = [24,15];
-    fs  = 9;
-    bins = 20;
+    if present_mode
+        dims = [24,15];
+        fs  = 9;
+        bins = 20;
+    else
+        dims = [24,15];
+        fs  = 9;
+        bins = 20;
+    end
 
-    clf
     start_idx = [1, 1, spec_opts.windowsize, spec_opts.windowsize, 1];
     quantity = {'E', 'Z', 'Km', 'Ke'};
 
     subplot(2,2,1)
     idx = 3;
+
     trange_0 = (start_idx(idx):size(X,2)) / 365;
     trange   = (size(X,2)+start_idx(idx):size(X,2)+size(ref_preds{1,1}, 1)) / 365;
 
@@ -220,19 +225,22 @@ if 1
     f_modonly = plot(trange, time_series1, '-', 'color', cols(2,:)); hold on;
 
     hold off
-    xmin = size(X,2)/365-10;
-    xmax = size(X,2)/365+50;
+    xmin = size(X,2)/365-20;
+    xmax = size(X,2)/365+40;
     xlim([xmin,xmax])
     % xlabel('time (years)','interpreter', 'latex')
     ylabel('$K_m$','interpreter', 'latex')
-    if present_mode
-        title('mean kinetic energy $K_m$', 'interpreter', 'latex')
-    end
     set(gca, 'ytick', [])
     ylim('auto')
     ylm = ylim();
+    if invert
+        invertcolors()
+    end
+    if present_mode
+        title('mean kinetic energy $K_m$', 'interpreter', 'latex')
+    else
 
-    exportfig([exportdir, 'motivating_transientplot.eps'], fs, dims,  invert, ylm)
+    end
     %--------------
     subplot(2,2,2)
     p1_2 = plotpdf(time_series0(trunc:end), bins, '.-', 'color', cols(1,:));
@@ -244,13 +252,15 @@ if 1
     set(gca, 'ytick', [])
     ylim(ylm);
     ylabel('$K_m$','interpreter', 'latex')
-    legend([p1_2,p2_2], 'perfect model', 'imperfect model', ...
+    legend([p1_2, p2_2], 'perfect model', 'imperfect model', ...
            'interpreter', 'latex','location','east')
     if present_mode
         title('equilibrium pdf estimate','interpreter', 'latex')
     end
 
-    exportfig([exportdir, 'motivating_transientplot.eps'], fs, dims,  invert, ylm)
+    if invert
+        invertcolors()
+    end
 
     %-------------------------------------------------------------------------------
     subplot(2,2,3)
@@ -289,7 +299,9 @@ if 1
     ylim('auto')
     ylm = ylim();
     set(gca, 'ytick', [])
-    exportfig([exportdir, 'motivating_transientplot.eps'], fs, dims, invert, ylm)
+    if invert
+        invertcolors()
+    end
 
     subplot(2,2,4)
     [hc, edg] = histcounts(time_series0(trunc:end), bins, 'normalization', 'pdf');
@@ -309,6 +321,9 @@ if 1
         title('equilibrium pdf estimate','interpreter', 'latex');
     end
 
+    if invert
+        invertcolors()
+    end
     exportfig([exportdir, 'motivating_transientplot.eps'], fs, dims, invert, ylm)
 
     %------------------------------------------------------------------
@@ -330,78 +345,58 @@ if 1
     ylim('auto');
     ylm = ylim();
 
-    if rom_plots
-        exportfig([exportdir, 'results_transientplot_rom.eps'], fs, dims, invert)
-    else
-        exportfig([exportdir, 'results_transientplot.eps'], fs, dims, invert)
+    if invert
+        invertcolors()
     end
 
     subplot(2,2,2)
     ylim(ylm);
 
-    % factorize... todo
-    % rom_stats = {stats{1,14}.(quantity{idx})(trunc:end), ...
-    %              stats{1,15}.(quantity{idx})(trunc:end), ...
-    %              stats{1,18}.(quantity{idx})(trunc:end)};
-
-    % rom_cols = {cols(3,:), ...
-    %             cols(4,:), ...
-    %             cols(7,:)};
-
     if rom_plots
-        hold on;
-        time_series1 = stats{1,14}.(quantity{idx})(trunc:end);
-        p3_2 = plotpdf(time_series1, bins, '.-', 'color', cols(3,:));
-        hold on;
-        time_series1 = stats{1,15}.(quantity{idx})(trunc:end);
-        p4_2 = plotpdf(time_series1, bins, '.-', 'color', cols(4,:));
-        hold on;
-        time_series1 = stats{1,18}.(quantity{idx})(trunc:end);
-        p5_2 = plotpdf(time_series1, bins, '.-', 'color', cols(7,:));
+        plot_stats = {stats{1,14}.(quantity{idx})(trunc:end), ...
+                      stats{1,15}.(quantity{idx})(trunc:end), ...
+                      stats{1,18}.(quantity{idx})(trunc:end)};
 
-        hold off
     else
-        hold on
-        time_series1 = stats{1,2}.(quantity{idx})(trunc:end);
-        p3_2 = plotpdf(time_series1, bins, '.-', 'color', cols(3,:));
-
-        hold on
-        time_series1 = stats{1,3}.(quantity{idx})(trunc:end);
-        p4_2 = plotpdf(time_series1, bins, '.-', 'color', cols(4,:));
-
-        hold on
-        time_series1 = stats{1,6}.(quantity{idx})(trunc:end);
-        p5_2 = plotpdf(time_series1, bins, '.-', 'color', cols(7,:));
-
-        hold on
-        time_series1 = stats4{1,2}.(quantity{idx})(trunc:end); % lambda = ...
-        p6_2 = plotpdf(time_series1, bins, '.-', 'color', cols(5,:));
-
-        hold on
-        time_series1 = stats2{1,2}.(quantity{idx})(trunc:end); % lambda = ...
-        p7_2 = plotpdf(time_series1, bins, '.-', 'color', cols(6,:));
-        hold off
+        plot_stats = {stats{1,2}.(quantity{idx})(trunc:end),...
+                      stats{1,3}.(quantity{idx})(trunc:end),...
+                      stats{1,6}.(quantity{idx})(trunc:end),...
+                      stats4{1,2}.(quantity{idx})(trunc:end),...
+                      stats2{1,2}.(quantity{idx})(trunc:end)};
     end
+
+    plot_cols = {cols(3,:), ...
+                 cols(4,:), ...
+                 cols(7,:), ...
+                 cols(5,:), ...
+                 cols(6,:)};
+
+    p3_2 = [];
+    for s = 1:numel(plot_stats)
+        hold on
+        p3_2{s} = plotpdf(plot_stats{s}, bins, '.-', 'color', plot_cols{s});
+    end
+    hold off
 
     set(gca, 'xtick', [])
 
     ylabel('$K_m$','interpreter', 'latex')
 
     if rom_plots
-        lg = legend([p1_2,p2_2,p3_2,p4_2,p5_2], 'perfect model', 'imperfect model', ...
-                    'ESN, local POD', 'ESNc, local POD', 'ESN+DMDc, local POD', 'interpreter', 'latex', 'location','east');
+        lg = legend([p1_2,p2_2, [p3_2{:}]], 'perfect model', 'imperfect model', ...
+                    'ESN, local POD', 'ESNc, local POD', ...
+                    'ESN+DMDc, local POD', 'interpreter', 'latex', 'location','east');
     else
-        lg = legend([p1_2,p2_2,p3_2,p4_2,p5_2, p6_2, p7_2], 'perfect model', 'imperfect model', ...
-                    'ESN', 'ESNc', 'ESN+DMDc', 'DMDc', 'correction only', 'interpreter', 'latex', 'location','east');
+        lg = legend([p1_2,p2_2, [p3_2{:}]], 'perfect model', 'imperfect model', ...
+                    'ESN', 'ESNc', 'ESN+DMDc', 'DMDc', ...
+                    'correction only', 'interpreter', 'latex', 'location','east');
     end
 
     lpos = lg.Position;
     lg.Position = [lpos(1), lpos(2)*0.95, lpos(3), lpos(4)];
 
-    if rom_plots
-        exportfig([exportdir, 'results_transientplot_rom.eps'], fs, dims, invert)
-    else
-        exportfig([exportdir, 'results_transientplot.eps'], fs, dims, invert)
+    if invert
+        invertcolors()
     end
 
     %----------------------
@@ -422,104 +417,108 @@ if 1
     ylim('auto')
     ylm = ylim();
 
-    if rom_plots
-        exportfig([exportdir, 'results_transientplot_rom.eps'], fs, dims, invert)
-    else
-        exportfig([exportdir, 'results_transientplot.eps'], fs, dims, invert)
+    if invert
+        invertcolors()
     end
 
     subplot(2,2,4)
-
     if rom_plots
-        hold on
-        time_series1 = stats{1,14}.(quantity{idx})(trunc:end);
-        p3_4 = plotpdf(time_series1, bins, '.-', 'color', cols(3,:));
-
-        hold on
-        time_series1 = stats{1,15}.(quantity{idx})(trunc:end);
-        p4_4 = plotpdf(time_series1, bins, '.-', 'color', cols(4,:));
-
-        hold on
-        time_series1 = stats{1,18}.(quantity{idx})(trunc:end);
-        p5_4 = plotpdf(time_series1, bins, '.-', 'color', cols(7,:));
+        plot_stats = {stats{1,14}.(quantity{idx})(trunc:end), ...
+                      stats{1,15}.(quantity{idx})(trunc:end), ...
+                      stats{1,18}.(quantity{idx})(trunc:end)};
 
     else
-        hold on
-        time_series1 = stats{1,2}.(quantity{idx})(trunc:end);
-        p3_4 = plotpdf(time_series1, bins, '.-', 'color', cols(3,:));
-
-        hold on
-        time_series1 = stats{1,3}.(quantity{idx})(trunc:end);
-        p4_4 = plotpdf(time_series1, bins, '.-', 'color', cols(4,:));
-
-        hold on
-        time_series1 = stats{1,6}.(quantity{idx})(trunc:end);
-        p5_4 = plotpdf(time_series1, bins, '.-', 'color', cols(7,:));
-
-        hold on
-        time_series1 = stats4{1,2}.(quantity{idx})(trunc:end);
-        p6_4 = plotpdf(time_series1, bins, '.-', 'color', cols(5,:));
-        hold on
-
-        time_series1 = stats2{1,2}.(quantity{idx})(trunc:end);
-        p7_4 = plotpdf(time_series1, bins, '.-', 'color', cols(6,:));
+        plot_stats = {stats{1,2}.(quantity{idx})(trunc:end),...
+                      stats{1,3}.(quantity{idx})(trunc:end),...
+                      stats{1,6}.(quantity{idx})(trunc:end),...
+                      stats4{1,2}.(quantity{idx})(trunc:end),...
+                      stats2{1,2}.(quantity{idx})(trunc:end)};
     end
+
+    p3_4 = [];
+    for s = 1:numel(plot_stats)
+        hold on
+        p3_4{s} = plotpdf(plot_stats{s}, bins, '.-', 'color', plot_cols{s});
+    end
+    hold off
 
     hold off
     set(gca, 'xtick', [])
     ylabel('$K_e$','interpreter', 'latex')
     ylim(ylm);
 
+    if invert
+        invertcolors()
+    end
+
     if rom_plots
-        exportfig([exportdir, 'results_transientplot_rom.eps'], fs, dims, invert)
+        if present_mode
+            exportfig([exportdir, 'results_transientplot_rom.eps'], fs, dims, invert)
+        else
+            for i = 1:4
+                exportsubplot(2,2,i, ...
+                              [exportdir, 'results_transientplot_rom'], fs, dims, invert);
+            end
+        end
     else
-        exportfig([exportdir, 'results_transientplot_all.eps'], fs, dims, invert)
+        if ~present_mode
+            for i = 1:4
+                exportsubplot(4,2,2,i, ...
+                              [exportdir, 'results_transientplot_all'], fs, dims, invert);
+            end
+        else
+            exportfig([exportdir, 'results_transientplot_all.eps'], fs, dims, invert)
+            set(p3_2{4},'visible','off')
+            set(p3_2{5},'visible','off')
+            set(p3_4{4},'visible','off')
+            set(p3_4{5},'visible','off')
+            exportfig([exportdir, 'results_transientplot1.eps'], fs, dims, invert)
 
-        set(p6_2,'visible','off')
-        set(p7_2,'visible','off')
-        set(p6_4,'visible','off')
-        set(p7_4,'visible','off')
-        exportfig([exportdir, 'results_transientplot1.eps'], fs, dims, invert)
+            set(p3_2{1},'visible','off')
+            set(p3_2{2},'visible','off')
+            set(p3_2{3},'visible','off')
+            set(p3_4{1},'visible','off')
+            set(p3_4{2},'visible','off')
+            set(p3_4{3},'visible','off')
 
-        set(p3_2,'visible','off')
-        set(p4_2,'visible','off')
-        set(p5_2,'visible','off')
-        set(p3_4,'visible','off')
-        set(p4_4,'visible','off')
-        set(p5_4,'visible','off')
-
-        set(p6_2,'visible','on')
-        set(p7_2,'visible','on')
-        set(p6_4,'visible','on')
-        set(p7_4,'visible','on')
-        exportfig([exportdir, 'results_transientplot2.eps'], fs, dims, invert)
+            set(p3_2{4},'visible','on')
+            set(p3_2{5},'visible','on')
+            set(p3_4{4},'visible','on')
+            set(p3_4{5},'visible','on')
+            exportfig([exportdir, 'results_transientplot2.eps'], fs, dims, invert)
+        end
     end
 end
 
-
 %-----------------------------------------------------------------------------
 %-----------------------------------------------------------------------------
-% % DRAW
+% % DRAW scaling experiments
 
-if 1
+if 0
     figure(5)
 
     gridexp_p.plot_mean = false;
     gridexp_p.plot_scatter = false;
 
-    [~,~,~,~,f] = gridexp_p.plot_experiment(false, false);
-
-    fs = 10;
-    dims = [19,12];
+    [nums,mdat,~,~,f] = gridexp_p.plot_experiment(false, false);
+    p.create_description(mdat)
     legend([f{:}], 'imperfect model', 'ESN', 'ESNc', 'DMDc', ...
            'correction only', 'ESN+DMDc', 'interpreter', 'latex','location','northwest')
     ylabel('accurate days', 'interpreter', 'latex')
-    xlabel('ESN state size $N_r$', 'interpreter', 'latex')
+    if present_mode
+        xlabel('ESN state size $N_r$', 'interpreter', 'latex')
+        fs = 10;
+        dims = [19,12];
+    else
+        xlabel('$N_r$', 'interpreter', 'latex')
+        fs = 14;
+        dims = [18,14];
+    end
     title('');
     exportfig([exportdir, 'results_gridexp.eps'], fs, dims, invert)
 end
 
-if 1
+if 0
     figure(6)
 
     romexp_p.plot_mean = false;
