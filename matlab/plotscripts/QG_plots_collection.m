@@ -1,6 +1,9 @@
 addpath('../');
 
-if ~exist('preds4', 'var') || ~exist('ref_preds', 'var') || ~exist('preds', 'var')
+if ~exist('preds4', 'var') || ...
+        ~exist('ref_preds', 'var') || ...
+        ~exist('preds', 'var') || ...
+        ~exist('spinup_stats', 'var')
     load_qg_data
 end
 exportdir_pres = '~/Projects/doc/presentations/kitp2021/';
@@ -189,11 +192,11 @@ if 1
 
     if present_mode
         dims = [24,15];
-        fs  = 9;
+        fs = 9;
         bins = 20;
     else
-        dims = [24,15];
-        fs  = 9;
+        dims = [20,16];
+        fs = 9;
         bins = 20;
     end
 
@@ -228,7 +231,9 @@ if 1
     xmin = size(X,2)/365-20;
     xmax = size(X,2)/365+40;
     xlim([xmin,xmax])
-    % xlabel('time (years)','interpreter', 'latex')
+    if ~present_mode
+        xlabel('time (years)','interpreter', 'latex')
+    end
     ylabel('$K_m$','interpreter', 'latex')
     set(gca, 'ytick', [])
     ylim('auto')
@@ -281,8 +286,6 @@ if 1
 
     f_c = plot([trange_0, trange], repmat(conf_hi, 1, numel(time_series0)), '--', 'color', cols(1,:));
     plot([trange_0, trange], repmat(conf_lo, 1, numel(time_series0)), '--', 'color', cols(1,:));
-
-
     [n_shifts, n_hyp] = size(preds);
     trange = (size(X,2)+start_idx(idx):size(X,2)+size(preds{1,1}, 1)) / 365;
 
@@ -452,41 +455,27 @@ if 1
     end
 
     if rom_plots
-        if present_mode
-            exportfig([exportdir, 'results_transientplot_rom.eps'], fs, dims, invert)
-        else
-            for i = 1:4
-                exportsubplot(2,2,i, ...
-                              [exportdir, 'results_transientplot_rom'], fs, dims, invert);
-            end
-        end
+        exportfig([exportdir, 'results_transientplot_rom.eps'], fs, dims, invert)
     else
-        if ~present_mode
-            for i = 1:4
-                exportsubplot(4,2,2,i, ...
-                              [exportdir, 'results_transientplot_all'], fs, dims, invert);
-            end
-        else
-            exportfig([exportdir, 'results_transientplot_all.eps'], fs, dims, invert)
-            set(p3_2{4},'visible','off')
-            set(p3_2{5},'visible','off')
-            set(p3_4{4},'visible','off')
-            set(p3_4{5},'visible','off')
-            exportfig([exportdir, 'results_transientplot1.eps'], fs, dims, invert)
+        exportfig([exportdir, 'results_transientplot_all.eps'], fs, dims, invert)
+        set(p3_2{4},'visible','off')
+        set(p3_2{5},'visible','off')
+        set(p3_4{4},'visible','off')
+        set(p3_4{5},'visible','off')
+        exportfig([exportdir, 'results_transientplot1.eps'], fs, dims, invert)
 
-            set(p3_2{1},'visible','off')
-            set(p3_2{2},'visible','off')
-            set(p3_2{3},'visible','off')
-            set(p3_4{1},'visible','off')
-            set(p3_4{2},'visible','off')
-            set(p3_4{3},'visible','off')
+        set(p3_2{1},'visible','off')
+        set(p3_2{2},'visible','off')
+        set(p3_2{3},'visible','off')
+        set(p3_4{1},'visible','off')
+        set(p3_4{2},'visible','off')
+        set(p3_4{3},'visible','off')
 
-            set(p3_2{4},'visible','on')
-            set(p3_2{5},'visible','on')
-            set(p3_4{4},'visible','on')
-            set(p3_4{5},'visible','on')
-            exportfig([exportdir, 'results_transientplot2.eps'], fs, dims, invert)
-        end
+        set(p3_2{4},'visible','on')
+        set(p3_2{5},'visible','on')
+        set(p3_4{4},'visible','on')
+        set(p3_4{5},'visible','on')
+        exportfig([exportdir, 'results_transientplot2.eps'], fs, dims, invert)
     end
 end
 
