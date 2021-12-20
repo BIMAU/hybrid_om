@@ -1,4 +1,4 @@
-function [maxr] = get_maxr(nx, ny)
+function [maxr, midx, midy] = get_maxr(nx, ny)
 % get largest radius used to obtain powerspectrum
     midx = nx/2+1;
     midy = ny/2+1;

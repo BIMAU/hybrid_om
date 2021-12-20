@@ -1,19 +1,15 @@
 function [f, Pm, Pv, g] = plot_qg_mean_spectrum(self, qg, states, opts, varargin)
+
     if ~isfield(opts, 'conf_int')
         opts.conf_int = false;
     end
+
     if ~isfield(opts, 'power_laws')
         opts.power_laws = false;
     end
 
-    P = [];
-    for i = opts.trunc+1:opts.skip:opts.T
-        [rPrf, ~, maxr, ~] = self.get_qg_spectrum(qg, states(:,i));
-        P = [P, rPrf];
-    end
-
-    Pm = mean(P')';
-    Pv = var(P')';
+    [Pm, Pv] = Utils.get_qg_mean_spectrum(qg, states, opts);
+    maxr = size(Pm,1);
 
     plot_range = 2:maxr-2;
     plot_range_var = 2:maxr-2;

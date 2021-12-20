@@ -17,15 +17,8 @@ function [rPrf, C, maxr, sumCoefs] = get_qg_spectrum(qg, x)
     rows = size(H,1);
     cols = size(H,2);
 
-    maxr = Utils.get_maxr(rows, cols);
-    
-    midx = rows/2+1;
-    midy = cols/2+1;
+    [maxr, midx, midy] = Utils.get_maxr(rows, cols);
 
-    maxr = floor(sqrt(midx^2 + midy^2)) + 1;
-    
-    keyboard
-    
     rPrf = zeros(maxr,1);
     cnt  = zeros(maxr,1);
     C    = zeros(rows,cols);
