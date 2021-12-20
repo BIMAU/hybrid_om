@@ -1,4 +1,4 @@
-function [rPrf, C, maxr, sumCoefs] = get_qg_spectrum(self, qg, x)
+function [rPrf, C, maxr, sumCoefs] = get_qg_spectrum(qg, x)
 
     nx = qg.nx;
     ny = qg.ny;
@@ -17,11 +17,15 @@ function [rPrf, C, maxr, sumCoefs] = get_qg_spectrum(self, qg, x)
     rows = size(H,1);
     cols = size(H,2);
 
+    maxr = Utils.get_maxr(rows, cols);
+    
     midx = rows/2+1;
     midy = cols/2+1;
 
     maxr = floor(sqrt(midx^2 + midy^2)) + 1;
-
+    
+    keyboard
+    
     rPrf = zeros(maxr,1);
     cnt  = zeros(maxr,1);
     C    = zeros(rows,cols);
