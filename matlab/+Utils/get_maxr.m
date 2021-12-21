@@ -3,4 +3,4 @@ function [maxr, midx, midy] = get_maxr(nx, ny)
     midx = nx/2+1;
     midy = ny/2+1;
     maxr = floor(sqrt(midx^2 + midy^2)) + 1;
-end    
+end

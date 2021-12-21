@@ -1,25 +1,33 @@
-function [stats] = get_qg_statistics(self, qg, states, opts)
+function [stats] = get_qg_statistics(qg, states, opts)
     time = tic;
+
+    if ~strcmp(qg.name, 'QGmodel');
+        fprintf('This routine is only available for QG!\n');
+        stats = 0;
+        return;
+    end
+
     fprintf(' computing statistics ... \n');
     wsize = opts.windowsize;
-    track_points = false;
 
-    nx   = opts.nx;
-    ny   = opts.ny;
-    nun  = opts.nun;
-    dim  = nx*ny*nun;
-    Re   = opts.Re;
-    ampl = opts.ampl;
-    stir = opts.stir;
-    
-    Ldim    = opts.Ldim;
-    Udim    = opts.Udim;
+    if ~isfield(opts, 'track_points')
+        track_points = false;
+    else
+        track_points = opts.track_points;
+    end
+
+    nx   = qg.nx;
+    ny   = qg.ny;
+    nun  = qg.nun;
+
+    Ldim    = qg.Lxdim;
+    Udim    = qg.Udim;
     tdim    = Ldim / Udim;  % in seconds
     scaling = 3600*24/tdim; % in days
 
-    T    = size(states, 2); % number of samples
+    [n,T] = size(states); % number of samples
+    assert(n == nx*ny*nun, 'input data in wrong form');
     assert(T > wsize, '   T <= wsize... not good.');
-    assert(nx*ny*nun == size(states,1), 'input states are possibly transposed');
 
     stats = struct();
 
@@ -27,8 +35,10 @@ function [stats] = get_qg_statistics(self, qg, states, opts)
     stats.Z  = zeros(T,1); % enstrophy
     stats.PS = zeros(T,2); % plain vorticity points
     stats.ST = zeros(T,2); % plain streamfun points
+
     u  = zeros(nx*ny,T); % velocity x-dir
     v  = zeros(nx*ny,T); % velocity y-dir
+
     fullKe = zeros(nx*ny,T); % full eddy kinetic energy fields
     fullKm = zeros(nx*ny,T); % full mean kinetic energy fields
 

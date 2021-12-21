@@ -23,7 +23,7 @@ classdef Experiment < handle
         % How to add details
         add_details = 'from_model';
 
-        store_state = 'final'; % which state to store: 'all', 'final'
+        store_state = 'final'; % which state to store: 'all', 'final', 'stats'
 
         dimension = '1D'; % problem dimension: '1D' or '2D'
 
@@ -37,6 +37,9 @@ classdef Experiment < handle
 
         % set the window size for the nrs
         nrmse_windowsize = 100;
+
+        % set the window size for Km, Ke, Z (qg only)
+        stats_windowsize = 100;
 
         % y-axis label
         ylab = 'samples';
@@ -81,10 +84,13 @@ classdef Experiment < handle
 
         % data storage for all runs
         predictions; % stores all predictions
-        truths;      % stores all truths
-        errors;      % stores the errors
-        ESN_states;  % stores snapshots of the ESN state X
-        damping;     % stores SVD damping curves
+        truths; % stores all truths
+        errors; % stores the errors
+        ESN_states; % stores snapshots of the ESN state X
+        damping; % stores SVD damping curves
+        spectra; % stores yearly average spectrum (1st component) and variance
+                 % (2nd component), qg only
+        stats; % stores statistics (Km, Ke, Z, ...), qg only
 
         % generated parameters of for the ESN
         esn_pars;
@@ -227,13 +233,31 @@ classdef Experiment < handle
                     self.damping{i, j} = damping;
                     if strcmp(self.store_state, 'all')
                         self.predictions{i, j} = predY(:,:);
-                        self.truths{i, j} = testY(:,:);
+                        if ~isempty(testY)
+                            self.truths{i, j} = testY(:,:);
+                        end
                         self.ESN_states{i,j} = esnX(round(linspace(1,size(esnX,1),20)),:);
 
                     elseif strcmp(self.store_state, 'final');
                         self.predictions{i, j} = predY(end,:);
-                        self.truths{i, j} = testY(end,:);
+
+                        if ~isempty(testY)
+                            self.truths{i, j} = testY(end,:);
+                        end
+
                         self.ESN_states{i,j} = esnX(end,:);
+
+                    elseif strcmp(self.store_state, 'stats');
+                        self.predictions{i, j} = predY(end,:);
+                        if ~isempty(testY)
+                            self.truths{i, j} = testY(end,:);
+                        end
+                        self.ESN_states{i,j} = esnX(end,:);
+                        [Pm, Pv] = Utils.get_qg_yearly_spectrum(self.model, predY');
+                        self.spectra{i,j,1} = Pm;
+                        self.spectra{i,j,2} = Pv;
+                        stat_opts.windowsize = stats_windowsize;
+                        self.stats{i,j} = get_qg_statistics(self.model, 
                     else
                         error('Unexpected input');
                     end
@@ -261,7 +285,9 @@ classdef Experiment < handle
                               {'model_config', self.model_config}, ...
                               {'esn_pars', self.esn_pars}, ...
                               {'ESN_states', self.ESN_states}, ...
-                              {'damping', self.damping} };
+                              {'damping', self.damping}, ...
+                              {'spectra', self.spectra}, ...
+                              {'stats', self.stats}};
 
                     self.store_results(pairs);
                 end

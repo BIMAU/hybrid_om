@@ -43,7 +43,6 @@ classdef Plot < handle
 
         [nums, mdat, preds, truths, f] = plot_experiment(self, ignore_nans, flip_axes);
         [nums, mdat, preds, truths, s] = get_qg_transient_data(self, opts);
-        [stats] = get_qg_statistics(self, qg, data, opts);
         [] = movie_qg(self, data, opts);
         % gather data from output .mat file
         [errs, nums, pids, ...

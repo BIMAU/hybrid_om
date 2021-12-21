@@ -27,7 +27,7 @@ function [nums, mdat, preds, truths, s] = get_qg_transient_data(self, opts)
         for i = 1:n_shifts
             fprintf('Getting statistics, shift: %d/%d, hyp: %d/%d\n', i, n_shifts, j, n_hyp);
             if ~isempty(preds{i,j})
-                s{i,j} = self.get_qg_statistics(qg, R*preds{i, j}', opts);
+                s{i,j} = Utils.get_qg_statistics(qg, R*preds{i, j}', opts);
             end
         end
     end
