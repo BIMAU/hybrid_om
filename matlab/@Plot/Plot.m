@@ -58,16 +58,5 @@ classdef Plot < handle
 
         [f] = my_boxplot(self, varargin);
 
-        function [out] = compute_qg_enstrophy(self, field)
-        % assume QG ordering
-            nun = 2;
-            out = sum(field(1:nun:end).^2);
-        end
-
-        function [out] = compute_qg_energy(self, field)
-        % assume QG ordering
-            nun = 2;
-            out = sum(field(1:nun:end).*field(2:nun:end));
-        end
     end
 end
