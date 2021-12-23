@@ -81,7 +81,7 @@ p = Plot(ref_dir);
 training_samples = 10000;
 X = opts.R*dgen.X(:,1:training_samples);
 
-stats_0 = p.get_qg_statistics(qg_c, X, opts);
+stats_0 = Utils.get_qg_statistics(qg_c, X, opts);
 [~, ~, ref_preds, ~, ref_stats] = p.get_qg_transient_data(opts);
 
 %% ------------------------------------------------------------------
@@ -89,7 +89,7 @@ stats_0 = p.get_qg_statistics(qg_c, X, opts);
 fprintf('load spinup data ...\n');
 spinup_data = load('~/Projects/qg/matlab/MLQG/data/fullmodel/N64_Re1.0e+03_Tstart0_Tend100_F2_Stir0_Rot1.mat');
 X_spinup = opts.R * spinup_data.states;
-spinup_stats = p.get_qg_statistics(qg_c, X_spinup, opts);
+spinup_stats = Utils.get_qg_statistics(qg_c, X_spinup, opts);
 
 %%------------------------------------------------------------------
 

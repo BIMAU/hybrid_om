@@ -11,8 +11,8 @@ exportdir = '~/Projects/doc/mlqg/figs/QG_spectra/';
 
 trunc = 20*365; % truncate initial spinup
 
-fs = 11;
-dims = [20,16];
+fs = 12;
+dims = [20,13];
 
 spec_opts = [];
 spec_opts.windowsize = 10;

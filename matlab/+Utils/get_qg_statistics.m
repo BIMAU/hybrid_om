@@ -55,8 +55,8 @@ function [stats] = get_qg_statistics(qg, states, opts)
     end
 
     for t = 1:T
-        stats.Z(t) = self.compute_qg_enstrophy(scaling*states(:,t));
-        stats.E(t) = self.compute_qg_energy(scaling*states(:,t));
+        stats.Z(t) = Utils.compute_qg_enstrophy(scaling*states(:,t));
+        stats.E(t) = Utils.compute_qg_energy(scaling*states(:,t));
         [u(:,t), v(:,t)] = qg.compute_uv(scaling*states(:,t));
 
         if track_points
@@ -82,12 +82,13 @@ function [stats] = get_qg_statistics(qg, states, opts)
     % stats.dZdt = stats.Z(2:end) - stats.Z(1:end-1);
     % stats.dEdt = stats.E(2:end) - stats.E(1:end-1);
     for t = 1:T-wsize+1
-        window        = t:t+wsize-1;
+        window = t:t+wsize-1;
 
         stats.Zvar(t)     = var(stats.Z(window));
         stats.Zmean(t)    = mean(stats.Z(window));
         stats.Evar(t)     = var(stats.E(window));
         stats.Emean(t)    = mean(stats.E(window));
+
         % stats.dZdtvar(t)  = var(stats.dZdt(window));
         % stats.dZdtmean(t) = mean(stats.dZdt(window));
         % stats.dEdtvar(t)  = var(stats.dEdt(window));
