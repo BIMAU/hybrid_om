@@ -46,9 +46,6 @@ classdef Experiment < handle
 
         % use the svd wavelet interface in ESN to average the data
         svd_averaging = 1;
-
-        % flag to parallelize hyperparams instead of data shifts.
-        parallel_hyps = false;
     end
 
     properties (Access = private)
@@ -156,141 +153,143 @@ classdef Experiment < handle
          function [dir] = run(self)
             time = tic;
 
-
             assert(~isempty(self.exp_id), 'no experiment added');
 
+            % initialize
             self.create_descriptors();
             self.create_hyp_range();
             self.create_storage();
             self.create_output_dir();
 
-            if self.parallel_hyps
-                my_hyps = self.my_indices(self.pid, self.procs, self.num_hyp_settings);
+            % number of time steps in series
+            Nt = size(self.data.X, 2);
+
+            % largest requested number of training samples
+            max_tr_samples = self.max_available_hyp('TrainingSamples');
+
+            % create shifts in the training data
+            % -1 to make sure there is output training data
+            if self.testing_on
+                max_shift = Nt - self.max_preds - max_tr_samples - 1;
             else
-                my_hyps = 1:self.num_hyp_settings;
+                max_shift = Nt - max_tr_samples - 1;
+            end
+            assert(max_shift > 1, 'invalid number of training samples, choose less');
+
+            if self.shifts > 1
+                tr_shifts = round(linspace(0, max_shift, self.shifts));
+            else
+                tr_shifts = 0;
             end
 
-            for j = my_hyps
+            % The core experiment is repeated with <reps>*<shifts> realizations of
+            % the network. The range of the training data changes with <shifts>.
+            cvec = combvec((1:self.reps), (1:self.shifts))';
+            rvec = cvec(:,1);
+            svec = cvec(:,2);
+            Ni = numel(svec); % number of indices
+
+            % combination of shifts and hyperparameter settings
+            reps_hyps = combvec(1:Ni, 1:self.num_hyp_settings)';
+
+            % total number of independent experiments
+            Ntotal = size(reps_hyps,1);
+            
+            % domain decomposition
+            my_inds = self.my_indices(self.pid, self.procs, Ntotal);
+            
+            for it = my_inds
+
+                i = reps_hyps(it,1);
+                j = reps_hyps(it,2);
 
                 [self.esn_pars, mod_pars] = self.distribute_params(j);
 
-                Nt = size(self.data.X, 2); % number of time steps in series
+                self.print_hyperparams(j);
+                self.print(' hyp setting: %d/%d shift: %d/%d repetitions: %d/%d \n', ...
+                           j, self.num_hyp_settings, ...
+                           svec(i), self.shifts, ...
+                           rvec(i), self.reps);
 
-                % -1 to make sure there is output training data
-                if self.testing_on
-                    max_shift = Nt - self.max_preds - self.tr_samples - 1;
-                else
-                    max_shift = Nt - self.tr_samples - 1;
-                end
-                assert(max_shift > 1, 'invalid number of training samples, choose less');
+                self.train_range = (1:self.tr_samples) + tr_shifts(svec(i));
+                self.test_range  = self.train_range(end) + (1:self.max_preds);
 
-                if self.shifts > 1
-                    tr_shifts = round(linspace(0, max_shift, self.shifts));
-                else
-                    tr_shifts = 0;
-                end
+                self.print('create scale separation modes: %s\n', ...
+                           self.scale_separation);
 
-                % The core experiment is repeated with <reps>*<shifts> realizations of
-                % the network. The range of the training data changes with <shifts>.
-                cvec = combvec((1:self.reps),(1:self.shifts))';
-                rvec = cvec(:,1);
-                svec = cvec(:,2);
-                Ni   = numel(svec); % number of indices
+                self.modes = Modes(self.scale_separation, mod_pars, ...
+                                   self.data, self.train_range);
 
-                % domain decomposition
-                if ~self.parallel_hyps
-                    my_inds = self.my_indices(self.pid, self.procs, Ni);
-                else
-                    my_inds = 1:Ni;
-                end
+                self.print('transform input/output data with modes: %s\n', ...
+                           self.scale_separation);
 
-                for i = my_inds
-                    self.print_hyperparams(j);
-                    self.print(' hyp setting: %d/%d shift: %d/%d repetitions: %d/%d \n', ...
-                               j, self.num_hyp_settings, ...
-                               svec(i), self.shifts, ...
-                               rvec(i), self.reps);
+                self.VX   = self.modes.Vinv * self.data.X;
+                self.VPhi = self.modes.Vinv * self.data.Phi;
 
-                    self.train_range = (1:self.tr_samples) + tr_shifts(svec(i));
-                    self.test_range  = self.train_range(end) + (1:self.max_preds);
+                [predY, testY, err, esnX, damping] = self.experiment_core();
 
-                    self.print('create scale separation modes: %s\n', ...
-                               self.scale_separation);
+                self.num_predicted(i, j) = size(predY, 1);
 
-                    self.modes = Modes(self.scale_separation, mod_pars, ...
-                                       self.data, self.train_range);
-
-                    self.print('transform input/output data with modes: %s\n', ...
-                               self.scale_separation);
-
-                    self.VX   = self.modes.Vinv * self.data.X;
-                    self.VPhi = self.modes.Vinv * self.data.Phi;
-
-                    [predY, testY, err, esnX, damping] = self.experiment_core();
-
-                    self.num_predicted(i, j) = size(predY, 1);
-
-                    self.damping{i, j} = damping;
-                    if strcmp(self.store_state, 'all')
-                        self.predictions{i, j} = predY(:,:);
-                        if ~isempty(testY)
-                            self.truths{i, j} = testY(:,:);
-                        end
-                        self.ESN_states{i,j} = esnX(round(linspace(1,size(esnX,1),20)),:);
-
-                    elseif strcmp(self.store_state, 'final');
-                        self.predictions{i, j} = predY(end,:);
-
-                        if ~isempty(testY)
-                            self.truths{i, j} = testY(end,:);
-                        end
-
-                        self.ESN_states{i,j} = esnX(end,:);
-
-                    elseif strcmp(self.store_state, 'stats');
-                        self.predictions{i, j} = predY(end,:);
-                        if ~isempty(testY)
-                            self.truths{i, j} = testY(end,:);
-                        end
-                        self.ESN_states{i,j} = esnX(end,:);
-                        [Pm, Pv] = Utils.get_qg_yearly_spectrum(self.model, predY');
-                        self.spectra{i,j,1} = Pm;
-                        self.spectra{i,j,2} = Pv;
-                        stat_opts.windowsize = stats_windowsize;
-                        self.stats{i,j} = get_qg_statistics(self.model, 
-                    else
-                        error('Unexpected input');
+                self.damping{i, j} = damping;
+                if strcmp(self.store_state, 'all')
+                    self.predictions{i, j} = predY(:,:);
+                    if ~isempty(testY)
+                        self.truths{i, j} = testY(:,:);
                     end
-                    self.errors{i, j} = err;
+                    self.ESN_states{i,j} = esnX(round(linspace(1,size(esnX,1),20)),:);
 
-                    xlab = self.exp_id;
+                elseif strcmp(self.store_state, 'final');
+                    self.predictions{i, j} = predY(end,:);
 
-                    % name-value pairs:
-                    % add whatever is useful here and use a meaningful name
-                    pairs = { {'my_inds', my_inds}, ...
-                              {'my_hyps', my_hyps}, ...
-                              {'hyp_range', self.hyp_range}, ...
-                              {'hyp', self.hyp}, ...
-                              {'exp_id', self.exp_id}, ...
-                              {'exp_ind', self.exp_ind}, ...
-                              {'xlab', xlab}, ...
-                              {'ylab', self.ylab}, ...
-                              {'num_predicted', self.num_predicted}, ...
-                              {'errs', self.errors}, ...
-                              {'predictions', self.predictions}, ...
-                              {'truths', self.truths}, ...
-                              {'test_range', self.test_range}, ...
-                              {'train_range', self.train_range}, ...
-                              {'testing_on', self.testing_on}, ...
-                              {'model_config', self.model_config}, ...
-                              {'esn_pars', self.esn_pars}, ...
-                              {'ESN_states', self.ESN_states}, ...
-                              {'damping', self.damping}, ...
-                              {'spectra', self.spectra}, ...
-                              {'stats', self.stats}};
+                    if ~isempty(testY)
+                        self.truths{i, j} = testY(end,:);
+                    end
 
-                    self.store_results(pairs);
+                    self.ESN_states{i,j} = esnX(end,:);
+
+                elseif strcmp(self.store_state, 'stats');
+                    self.predictions{i, j} = predY(end,:);
+                    if ~isempty(testY)
+                        self.truths{i, j} = testY(end,:);
+                    end
+                    self.ESN_states{i,j} = esnX(end,:);
+                    [Pm, Pv] = Utils.get_qg_yearly_spectrum(self.model, predY');
+                    self.spectra{i,j,1} = Pm;
+                    self.spectra{i,j,2} = Pv;
+                    stat_opts.windowsize = self.stats_windowsize;
+                    self.stats{i,j} = ...
+                        Utils.get_qg_statistics(self.model, predY', stat_opts);
+                else
+                    error('Unexpected input');
                 end
+                self.errors{i, j} = err;
+
+                xlab = self.exp_id;
+
+                % name-value pairs:
+                % add whatever is useful here and use a meaningful name
+                pairs = { {'my_inds', my_inds}, ...
+                          {'hyp_range', self.hyp_range}, ...
+                          {'hyp', self.hyp}, ...
+                          {'exp_id', self.exp_id}, ...
+                          {'exp_ind', self.exp_ind}, ...
+                          {'xlab', xlab}, ...
+                          {'ylab', self.ylab}, ...
+                          {'num_predicted', self.num_predicted}, ...
+                          {'errs', self.errors}, ...
+                          {'predictions', self.predictions}, ...
+                          {'truths', self.truths}, ...
+                          {'test_range', self.test_range}, ...
+                          {'train_range', self.train_range}, ...
+                          {'testing_on', self.testing_on}, ...
+                          {'model_config', self.model_config}, ...
+                          {'esn_pars', self.esn_pars}, ...
+                          {'ESN_states', self.ESN_states}, ...
+                          {'damping', self.damping}, ...
+                          {'spectra', self.spectra}, ...
+                          {'stats', self.stats}};
+
+                self.store_results(pairs);
             end
             self.print('done (%fs)\n', toc(time));
             dir = self.output_dir;
@@ -343,5 +342,6 @@ classdef Experiment < handle
         [] = create_output_dir(self);
         [dir] = store_results(self, pairs);
 
+        [value] = max_available_hyp(self, name);
     end
 end

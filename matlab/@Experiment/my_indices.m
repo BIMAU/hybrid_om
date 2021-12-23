@@ -17,6 +17,7 @@ function [inds] = my_indices(self, pid, procs, N)
     remain = N; % elements that remain
     decomp = cell(procs);
     for i = 1:procs
+        % rudimentary load balancing
         subset    = floor(remain / k);
         decomp{i} = offset + 1: offset + subset;
         offset    = offset + subset;
