@@ -42,16 +42,9 @@ classdef Plot < handle
         end
 
         [nums, mdat, preds, truths, f] = plot_experiment(self, ignore_nans, flip_axes);
-        [nums, mdat, preds, truths, s] = get_qg_transient_data(self, opts);
         [] = movie_qg(self, data, opts);
-        % gather data from output .mat file
-        [errs, nums, pids, ...
-         metadata, predictions, ...
-         truths] = gather_data(self, varargin);
 
-        [description] = create_description(self, mdat);
         [f, Pm, Pv, g] = plot_qg_mean_spectrum(self, qg, states, opts, varargin);
-        [labels, Nvalues, xlab, exp_ind, I, opts_str] = unpack_metadata(self, mdat);
     end
 
     methods (Access = private)

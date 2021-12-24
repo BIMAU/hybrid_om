@@ -1,4 +1,4 @@
-function [labels, Nvalues, par_names, exp_ind, I, opts_str] = unpack_metadata(self, mdat)
+function [labels, Nvalues, par_names, exp_ind, I, opts_str] = unpack_metadata(mdat)
     [exp_ind, I] = sort( [mdat.exp_ind{:}] );
     Nexp = numel(exp_ind);
 

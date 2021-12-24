@@ -1,4 +1,4 @@
-function [description] = create_description(self, mdat)
+function [description] = create_description(mdat)
     par_names = fieldnames(mdat.hyp);
     default = 1;
 

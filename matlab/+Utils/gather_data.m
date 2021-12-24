@@ -1,9 +1,9 @@
 function [errs, nums, pids, ...
           metadata, predictions, ...
-          truths] = gather_data(self, varargin)
+          truths] = gather_data(varargin)
 
     switch nargin
-      case 2
+      case 1
         dir = varargin{1};
         assert(exist(dir) == 7, ...
                'experiment directory does not exist');
@@ -12,7 +12,7 @@ function [errs, nums, pids, ...
         [~, fc] = system(['ls ', dir, ' -1 | grep mat | wc -l']);
         procs = str2num(fc);
 
-      case 3
+      case 2
         dir = varargin{1};
         procs = varargin{2};
 
@@ -65,25 +65,36 @@ function [errs, nums, pids, ...
             initialize = false;
         end
 
+        % backward compatibility
         if isfield(data, 'my_hyps')
             j_range = data.my_hyps;
         else
             j_range = 1:n_hyps;
         end
+        
+        if isfield(data, 'my_reps_hyps')
+            % new parallelization:
+            idx_set = data.my_reps_hyps;
+        else
+            % old pararallelization:
+            idx_set = combvec(data.my_inds, j_range)';
+        end
+        
+        for k = 1:size(idx_set,1)
+            i = idx_set(k,1);
+            j = idx_set(k,2);
 
-        for i = data.my_inds
-            for j = j_range
-                errs{i, j} = data.errs{i, j};
-                pids{i, j} = d;
+            errs{i, j} = data.errs{i, j};
+            pids{i, j} = d;
 
-                predictions{i, j} = data.predictions{i, j};
-                truths{i, j}      = data.truths{i, j};
+            predictions{i, j} = data.predictions{i, j};
+            truths{i, j}      = data.truths{i, j};
 
-                num = data.num_predicted(i, j);
-                if num > 0
-                    nums(i, j) = num;
-                end
+            num = data.num_predicted(i, j);
+            if num > 0
+                nums(i, j) = num;
             end
+
         end
     end
 

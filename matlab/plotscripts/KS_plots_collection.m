@@ -28,7 +28,7 @@ for k = 1:numel(exp_dirs)
     output_dir = ['~/Projects/doc/mlqg/figs/', exp_dirs{k}];
     eval(['mkdir ', output_dir]);
 
-    p.create_description(mdat)
+    Utils.create_description(mdat)
 
     if k >= 3
         % create legend plot

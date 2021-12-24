@@ -194,10 +194,12 @@ classdef Experiment < handle
 
             % total number of independent experiments
             Ntotal = size(reps_hyps,1);
-            
+
             % domain decomposition
             my_inds = self.my_indices(self.pid, self.procs, Ntotal);
-            
+
+            my_reps_hyps = reps_hyps(my_inds, :);
+
             for it = my_inds
 
                 i = reps_hyps(it,1);
@@ -269,6 +271,7 @@ classdef Experiment < handle
                 % name-value pairs:
                 % add whatever is useful here and use a meaningful name
                 pairs = { {'my_inds', my_inds}, ...
+                          {'my_reps_hyps', my_reps_hyps}, ...
                           {'hyp_range', self.hyp_range}, ...
                           {'hyp', self.hyp}, ...
                           {'exp_id', self.exp_id}, ...

@@ -1,11 +1,4 @@
-addpath('../');
-
-if ~exist('romexp_p', 'var') || ...
-        ~exist('gridexp_p', 'var') || ...
-        ~exist('preds', 'var') || ...
-        ~exist('spinup_stats', 'var')
-    load_qg_data
-end
+addpath('../')
 
 exportdir = '~/Projects/doc/mlqg/figs/QG_scaling/';
 invert = false;
@@ -13,11 +6,14 @@ invert = false;
 %-----------------------------------------------------------------------------
 % % DRAW scaling experiments
 figure(1)
+gridexp_dir = 'QG_GridExp/NR_200-12800_MC_1-8_parallel_param_5.00e+02/';
+gridexp_p = Plot([base_dir, gridexp_dir, '/']);
+
 gridexp_p.plot_mean = false;
 gridexp_p.plot_scatter = false;
 
 [nums,mdat,~,~,f] = gridexp_p.plot_experiment(false, false);
-p.create_description(mdat)
+Utils.create_description(mdat)
 legend([f{:}], 'imperfect model', 'ESN', 'ESNc', 'DMDc', ...
        'correction only', 'ESN+DMDc', 'interpreter', 'latex','location','northwest')
 ylabel('accurate days', 'interpreter', 'latex')
@@ -30,6 +26,8 @@ exportfig([exportdir, 'results_gridexp.eps'], fs, dims, invert)
 
 %-----------------------------------------------------------------------------
 figure(2)
+romexp_dir = 'QG_NR_ScaleSep_T10000/NR_200-12800_SC_1-5_parallel_param_5.00e+02/';
+romexp_p = Plot([base_dir, romexp_dir, '/']);
 
 romexp_p.plot_mean = false;
 romexp_p.plot_scatter = false;

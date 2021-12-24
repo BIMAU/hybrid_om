@@ -11,7 +11,7 @@ function [nums, mdat, preds, truths, f] = ...
     end
 
     [errs, nums, pids, mdat, preds, truths] = ...
-        self.gather_data(self.dir);
+        Utils.gather_data(self.dir);
 
     if ignore_nans
         % Failed experiments (usually out of memory) give nans. The whole row
@@ -23,7 +23,7 @@ function [nums, mdat, preds, truths, f] = ...
         end
     end
 
-    [labels, Nvalues, xlab, exp_ind, I] = self.unpack_metadata(mdat);
+    [labels, Nvalues, xlab, exp_ind, I] = Utils.unpack_metadata(mdat);
     Nexp = numel(exp_ind);
 
     if flip_axes
@@ -112,7 +112,7 @@ function [nums, mdat, preds, truths, f] = ...
 
     if self.description
         % create description
-        descr = self.create_description(mdat);
+        descr = Utils.create_description(mdat);
         % ylim([min(ylim), 1.4*max(ylim)])
 
         tx = text(min(xlim), max(ylim), descr, ...

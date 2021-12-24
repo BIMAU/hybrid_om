@@ -490,7 +490,7 @@ if 0
     gridexp_p.plot_scatter = false;
 
     [nums,mdat,~,~,f] = gridexp_p.plot_experiment(false, false);
-    p.create_description(mdat)
+    Utils.create_description(mdat)
     legend([f{:}], 'imperfect model', 'ESN', 'ESNc', 'DMDc', ...
            'correction only', 'ESN+DMDc', 'interpreter', 'latex','location','northwest')
     ylabel('accurate days', 'interpreter', 'latex')
