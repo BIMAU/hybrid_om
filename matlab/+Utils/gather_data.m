@@ -1,6 +1,6 @@
 function [errs, nums, pids, ...
           metadata, predictions, ...
-          truths] = gather_data(varargin)
+          truths, spectra, stats] = gather_data(varargin)
 
     switch nargin
       case 1
@@ -60,6 +60,8 @@ function [errs, nums, pids, ...
 
             predictions = cell(n_ens, n_hyps);
             truths = cell(n_ens, n_hyps);
+            stats = cell(n_ens, n_hyps);
+            spectra = cell(n_ens, n_hyps);
             nums = nan(n_ens, n_hyps);
 
             initialize = false;
@@ -89,7 +91,13 @@ function [errs, nums, pids, ...
 
             predictions{i, j} = data.predictions{i, j};
             truths{i, j}      = data.truths{i, j};
-
+            
+            if isfield(data, 'stats') && ...
+                    isfield(data, 'spectra')
+                spectra{i, j} = data.spectra{i, j};
+                stats{i, j} = data.stats{i, j};
+            end
+            
             num = data.num_predicted(i, j);
             if num > 0
                 nums(i, j) = num;
