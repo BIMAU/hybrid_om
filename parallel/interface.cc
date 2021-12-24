@@ -14,10 +14,6 @@ int main(int argc, char **argv)
     int pid;
     MPI_Comm_rank(MPI_COMM_WORLD, &pid);
 
-    std::string threads = "1";
-    if (argc == 2)
-        threads = argv[1];
-
     std::stringstream command;
     command << "./" << argv[1] << " " <<  pid << " " << numProcs;
 
