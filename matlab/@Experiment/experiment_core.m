@@ -3,9 +3,9 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
 %   predY:  full dimensional predictions
 %   testY:  full dimensional truths
 
-    self.print(' train range: %d - %d\n', ...
+    self.printpid(' train range: %d - %d\n', ...
                min(self.train_range), max(self.train_range));
-    self.print('  test range: %d - %d\n', ...
+    self.printpid('  test range: %d - %d\n', ...
                min(self.test_range), max(self.test_range));
 
     % we use the time step size of  the imperfect model
@@ -37,15 +37,15 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
     esn_dmd_active = ~model_only;
 
     if hybrid_esn || hybrid_dmd || hybrid_esn_dmd
-        self.print('Create input/output data for hybrid ESN\n');
+        % Create input/output data for hybrid ESN
         U = [self.VX(:, 1:end-1); self.VPhi(:, 1:end-1)];
         Y = [self.VX(:, 2:end)];
     elseif esn_only || dmd_only || esn_plus_dmd
-        self.print('Create input/output data for standalone ESN\n')
+        % Create input/output data for standalone ESN
         U = [self.VX(:, 1:end-1)];
         Y = [self.VX(:, 2:end)];
     elseif corr_only
-        self.print('Create input/output to only fit the correction\n')
+        % Create input/output to only fit the correction
         U = [self.VPhi(:, 1:end-1)];
         Y = [self.VX(:, 2:end)];
     elseif model_only
@@ -72,11 +72,10 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
     err   = zeros(Npred, 1); % error array
     esnX  = 0; % esn state snapshots
 
-    % initial state for the predictions
+    % initialization index
     init_idx = self.train_range(end)+1;
+    % initial state for the predictions
     yk = self.data.X(:, init_idx);
-
-    self.print('initialization index: %d\n', init_idx);
 
     clear self.VX self.VPhi;
 
@@ -124,6 +123,7 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
     clear trainU trainY
     % reset memory for nrmse
     self.nrmse_memory = struct();
+    % #FIXME this should be a parameter
     verbosity = 100;
     for i = 1:Npred
         % model prediction of next time step
@@ -149,7 +149,7 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
             elseif corr_only
                 u_in = [self.modes.Vinv * Pyk(:)]';
             else
-                fprintf('no model active, doing nothing\n');
+                self.printpid('no model active, doing nothing\n');
                 continue
             end
 
@@ -179,9 +179,9 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
         end
 
         if (mod(i,verbosity) == 0) || (i == Npred) || stop
-            self.print(['prediction step %4d/%4d, Newton iterations %d,',...
-                        'error %1.2e\n'], ...
-                       i, Npred, Nk, err(i));
+            self.printpid(['prediction step %4d/%4d, Newton iterations %d,',...
+                           'error %1.2e\n'], ...
+                          i, Npred, Nk, err(i));
         end
 
         if stop

@@ -208,22 +208,16 @@ classdef Experiment < handle
                 [self.esn_pars, mod_pars] = self.distribute_params(j);
 
                 self.print_hyperparams(j);
-                self.print(' hyp setting: %d/%d shift: %d/%d repetitions: %d/%d \n', ...
-                           j, self.num_hyp_settings, ...
-                           svec(i), self.shifts, ...
-                           rvec(i), self.reps);
+                self.printpid('hyp setting: %d/%d shift: %d/%d repetitions: %d/%d \n', ...
+                              j, self.num_hyp_settings, ...
+                              svec(i), self.shifts, ...
+                              rvec(i), self.reps);
 
                 self.train_range = (1:self.tr_samples) + tr_shifts(svec(i));
                 self.test_range  = self.train_range(end) + (1:self.max_preds);
 
-                self.print('create scale separation modes: %s\n', ...
-                           self.scale_separation);
-
                 self.modes = Modes(self.scale_separation, mod_pars, ...
                                    self.data, self.train_range);
-
-                self.print('transform input/output data with modes: %s\n', ...
-                           self.scale_separation);
 
                 self.VX   = self.modes.Vinv * self.data.X;
                 self.VPhi = self.modes.Vinv * self.data.Phi;
@@ -294,7 +288,7 @@ classdef Experiment < handle
 
                 self.store_results(pairs);
             end
-            self.print('done (%fs)\n', toc(time));
+            self.printpid('done (%fs)\n', toc(time));
             dir = self.output_dir;
         end
 
