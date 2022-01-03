@@ -6,11 +6,11 @@ physics-controlled ESN.
 - Adjust the `base_dir` in `DataGen`
 
 ## executables
-    - `matlab/KS_GridExp`
-    - `matlab/KS_Path2018`
-    - `matlab/QG_GridExp`
-    - `matlab/QG_transient`
+- `matlab/KS_GridExp`
+- `matlab/KS_Path2018`
+- `matlab/QG_GridExp`
+- `matlab/QG_transient`
     
 ## parallel execution
-    - set job settings in `submit_mpi_experiment.sh`
-    - `./compile_and_submit <executable> <run_dir>`
+- set job settings in `submit_mpi_experiment.sh`
+- `./compile_and_submit <executable> <run_dir>`
