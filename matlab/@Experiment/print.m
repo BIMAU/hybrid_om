@@ -1,7 +1,6 @@
 function [] = print(self, varargin)
-% only print form pid 0
+% only print from pid 0
     if self.pid == 0
-        fprintf('- ');
-        fprintf(varargin{:});
+        self.printpid(self, varargin);
     end
 end

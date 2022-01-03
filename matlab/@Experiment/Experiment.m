@@ -330,6 +330,7 @@ classdef Experiment < handle
         [inds] = my_indices(self, pid, procs, Ni);
 
         [] = print(self, varargin);
+        [] = printpid(self, varargin);        
 
         [] = print_hyperparams(self, exp_idx);
         [esn_pars, mod_pars] = distribute_params(self, exp_idx);

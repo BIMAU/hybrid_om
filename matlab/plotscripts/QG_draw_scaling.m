@@ -1,5 +1,6 @@
 addpath('../')
 
+base_dir = '~/Projects/hybrid_om/data/experiments/';
 exportdir = '~/Projects/doc/mlqg/figs/QG_scaling/';
 invert = false;
 %-----------------------------------------------------------------------------
