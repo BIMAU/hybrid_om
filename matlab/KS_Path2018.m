@@ -3,7 +3,7 @@ function [dir] = KS_Path2018(varargin)
     Utils.add_paths();
     
     % epsilon
-    epsilon = 1;
+    epsilon = 0.1;
 
     % create and initialize two KS models
     L      = 35;
@@ -37,6 +37,7 @@ function [dir] = KS_Path2018(varargin)
 
     % experimental setup
     expObj.shifts = 100;
+    
     expObj.reps = 1;
     expObj.store_state = 'final';
     expObj.nrmse_windowsize = 50;
@@ -92,7 +93,7 @@ function [dir] = KS_Path2018(varargin)
     expObj.set_default_hyp('ModelConfig', 4);
 
     % Tikhonov regularization
-    expObj.set_default_hyp('Lambda', 1e-10);
+    expObj.set_default_hyp('Lambda', 1e-8);
 
     expObj.add_experiment('ReservoirSize', [200,400,800,1600,3200,6400]);
     expObj.add_experiment('ModelConfig', [1,2,4,5,6,8]);
