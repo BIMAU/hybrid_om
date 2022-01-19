@@ -36,10 +36,10 @@ classdef Experiment < handle
         ident = 'default';
 
         % set the window size for the nrs
-        nrmse_windowsize = 100;
+        nrmse_windowsize = 50;
 
         % set the window size for Km, Ke, Z (qg only)
-        stats_windowsize = 100;
+        stats_windowsize = 50;
 
         % y-axis label
         ylab = 'samples';

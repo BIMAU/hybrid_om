@@ -2,14 +2,16 @@
 
 addpath('../')
 
-exp_dirs = {'Pathak2018repl/NR_200-6400_MC_1-8_parallel_param_1.00e+00/', ...
-            'Pathak2018repl/NR_200-6400_MC_1-8_parallel_param_1.00e-01/', ...
-            'Pathak2018repl/NR_200-6400_MC_1-8_parallel_param_1.00e-02/' ...
-            'KS_GridExp/NR_200-6400_MC_1-8_parallel_param_0.00e+00'};
+ exp_dirs = {'Pathak2018repl/NR_200-6400_MC_1-8_parallel_param_1.00e+00/', ...
+             'Pathak2018repl/NR_200-6400_MC_1-8_parallel_param_1.00e-01/', ...
+             'Pathak2018repl/NR_200-6400_MC_1-8_parallel_param_1.00e-02/' ...
+             'KS_GridExp/NR_200-6400_MC_1-8_parallel_param_0.00e+00'};
+
 
 base_dir = '~/Projects/hybrid_om/data/experiments/';
 
 for k = 1:numel(exp_dirs)
+    figure(k)
     dir = [base_dir, exp_dirs{k}, '/'];
 
     p = Plot(dir);
@@ -23,7 +25,7 @@ for k = 1:numel(exp_dirs)
     p.ylab = 'Valid time';
     p.xlab = '$N_r$';
 
-    [nums, mdat, preds, truths, f] = p.plot_experiment();
+    [nums, mdat, preds, truths, f] = p.plot_experiment(false);
 
     output_dir = ['~/Projects/doc/mlqg/figs/', exp_dirs{k}];
     eval(['mkdir ', output_dir]);

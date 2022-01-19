@@ -20,6 +20,7 @@ function [f] = my_boxplot(self, varargin)
     ylimMax   = 0.0;
     plot_mean    = self.plot_mean;
     plot_scatter = self.plot_scatter;
+    plot_boxplot = self.plot_boxplot;
     Q = zeros(numel(x_index), 3);
 
     for idx = x_index
@@ -42,13 +43,15 @@ function [f] = my_boxplot(self, varargin)
         q3 = quantile(arr,0.75);
         Q(idx, :) = [q1,q2,q3];
 
-        plot(idx, q2, '.','markersize', 15, 'linewidth',2, 'color', colors{1});
-        hold on
+        if plot_boxplot
+            plot(idx, q2, '.','markersize', 15, 'linewidth',2, 'color', colors{1});
+            hold on
 
-        % plot quantiles
-        f = plot(repmat(idx,1,2), ...
-                 [q1, q3], ...
-                 '.-','markersize', 12,'linewidth',2, 'color', colors{1});
+            % plot quantiles
+            f = plot(repmat(idx,1,2), ...
+                     [q1, q3], ...
+                     '.-','markersize', 12,'linewidth',2, 'color', colors{1});
+        end
 
         if plot_mean
             mn = mean(arr(~isnan(arr)));

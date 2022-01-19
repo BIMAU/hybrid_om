@@ -1,12 +1,18 @@
-function [mn, mx] = global_bounds(data, field)
+function [mn, mx] = global_bounds(data, field, mn, mx)
     [R,N] = size(data);
-    mn = Inf;
-    mx = -Inf;
+    if nargin < 3
+        mn = Inf;
+        mx = -Inf;
+    end
     for j = 1:N
         for i = 1:R
             series = data{i,j}.(field);
-            mn = min(mn, min(series));
-            mx = max(mx, max(series));
+            if (series(end) == 0)
+                fprintf('failed run: %d %d \n', i, j);
+            else
+                mn = min(mn, min(series));
+                mx = max(mx, max(series));
+            end
         end
     end
 end

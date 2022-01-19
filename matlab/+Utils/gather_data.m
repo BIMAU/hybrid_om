@@ -105,7 +105,6 @@ function [errs, nums, pids, ...
 
         end
     end
-
     assert(i == size(data.num_predicted, 1), ...
            'failed assertion, probably wrong procs');
     % export additional labels for plotting

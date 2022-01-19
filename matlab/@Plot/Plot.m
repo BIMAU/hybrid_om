@@ -33,6 +33,9 @@ classdef Plot < handle
 
         % show the whole dataset in the background
         plot_scatter = true;
+
+        % show a boxplot
+        plot_boxplot = true;
     end
 
     methods (Access = public)

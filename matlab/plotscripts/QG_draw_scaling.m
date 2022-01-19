@@ -7,7 +7,7 @@ invert = false;
 %-----------------------------------------------------------------------------
 % % DRAW scaling experiments
 figure(1)
-gridexp_dir = 'QG_GridExp/NR_200-12800_MC_1-8_parallel_param_5.00e+02/';
+gridexp_dir = 'QG_GridExp/MC_1-8_NR_200-12800_parallel_param_5.00e+02/';
 gridexp_p = Plot([base_dir, gridexp_dir, '/']);
 
 gridexp_p.plot_mean = false;
@@ -33,7 +33,8 @@ romexp_p = Plot([base_dir, romexp_dir, '/']);
 romexp_p.plot_mean = false;
 romexp_p.plot_scatter = false;
 
-[~,~,~,~,f] = romexp_p.plot_experiment(false, false);
+[~,mdat,~,~,f] = romexp_p.plot_experiment(false, false);
+Utils.create_description(mdat)
 
 legend([f{:}], 'ESNc, no scale separation, no reduction', 'ESNc, wavelet', ...
        'ESNc, POD', 'ESNc, local POD', ...
