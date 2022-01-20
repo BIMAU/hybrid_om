@@ -36,6 +36,12 @@ classdef Plot < handle
 
         % show a boxplot
         plot_boxplot = true;
+
+        % default boxplot style
+        style = {'.', '-.', '-'};
+
+        % default boxplot markersizes
+        msize = {15, 12};
     end
 
     methods (Access = public)
@@ -44,7 +50,7 @@ classdef Plot < handle
             self.dir = dir;
         end
 
-        [nums, mdat, preds, truths, f] = plot_experiment(self, ignore_nans, flip_axes);
+        [nums, mdat, preds, truths, f, h] = plot_experiment(self, ignore_nans, flip_axes, nums, mdat);
         [] = movie_qg(self, data, opts);
 
         [f, Pm, Pv, g] = plot_qg_mean_spectrum(self, qg, states, opts, varargin);
@@ -52,7 +58,7 @@ classdef Plot < handle
 
     methods (Access = private)
 
-        [f] = my_boxplot(self, varargin);
+        [f,h] = my_boxplot(self, varargin);
 
     end
 end

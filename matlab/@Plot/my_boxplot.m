@@ -1,19 +1,33 @@
-function [f] = my_boxplot(self, varargin)
+function [f, h] = my_boxplot(self, varargin)
 
     switch nargin
       case 2
         array    = varargin{1};
         colors   = {'k', 'k'};
+        style    = {'.', '-.', '--'};
+        msize    = {15,12};
 
       case 3
         array    = varargin{1};
         colors   = varargin{2};
+        style    = {'.', '-.', '--'};
+        msize    = {15,12};
+
+      case 4
+        array    = varargin{1};
+        colors   = varargin{2};
+        style    = varargin{3};
+        msize    = {15,12};
+
+      case 5
+        array    = varargin{1};
+        colors   = varargin{2};
+        style    = varargin{3};
+        msize    = varargin{4};
 
       otherwise
         error('Unexpected input');
     end
-
-
 
     x_index   = 1:size(array,2);
     alpha     = 0.2;
@@ -22,6 +36,7 @@ function [f] = my_boxplot(self, varargin)
     plot_scatter = self.plot_scatter;
     plot_boxplot = self.plot_boxplot;
     Q = zeros(numel(x_index), 3);
+    h = hggroup;
 
     for idx = x_index
         arr = array(:,idx);
@@ -44,27 +59,31 @@ function [f] = my_boxplot(self, varargin)
         Q(idx, :) = [q1,q2,q3];
 
         if plot_boxplot
-            plot(idx, q2, '.','markersize', 15, 'linewidth',2, 'color', colors{1});
+            plot(idx, q2, style{1}, 'markersize', msize{1},  ...
+                 'linewidth',2, 'color', colors{1}, 'Parent', h);
             hold on
 
             % plot quantiles
-            f = plot(repmat(idx,1,2), ...
-                     [q1, q3], ...
-                     '.-','markersize', 12,'linewidth',2, 'color', colors{1});
+            plot(repmat(idx,1,2), ...
+                 [q1, q3], ...
+                 style{2}, 'markersize', msize{2},  ...
+                 'linewidth',2, 'color', colors{1}, 'Parent', h);
         end
 
         if plot_mean
             mn = mean(arr(~isnan(arr)));
             st = std(arr(~isnan(arr)));
             plot(idx, mn, ...
-                 '*', 'markersize', 8, 'color', colors{2});
+                 '*', 'markersize', 8, 'color', colors{2}, 'Parent', h);
         end
 
         ylimMax = max(ylimMax, 1.05*quantile(arr, 0.75));
     end
-    
-    ht = plot(x_index, Q, 'color', colors{2});
-    uistack(ht, 'bottom');
+
+    f = plot(x_index, Q, style{3}, 'markersize', msize{2}, ...
+              'color', colors{2}, 'Parent', h);
+    uistack(f, 'bottom');
+    f = f(1);
 
     xlim([min(x_index)-0.5, max(x_index)+0.5]);
     xticks([x_index]);

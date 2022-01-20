@@ -99,7 +99,7 @@ function [errs, nums, pids, ...
             end
             
             num = data.num_predicted(i, j);
-            if num > 0
+            if num > 0 && errs{i,j}(end) ~= 999
                 nums(i, j) = num;
             end
 
