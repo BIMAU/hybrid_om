@@ -20,21 +20,21 @@ stats_dkl = [];
 DKL = [];
 FLG = [];
 Ndirs = numel(exp_dirs);
-for i = 1:Ndirs;
+for d = 1:Ndirs;
 
-    [~, nums_dkl{i}, ~, ...
-     mdat_dkl{i}, ~, ~, ...
-     spectra_dkl{i}, ...
-     stats_dkl{i}] = Utils.gather_data([base_dir, exp_dirs{i}]);
+    [~, nums_dkl{d}, ~, ...
+     mdat_dkl{d}, ~, ~, ...
+     spectra_dkl{d}, ...
+     stats_dkl{d}] = Utils.gather_data([base_dir, exp_dirs{d}]);
 
-    [R, N] = size(nums_dkl{i});
+    [R, N] = size(nums_dkl{d});
     trunc = 20*365;
 
     % R should be equal in the experiments
     DKL = [DKL, zeros(R,N)];
 
     % setup flags to identify failed transients
-    [mn, mx, ign] = Utils.global_bounds(stats_dkl{i}, 'Km');
+    [mn, mx, ign] = Utils.global_bounds(stats_dkl{d}, 'Km');
     flags = logical(ones(R,N));
     for i = 1:size(ign,1)
         flags(ign(i,1),ign(i,2))=0;
@@ -57,4 +57,23 @@ for qnt_idx = 1:4
     dx = lsp(2)-lsp(1);
     lsp = [lsp-dx/2, lsp(end)+dx/2];
 
+    [ref_pdf, cnt] = Utils.compute_pdf(ref_stats{1,1}.(qnt)(trunc:end), lsp, ...
+                                       'normalization', 'probability');
+
+    col_idx = 0;
+    for d = 1:Ndirs
+        [R,N] = size(stats_dkl{d});
+        for j = 1:N
+            col_idx = col_idx + 1
+            for i = 1:R
+                if ~FLG(i, col_idx)
+                    continue;
+                end
+
+                series = stats_dkl{d}{i,j}.(qnt)(trunc:end);
+                [pdf, cnt] = Utils.compute_pdf(series, lsp, 'normalization', 'probability');
+                DKL(i,col_idx) = Utils.dkl(ref_pdf', pdf', true);
+            end
+        end
+    end
 end
