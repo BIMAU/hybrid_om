@@ -47,18 +47,18 @@ classdef Plot < handle
     methods (Access = public)
 
         function self = Plot(dir)
-            self.dir = dir;
+            if nargin < 1
+                self.dir = 'unknown';
+            else
+                self.dir = dir;
+            end
         end
 
         [nums, mdat, preds, truths, f, h] = plot_experiment(self, ignore_nans, flip_axes, nums, mdat);
         [] = movie_qg(self, data, opts);
 
         [f, Pm, Pv, g] = plot_qg_mean_spectrum(self, qg, states, opts, varargin);
-    end
-
-    methods (Access = private)
-
         [f,h] = my_boxplot(self, varargin);
-
     end
+
 end

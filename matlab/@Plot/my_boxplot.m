@@ -4,7 +4,7 @@ function [f, h] = my_boxplot(self, varargin)
       case 2
         array    = varargin{1};
         colors   = {'k', 'k'};
-        style    = {'.', '-.', '--'};
+        style    = {'.', '-', ':'};
         msize    = {15,12};
 
       case 3
