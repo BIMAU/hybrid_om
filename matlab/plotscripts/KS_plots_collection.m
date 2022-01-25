@@ -9,9 +9,11 @@ addpath('../')
 
 
 base_dir = '~/Projects/hybrid_om/data/experiments/';
+set(groot,'defaultAxesTickLabelInterpreter','latex'); 
 
 for k = 1:numel(exp_dirs)
     figure(k)
+    clf
     dir = [base_dir, exp_dirs{k}, '/'];
 
     p = Plot(dir);
@@ -24,6 +26,9 @@ for k = 1:numel(exp_dirs)
     p.scaling = 0.25 * 0.07;
     p.ylab = 'Valid time';
     p.xlab = '$N_r$';
+    p.style = {'.', '-', '-'};
+    p.msize = {15, 12};
+
 
     [nums, mdat, preds, truths, f] = p.plot_experiment(false);
 

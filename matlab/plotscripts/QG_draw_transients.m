@@ -7,17 +7,23 @@ if ~exist('preds4', 'var') || ...
     load_qg_data
 end
 
+if ~exist('stats_dkl', 'var')
+    load_qg_transient_data
+end
+
 exportdir = '~/Projects/doc/mlqg/figs/QG_transients/';
 
 cols = [0,0,0; min(1.0*lines(20),1)];
 
 fs = 10;
 dims = [24, 10];
-windowsize = 10;
+windowsize = 50;
 
 start_idx = [1, 1, windowsize, windowsize];
 quantity = {'E', 'Z', 'Km', 'Ke'};
 ylbls = {'$E$', '$Z$', '$K_m$', '$K_e$'};
+
+set(groot,'defaultAxesTickLabelInterpreter','latex'); 
 
 for idx = [3]
     % -----------------------------------------------------------------------------
@@ -45,7 +51,7 @@ for idx = [3]
     hold on
     f_c = plot(trange_full, repmat(conf_hi, 1, numel(trange_full)), '--', 'color', cols(1,:));
     f_c = plot(trange_full, repmat(conf_lo, 1, numel(trange_full)), '--', 'color', cols(1,:));
-
+    
     %-----------------------------------------------------------------------------
     % model only
     trange = (T2+(start_idx(idx):size(preds{1,1}, 1))) / 365;
@@ -86,7 +92,7 @@ for idx = [3]
     exportfig([exportdir, 'spinup_', quantity{idx}, '.eps'], fs, dims, invert);
     % -----------------------------------------------------------------------------
 end
-
+return
 %-----------------------------------------------------------------------------
 % PDF plots
 

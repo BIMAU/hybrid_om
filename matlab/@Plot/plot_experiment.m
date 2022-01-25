@@ -4,7 +4,7 @@ function [nums, mdat, preds, truths, f, h] = ...
 % gather data from experiment dir
 
     if nargin < 3
-        flip_axes = false
+        flip_axes = false;
     end
     if nargin < 2
         ignore_nans = true;

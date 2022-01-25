@@ -1,0 +1,58 @@
+base_dir = '~/Projects/hybrid_om/data/experiments/';
+
+exp_dirs = [];
+exp_dirs{1} = 'QG_transient_modelonly/MC_1-1_SC_1-1_parallel_param_5.00e+02/'; %model only
+exp_dirs{2} = 'QG_transient_ESN_Lambda1/MC_2-8_SC_1-5_parallel_param_5.00e+02/'; %ESN models
+exp_dirs{3} = 'QG_transient_modelonly/MC_5-5_SC_1-5_parallel_param_5.00e+02/'; %DMDc
+exp_dirs{4} = 'QG_transient_corr/MC_6-6_SC_1-5_parallel_param_5.00e+02/'; %corr
+
+% What's inside the exp_dirs, in the correct order
+labels = {'model only', ...
+          'ESN', ...
+          'ESNc', ...
+          'ESN+DMDc', ...
+          'ESN (ROM)', ...
+          'ESNc (ROM)',...
+          'ESN+DMDc (ROM)', ...
+          'DMDc', ...
+          'DMDc (ROM)', ...
+          'correction only', ...
+          'correction only (ROM)'};
+
+ORD_range = [1,2,3,8,10,4];
+ROM_range = [1,5,6,9,11,7];
+
+nums_dkl = [];
+mdat_dkl = [];
+spectra_dkl = [];
+stats_dkl = [];
+
+% load transient data
+DKL = [];
+FLG = [];
+Ndirs = numel(exp_dirs);
+descr_string = [];
+
+for d = 1:Ndirs;
+
+    [~, nums_dkl{d}, ~, ...
+     mdat_dkl{d}, ~, ~, ...
+     spectra_dkl{d}, ...
+     stats_dkl{d}] = Utils.gather_data([base_dir, exp_dirs{d}]);
+    [~, ~, ~, ~, ~, opts_str] = Utils.unpack_metadata(mdat_dkl{d});
+    descr_string = [descr_string, opts_str];
+
+    [R, N] = size(nums_dkl{d});
+    trunc = 20*365;
+
+    % R should be equal in the experiments
+    DKL = [DKL, zeros(R,N)];
+
+    % setup flags to identify failed transients
+    [mn, mx, ign] = Utils.global_bounds(stats_dkl{d}, 'Km');
+    flags = logical(ones(R,N));
+    for i = 1:size(ign,1)
+        flags(ign(i,1),ign(i,2))=0;
+    end
+    FLG = [FLG, flags];
+end
