@@ -12,7 +12,10 @@ end
 % bins <bins>.
 
 quantity = {'Km', 'Ke', 'Z'};
+qntlabels = {'mean kinetic energy $K_m$', 'eddy kinetic energy $K_e$', 'enstrophy $Z$'};
+
 bins = 100;
+exportdir = '~/Projects/doc/mlqg/figs/QG_dkl_boxplots/';
 
 for qnt_idx = 1:numel(quantity)
     qnt = quantity{qnt_idx};
@@ -50,11 +53,33 @@ for qnt_idx = 1:numel(quantity)
     p = Plot();
     p.plot_mean = false;
     p.plot_scatter = false;
+    p.plot_connections = false;
+    p.style = {'.', '.-', '-'};
+    p.msize = {14, 14};
     p.my_boxplot(DKL(:,ORD_range));
+        
     set(gca, 'yscale','log')
     set(gca, 'xticklabels', labels(ORD_range));
     xtickangle(45);
-    title(qnt)
-    ylabel('DKL')
+    ylabel(['$D_{KL}$, ', qntlabels{qnt_idx}], 'interpreter','latex');
     grid on
+    fs = 10;
+    dims = [7,15];
+    invert = false;
+    ylim([3*10^(-2),10^2])
+    exportfig([exportdir, qnt, '.eps'], fs, dims, invert)
+
+    clf
+    p.my_boxplot(DKL(:,ROM_range));
+        
+    set(gca, 'yscale','log')
+    set(gca, 'xticklabels', labels(ROM_range));
+    xtickangle(45);
+    ylabel(['$D_{KL}$, ', qntlabels{qnt_idx}], 'interpreter','latex');
+    grid on
+    fs = 10;
+    dims = [7,15];
+    invert = false;
+    ylim([3*10^(-2),10^2])
+    exportfig([exportdir, qnt, '_ROM.eps'], fs, dims, invert)
 end

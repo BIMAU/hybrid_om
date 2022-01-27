@@ -4,20 +4,20 @@ function [f, h] = my_boxplot(self, varargin)
       case 2
         array    = varargin{1};
         colors   = {'k', 'k'};
-        style    = {'.', '-', '-'};
-        msize    = {15,12};
+        style    = self.style;
+        msize    = self.msize;
 
       case 3
         array    = varargin{1};
         colors   = varargin{2};
-        style    = {'.', '-', '-'};
-        msize    = {15,12};
+        style    = self.style;
+        msize    = self.msize;
 
       case 4
         array    = varargin{1};
         colors   = varargin{2};
         style    = varargin{3};
-        msize    = {15,12};
+        msize    = self.msize;
 
       case 5
         array    = varargin{1};
@@ -32,9 +32,12 @@ function [f, h] = my_boxplot(self, varargin)
     x_index   = 1:size(array,2);
     alpha     = 0.2;
     ylimMax   = 0.0;
+
     plot_mean    = self.plot_mean;
     plot_scatter = self.plot_scatter;
     plot_boxplot = self.plot_boxplot;
+    plot_connections = self.plot_connections;
+
     Q = zeros(numel(x_index), 3);
     h = hggroup;
 
@@ -59,8 +62,8 @@ function [f, h] = my_boxplot(self, varargin)
         Q(idx, :) = [q1,q2,q3];
 
         if plot_boxplot
-            plot(idx, q2, style{1}, 'markersize', msize{1},  ...
-                 'linewidth',2, 'color', colors{1}, 'Parent', h);
+            f = plot(idx, q2, style{1}, 'markersize', msize{1},  ...
+                     'linewidth',2, 'color', colors{1}, 'Parent', h);
             hold on
 
             % plot quantiles
@@ -80,10 +83,12 @@ function [f, h] = my_boxplot(self, varargin)
         ylimMax = max(ylimMax, 1.05*quantile(arr, 0.75));
     end
 
-    f = plot(x_index, Q, style{3}, 'markersize', msize{2}, ...
-              'color', colors{2}, 'Parent', h);
-    uistack(f, 'bottom');
-    f = f(1);
+    if plot_connections
+        f = plot(x_index, Q, style{3}, 'markersize', msize{2}, ...
+                 'color', colors{2}, 'Parent', h);
+        uistack(f, 'bottom');
+        f = f(1);
+    end
 
     xlim([min(x_index)-0.5, max(x_index)+0.5]);
     xticks([x_index]);

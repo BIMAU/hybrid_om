@@ -37,8 +37,11 @@ classdef Plot < handle
         % show a boxplot
         plot_boxplot = true;
 
+        % plot connections between quantiles in different boxplots
+        plot_connections = true;
+
         % default boxplot style
-        style = {'.', '-.', '-'};
+        style = {'.', '-', '-'};
 
         % default boxplot markersizes
         msize = {15, 12};
