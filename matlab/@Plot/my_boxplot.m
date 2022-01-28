@@ -6,30 +6,40 @@ function [f, h] = my_boxplot(self, varargin)
         colors   = {'k', 'k'};
         style    = self.style;
         msize    = self.msize;
+        x_index  = 1:size(array,2);
 
       case 3
         array    = varargin{1};
         colors   = varargin{2};
         style    = self.style;
         msize    = self.msize;
+        x_index  = 1:size(array,2);
 
       case 4
         array    = varargin{1};
         colors   = varargin{2};
         style    = varargin{3};
         msize    = self.msize;
+        x_index  = 1:size(array,2);
 
       case 5
         array    = varargin{1};
         colors   = varargin{2};
         style    = varargin{3};
         msize    = varargin{4};
+        x_index  = 1:size(array,2);
+
+      case 6
+        array    = varargin{1};
+        colors   = varargin{2};
+        style    = varargin{3};
+        msize    = varargin{4};
+        x_index  = varargin{5};
 
       otherwise
         error('Unexpected input');
     end
 
-    x_index   = 1:size(array,2);
     alpha     = 0.2;
     ylimMax   = 0.0;
 
@@ -84,7 +94,7 @@ function [f, h] = my_boxplot(self, varargin)
     end
 
     if plot_connections
-        f = plot(x_index, Q, style{3}, 'markersize', msize{2}, ...
+        f = plot(x_index, Q(x_index,:), style{3}, 'markersize', msize{2}, ...
                  'color', colors{2}, 'Parent', h);
         uistack(f, 'bottom');
         f = f(1);
