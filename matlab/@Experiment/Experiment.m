@@ -190,20 +190,24 @@ classdef Experiment < handle
             Ni = numel(svec); % number of indices
 
             % combination of shifts and hyperparameter settings
-            reps_hyps = combvec(1:Ni, 1:self.num_hyp_settings)';
+            reps_hyps = combvec(1:self.num_hyp_settings, 1:Ni)';
 
             % total number of independent experiments
             Ntotal = size(reps_hyps,1);
 
-            % domain decomposition
+            % Domain decomposition. Using this ordering in reps_hyps every core
+            % will have many different hyperparam combinations and few
+            % different training ranges. This is better for the load
+            % balancing, as opposed to many shifts and one or two hyp
+            % configs.
             my_inds = self.my_indices(self.pid, self.procs, Ntotal);
 
             my_reps_hyps = reps_hyps(my_inds, :);
 
             for it = my_inds
 
-                i = reps_hyps(it,1);
-                j = reps_hyps(it,2);
+                i = reps_hyps(it,2);
+                j = reps_hyps(it,1);
 
                 [self.esn_pars, mod_pars] = self.distribute_params(j);
 
@@ -268,6 +272,7 @@ classdef Experiment < handle
                           {'procs', self.procs}, ...
                           {'my_inds', my_inds}, ...
                           {'my_reps_hyps', my_reps_hyps}, ...
+                          {'hyps_first', true}, ... % ordering in my_reps_hyps
                           {'hyp_range', self.hyp_range}, ...
                           {'hyp', self.hyp}, ...
                           {'exp_id', self.exp_id}, ...

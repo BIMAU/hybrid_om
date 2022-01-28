@@ -23,6 +23,7 @@ labels = {'model only', ...
 ORD_range = [1,2,3,8,10,4];
 ROM_range = [1,5,6,9,11,7];
 
+errs_dkl = [];
 nums_dkl = [];
 pids_dkl = [];
 mdat_dkl = [];
@@ -39,12 +40,20 @@ FLD_FLG = []; % failed flags
 Ndirs = numel(exp_dirs);
 descr_string = [];
 
-for d = 5
-    
-    [~, nums_dkl{d}, pids_dkl{d}, ...
-     mdat_dkl{d}, preds_dkl{d}, ~, ...
-     spectra_dkl{d}, ...
-     stats_dkl{d}] = Utils.gather_data([base_dir, exp_dirs{d}]);
+for d = 1:Ndirs
+
+    if d == 5 %% HACK FIXME FIXME
+        [errs_dkl{d}, nums_dkl{d}, pids_dkl{d}, ...
+         mdat_dkl{d}, preds_dkl{d}, ~, ...
+         spectra_dkl{d}, ...
+         stats_dkl{d}] = Utils.gather_data([base_dir, exp_dirs{d}],50);
+    else
+        [errs_dkl{d}, nums_dkl{d}, pids_dkl{d}, ...
+         mdat_dkl{d}, preds_dkl{d}, ~, ...
+         spectra_dkl{d}, ...
+         stats_dkl{d}] = Utils.gather_data([base_dir, exp_dirs{d}]);
+    end
+
     [~, ~, ~, ~, ~, opts_dkl{d}] = Utils.unpack_metadata(mdat_dkl{d});
     descr_string = [descr_string, opts_dkl{d}];
 
@@ -52,7 +61,7 @@ for d = 5
     trunc = 20*365;
 
     % R should be equal in the experiments
-    DKL = [DKL, zeros(R,N)];
+    DKL{d} = nan(R,N);
 
     % setup flags to identify failed transients
     [mn, mx, ign, fld] = Utils.global_bounds(stats_dkl{d}, 'Km');
@@ -60,10 +69,11 @@ for d = 5
     for i = 1:size(ign,1)
         ign_flags(ign(i,1),ign(i,2))=0;
     end
-    IGN_FLG = [IGN_FLG, ign_flags];
+    IGN_FLG{d} = ign_flags;
+
     fld_flags = logical(ones(R,N));
     for i = 1:size(fld,1)
         fld_flags(fld(i,1),fld(i,2))=0;
     end
-    FLD_FLG = [FLD_FLG, ign_flags];
+    FLD_FLG{d} = fld_flags;
 end

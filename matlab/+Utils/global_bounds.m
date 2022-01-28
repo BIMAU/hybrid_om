@@ -18,7 +18,6 @@ function [mn, mx, ign, fld] = global_bounds(data, field, mn, mx)
                 if series(end) == 0
                     fprintf('failed run: %d %d \n', i, j);
                     fld = [fld;i,j];
-                    keyboard
                 else
                     mn = min(mn, min(series));
                     mx = max(mx, max(series));

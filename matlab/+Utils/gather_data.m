@@ -82,8 +82,13 @@ function [errs, nums, pids, ...
         end
 
         for k = 1:size(idx_set,1)
-            i = idx_set(k,1);
-            j = idx_set(k,2);
+            if isfield(data, 'hyps_first') && data.hyps_first
+                i = idx_set(k,2);
+                j = idx_set(k,1);
+            else
+                i = idx_set(k,1);
+                j = idx_set(k,2);
+            end
 
             errs{i, j} = data.errs{i, j};
             pids(i, j) = d;
