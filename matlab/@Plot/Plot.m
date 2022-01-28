@@ -33,23 +33,35 @@ classdef Plot < handle
 
         % show the whole dataset in the background
         plot_scatter = true;
+
+        % show a boxplot
+        plot_boxplot = true;
+
+        % plot connections between quantiles in different boxplots
+        plot_connections = true;
+
+        % default boxplot style
+        style = {'.', '-', '-'};
+
+        % default boxplot markersizes
+        msize = {15, 12};
     end
 
     methods (Access = public)
 
         function self = Plot(dir)
-            self.dir = dir;
+            if nargin < 1
+                self.dir = 'unknown';
+            else
+                self.dir = dir;
+            end
         end
 
-        [nums, mdat, preds, truths, f] = plot_experiment(self, ignore_nans, flip_axes);
+        [nums, mdat, preds, truths, f, h] = plot_experiment(self, ignore_nans, flip_axes, nums, mdat);
         [] = movie_qg(self, data, opts);
 
         [f, Pm, Pv, g] = plot_qg_mean_spectrum(self, qg, states, opts, varargin);
+        [f,h] = my_boxplot(self, varargin);
     end
 
-    methods (Access = private)
-
-        [f] = my_boxplot(self, varargin);
-
-    end
 end

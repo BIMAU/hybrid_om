@@ -1,17 +1,21 @@
-function [nums, mdat, preds, truths, f] = ...
-        plot_experiment(self, ignore_nans, flip_axes)
+function [nums, mdat, preds, truths, f, h] = ...
+        plot_experiment(self, ignore_nans, flip_axes, nums, mdat)
 %
 % gather data from experiment dir
 
     if nargin < 3
-        flip_axes = false
+        flip_axes = false;
     end
     if nargin < 2
         ignore_nans = true;
     end
-
-    [errs, nums, pids, mdat, preds, truths] = ...
-        Utils.gather_data(self.dir);
+    if nargin < 4
+        [errs, nums, pids, mdat, preds, truths] = ...
+            Utils.gather_data(self.dir);
+    else
+        preds = 0;
+        truths = 0;
+    end
 
     if ignore_nans
         % Failed experiments (usually out of memory) give nans. The whole row
@@ -40,6 +44,7 @@ function [nums, mdat, preds, truths, f] = ...
 
     % plot results
     f = [];
+    h = [];
     clrs = lines(Nboxplots);
 
     H = mdat.hyp_range(exp_ind(xlab_index), :);
@@ -65,7 +70,9 @@ function [nums, mdat, preds, truths, f] = ...
 
     for i = 1:Nboxplots
         subrange = range1((i-1)*maxValues+1:i*maxValues);
-        f{i} = self.my_boxplot(nums(:, subrange), {clrs(i,:), clrs(i,:)});
+        [f{i}, group] = self.my_boxplot(nums(:, subrange), {clrs(i,:), clrs(i,:)}, ...
+                                      self.style, self.msize);
+        h{i} = group;
         xticklabels([]);
         hold on
     end

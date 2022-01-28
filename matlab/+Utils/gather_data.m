@@ -51,12 +51,11 @@ function [errs, nums, pids, ...
         data = load(fileNames{d});
         time = toc;
         fprintf('loading %s done (%fs) \n', fileNames{d}, time);
-
         if initialize
             [n_ens, n_hyps] = size(data.num_predicted);
 
             errs = cell(n_ens, n_hyps);
-            pids = cell(n_ens, n_hyps);
+            pids = nan(n_ens, n_hyps);
 
             predictions = cell(n_ens, n_hyps);
             truths = cell(n_ens, n_hyps);
@@ -73,39 +72,43 @@ function [errs, nums, pids, ...
         else
             j_range = 1:n_hyps;
         end
-        
+
         if isfield(data, 'my_reps_hyps')
             % new parallelization:
             idx_set = data.my_reps_hyps;
         else
-            % old pararallelization:
+            % old parallelization:
             idx_set = combvec(data.my_inds, j_range)';
         end
-        
+
         for k = 1:size(idx_set,1)
-            i = idx_set(k,1);
-            j = idx_set(k,2);
+            if isfield(data, 'hyps_first') && data.hyps_first
+                i = idx_set(k,2);
+                j = idx_set(k,1);
+            else
+                i = idx_set(k,1);
+                j = idx_set(k,2);
+            end
 
             errs{i, j} = data.errs{i, j};
-            pids{i, j} = d;
+            pids(i, j) = d;
 
             predictions{i, j} = data.predictions{i, j};
-            truths{i, j}      = data.truths{i, j};
-            
+            truths{i, j} = data.truths{i, j};
+
             if isfield(data, 'stats') && ...
                     isfield(data, 'spectra')
                 spectra{i, j} = data.spectra{i, j};
                 stats{i, j} = data.stats{i, j};
             end
-            
+
             num = data.num_predicted(i, j);
-            if num > 0
+            if num > 0 && errs{i,j}(end) ~= 999
                 nums(i, j) = num;
             end
 
         end
     end
-
     assert(i == size(data.num_predicted, 1), ...
            'failed assertion, probably wrong procs');
     % export additional labels for plotting

@@ -16,7 +16,7 @@ opts.ny = ny_c;
 opts.Re = Re_c;
 opts.ampl = ampl;
 opts.stir = stir;
-opts.windowsize = 10;
+opts.windowsize = 50;
 
 % fine QG with periodic bdc
 qg_f = QG(nx_f, ny_f, 1);

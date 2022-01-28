@@ -178,7 +178,7 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
                 self.stopping_criterion(predY(i,:), testY(i,:));
         end
 
-        if (mod(i,verbosity) == 0) || (i == Npred) || stop
+        if ( mod(i,verbosity) == 0 ) || ( i == Npred ) || stop
             self.printpid(['prediction step %4d/%4d, Newton iterations %d,',...
                            'error %1.2e\n'], ...
                           i, Npred, Nk, err(i));

@@ -7,6 +7,10 @@ if ~exist('preds4', 'var') || ...
     load_qg_data
 end
 
+if ~exist('preds_dkl', 'var')
+    load_qg_transient_data
+end   
+
 exportdir = '~/Projects/doc/mlqg/figs/QG_snapshots/';
 
 fs = 10;
@@ -17,13 +21,14 @@ crange = [-0.3,0.3];
 
 % snapshots at 200 years since initial spinup
 T = 200*365-10000-100*365;
+set(groot,'defaultAxesTickLabelInterpreter','latex');
 
 figure(1)
-fields = {ref_preds{1,1}(round(T/2),:)', ...
-          preds{1,1}(round(T/2),:)', ...
-          preds{1,2}(round(T/2),:)', ...
-          preds{1,3}(round(T/2),:)', ...
-          preds{1,6}(round(T/2),:)'};
+fields = {ref_preds{1,1}(end,:)', ...
+          preds_dkl{1}{1,1}(end,:)', ...
+          preds_dkl{2}{1,1}(end,:)', ...
+          preds_dkl{2}{1,2}(end,:)', ...
+          preds_dkl{2}{1,3}(end,:)'};
 
 titles = {'perfect model, vorticity (day$^{-1}$)', ...
           'imperfect model, vorticity (day$^{-1}$)', ...
@@ -45,7 +50,8 @@ for j = 1:numel(fields)
     ny = state_dims{min(2,j)}(2);
     plotQG(nx, ny, 1, scaling*fields{1,j}, true);
     colormap(map);
-    colorbar
+    c = colorbar;
+    c.TickLabelInterpreter = 'latex';
     caxis(crange)
     set(gca,'xtick',[])
     set(gca,'ytick',[])
