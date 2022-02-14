@@ -62,6 +62,8 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
     % full dimensional output testing
     if self.testing_on
         testY = self.data.X(:, 2:end);
+        trfirst = self.test_range(1);
+        trHist = testY(:, trfirst-self.error_windowsize:trfirst-1);
         testY = testY(:, self.test_range)';
     else
         testY = [];
@@ -121,8 +123,13 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
     end
 
     clear trainU trainY
-    % reset memory for nrmse
-    self.nrmse_memory = struct();
+
+    % reset error memory
+    self.error_memory = struct();
+    % fill error memory with truth history
+    self.error_memory.test = trHist;
+    self.error_memory.pred = trHist;
+
     % #FIXME this should be a parameter
     verbosity = 100;
     for i = 1:Npred
@@ -195,5 +202,4 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
         testY = testY(1:i,:);
     end
     err = err(1:i);
-
 end
