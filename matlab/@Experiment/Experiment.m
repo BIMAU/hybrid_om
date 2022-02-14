@@ -336,7 +336,7 @@ classdef Experiment < handle
         [] = print_hyperparams(self, exp_idx);
         [esn_pars, mod_pars] = distribute_params(self, exp_idx);
 
-        [err, nrm] = nrmse(self, pred, test);
+        [err, nrm] = error(self, pred, test);
 
         [] = add_field_to_memory(self, name, field);
 

@@ -1,5 +1,5 @@
 function [stop_flag, err] = stopping_criterion(self, predY, testY)
-    err  = self.nrmse(predY(:), testY(:));
+    err  = self.error(predY(:), testY(:));
 
     % err = norm(testY(:) - predY(:)) / norm(testY(:),2);
     stop_flag = false;

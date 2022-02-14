@@ -1,4 +1,4 @@
-function [err, nrm] = nrmse(self, pred, test)
+function [err, nrm] = error(self, pred, test)
 % pred: predicted field
 % test: testing field/truth
     
