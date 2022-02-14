@@ -60,7 +60,7 @@ function [errs, nums, pids, ...
             predictions = cell(n_ens, n_hyps);
             truths = cell(n_ens, n_hyps);
             stats = cell(n_ens, n_hyps);
-            spectra = cell(n_ens, n_hyps);
+            spectra = cell(n_ens, n_hyps, 2); % contains Pm and Pv
             nums = nan(n_ens, n_hyps);
 
             initialize = false;
@@ -98,7 +98,8 @@ function [errs, nums, pids, ...
 
             if isfield(data, 'stats') && ...
                     isfield(data, 'spectra')
-                spectra{i, j} = data.spectra{i, j};
+                spectra{i, j, 1} = data.spectra{i, j, 1};
+                spectra{i, j, 2} = data.spectra{i, j, 2};
                 stats{i, j} = data.stats{i, j};
             end
 
