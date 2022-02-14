@@ -35,8 +35,11 @@ classdef Experiment < handle
         % Problem identifier
         ident = 'default';
 
-        % set the window size for the nrs
-        nrmse_windowsize = 50;
+        % error types 'nrmse', 'norm'
+        err_type = 'nrmse';
+
+        % set the window size for the errors (nrmse and norm)
+        error_windowsize = 50;
 
         % set the window size for Km, Ke, Z (qg only)
         stats_windowsize = 50;
@@ -109,8 +112,8 @@ classdef Experiment < handle
         VX;
         VPhi;
 
-        % A memory with a windowsize is needed to be able to compute a NRMSE
-        nrmse_memory = struct();
+        % A memory with a windowsize is needed to be able to compute errors
+        error_memory = struct();
 
         % output_directory
         output_dir = '';
