@@ -51,8 +51,9 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
     elseif model_only
     end
 
+    tfirst = self.train_range_range(1)+1;
     if esn_dmd_active
-        assert(self.train_range(end)+1 == self.test_range(1), ...
+        assert(tfirst == self.test_range(1), ...
                'incompatible train and test range');
         trainU = U(:, self.train_range)';
         trainY = Y(:, self.train_range)';
@@ -60,10 +61,10 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
     end
 
     % full dimensional output testing
+    testY = self.data.X(:, 2:end);
+    trHist = testY(:, tfirst-self.error_windowsize:tfirst-1);
+
     if self.testing_on
-        testY = self.data.X(:, 2:end);
-        trfirst = self.test_range(1);
-        trHist = testY(:, trfirst-self.error_windowsize:trfirst-1);
         testY = testY(:, self.test_range)';
     else
         testY = [];
