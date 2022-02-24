@@ -40,15 +40,19 @@ function [f, h] = my_boxplot(self, varargin)
         error('Unexpected input');
     end
 
-    alpha     = 0.2;
+    alpha     = 0.8;
     ylimMax   = 0.0;
 
     plot_mean    = self.plot_mean;
     plot_scatter = self.plot_scatter;
     plot_boxplot = self.plot_boxplot;
     plot_connections = self.plot_connections;
+    plot_q_conn = self.plot_q_conn;
 
-    Q = zeros(numel(x_index), 3);
+    assert(numel(plot_q_conn) == 3);
+    assert(sum(plot_q_conn) >= 1);
+    assert(sum(plot_q_conn) <= 3);
+    Q = zeros(numel(x_index), sum(plot_q_conn));
     h = hggroup;
 
     for idx = x_index
@@ -62,23 +66,31 @@ function [f, h] = my_boxplot(self, varargin)
                     'markerfacecolor', colors{1}, ...
                     'markeredgecolor', colors{1}, ...
                     'markerfacealpha', alpha, ...
-                    'linewidth', 0.01); hold on
+                    'linewidth', 0.1, 'Parent', h);
+            hold on
         end
 
         % plot median
-        q1 = quantile(arr,0.25);
-        q2 = quantile(arr,0.5);
-        q3 = quantile(arr,0.75);
-        Q(idx, :) = [q1,q2,q3];
+        q(1) = quantile(arr,0.25);
+        q(2) = quantile(arr,0.5);
+        q(3) = quantile(arr,0.75);
+
+        q_arr = [];
+        for i = 1:numel(plot_q_conn)
+            if plot_q_conn(i) == 1
+                q_arr = [q_arr, q(i)];
+            end
+        end
+        Q(idx, :) = q_arr;
 
         if plot_boxplot
-            f = plot(idx, q2, style{1}, 'markersize', msize{1},  ...
+            f = plot(idx, q(2), style{1}, 'markersize', msize{1},  ...
                      'linewidth',2, 'color', colors{1}, 'Parent', h);
             hold on
 
             % plot quantiles
             plot(repmat(idx,1,2), ...
-                 [q1, q3], ...
+                 [q(1), q(3)], ...
                  style{2}, 'markersize', msize{2},  ...
                  'linewidth',2, 'color', colors{1}, 'Parent', h);
         end
@@ -94,10 +106,20 @@ function [f, h] = my_boxplot(self, varargin)
     end
 
     if plot_connections
-        f = plot(x_index, Q(x_index,:), style{3}, 'markersize', msize{2}, ...
-                 'color', colors{2}, 'Parent', h);
-        uistack(f, 'bottom');
-        f = f(1);
+        f = [];
+        for j = 1:size(Q,2)
+            if numel(style{3}) > 1
+                st = style{3}{j};
+            else
+                st = style{3};
+            end
+            f(j) = plot(x_index, Q(x_index,j), st, 'markersize', msize{2}, ...
+                        'color', colors{2}, 'Parent', h);
+            uistack(f, 'bottom');
+        end
+        if numel(f) > 1
+            f = f(2);
+        end
     end
 
     xlim([min(x_index)-0.5, max(x_index)+0.5]);

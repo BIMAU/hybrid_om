@@ -40,6 +40,9 @@ classdef Plot < handle
         % plot connections between quantiles in different boxplots
         plot_connections = true;
 
+        % which connections to plot
+        plot_q_conn = [1,1,1];
+
         % default boxplot style
         style = {'.', '-', '-'};
 

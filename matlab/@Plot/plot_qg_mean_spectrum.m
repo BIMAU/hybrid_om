@@ -8,7 +8,12 @@ function [f, Pm, Pv, g] = plot_qg_mean_spectrum(self, qg, states, opts, varargin
         opts.power_laws = false;
     end
 
-    [Pm, Pv] = Utils.get_qg_mean_spectrum(qg, states, opts);
+    if (size(states,1) == qg.nx*qg.ny*qg.nun)
+        [Pm, Pv] = Utils.get_qg_mean_spectrum(qg, states, opts);
+    else
+        Pm = mean(states{1},2);
+        Pv = mean(states{2},2);
+    end
     maxr = size(Pm,1);
 
     plot_range = 2:maxr-2;

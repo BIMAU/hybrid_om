@@ -31,18 +31,18 @@ for idx = [3]
 
     plot_stats = { ref_stats{1,1}.(quantity{idx}), ...
                    stats_dkl{1}{1,1}.(quantity{idx}), ...
-                   stats_dkl{2}{1,2}.(quantity{idx}), ...
-                   stats_dkl{2}{1,3}.(quantity{idx}) };
+                   stats_dkl{5}{1,5}.(quantity{idx}), ...
+                   stats_dkl{5}{1,12}.(quantity{idx}) };
 
     names = {'perfect QG', ...
              'imperfect QG', ...
-             'ESNc', ...              % lambda 1
-             'ESN+DMDc'};             % lambda 1
+             'ESN', ...           % lambda 1
+             'ESNc'};             % lambda 1
 
     colors = {cols(1,:), ...
               cols(2,:), ...
-              cols(4,:), ...
-              cols(7,:)}
+              cols(3,:), ...
+              cols(4,:)}
 
     % -----------------------------------------------------------------------------
     % Reference spinup
@@ -79,19 +79,14 @@ for idx = [3]
 
     %-----------------------------------------------------------------------------
     % ESN
-    % tserie_esnc = stats_dkl{2}{1,1}.(quantity{idx});
-    % [f_esn, u_esn] = my_plot(trange, tserie_esnc, 'color', cols(3,:));
+    tserie_esn = plot_stats{3};
+    [f_esn, u_esn] = my_plot(trange, tserie_esn, 'color', colors{3});
+    uistack(u_esn, 'bottom')
 
     %-----------------------------------------------------------------------------
     % ESNc
-    tserie_esnc = plot_stats{3};
-    f_esnc = my_plot(trange, tserie_esnc, 'color', colors{3});
-
-    %-----------------------------------------------------------------------------
-    % ESN+DMDc
-    tserie_esndmdc = plot_stats{4};
-    [f_esndmdc, u_esndmdc] = my_plot(trange, tserie_esndmdc, 'color', colors{4});
-    uistack(u_esndmdc, 'bottom')
+    tserie_esnc = plot_stats{4};
+    [f_esnc, u_esnc] = my_plot(trange, tserie_esnc, 'color', colors{4});
     uistack(u_ref, 'top')
 
     %-----------------------------------------------------------------------------
@@ -107,8 +102,8 @@ for idx = [3]
     end
 
     xlim([trange_full(365), trange_full(end)])
-    lg = legend([f_ref, f_c, f_modonly, f_esnc, f_esndmdc], 'perfect QG', 'confidence interval', ...
-                'imperfect QG', 'ESNc prediction', 'ESN+DMDc prediction',  ...
+    lg = legend([f_ref, f_c, f_modonly, f_esn, f_esnc], 'perfect QG', 'confidence interval', ...
+                'imperfect QG', 'ESN prediction', 'ESNc prediction',  ...
                 'interpreter', 'latex', ...
                 'orientation', 'vertical', 'location', 'southwest');
 

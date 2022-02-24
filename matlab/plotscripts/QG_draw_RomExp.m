@@ -9,13 +9,13 @@ invert = false;
 % Gather data
 romexp4_dir = 'QG_RomExp_NR3200_MC4/SC_1-5_RF_1-0.0625_parallel_param_5.00e+02/';
 fulldir4=[base_dir, romexp4_dir, '/'];
-[~, nums4, ~, mdat4, ~, ~] = ...
+[~, nums4, ~, mdat4, ~, ~, ~] = ...
             Utils.gather_data(fulldir4);
 p4 = Plot(fulldir4);
 
 romexp8_dir = 'QG_RomExp_NR3200_MC8/SC_1-5_RF_1-0.0625_parallel_param_5.00e+02/';
 fulldir8=[base_dir, romexp8_dir, '/'];
-[~, nums8, ~, mdat8, ~, ~] = ...
+[~, nums8, ~, mdat8, ~,~, ~] = ...
     Utils.gather_data(fulldir8);
 p8 = Plot(fulldir8);
 
