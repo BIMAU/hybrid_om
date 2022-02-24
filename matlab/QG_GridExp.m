@@ -69,15 +69,8 @@ function [dir] = QG_GridExp(varargin)
     % create experiment class
     expObj = Experiment(dgen, pid, procs);
 
-    % add experiment identification
-    expObj.ident = 'QG_Nr';
-
-    %
-    expObj.shifts = 100;
     expObj.reps = 1;
     expObj.store_state = 'final';
-    expObj.nrmse_windowsize = 50;
-    expObj.err_tol = 0.5;
     expObj.max_preds = 365;
 
     % adjust hyperparam defaults
@@ -85,18 +78,14 @@ function [dir] = QG_GridExp(varargin)
     expObj.set_default_hyp('TrainingSamples', 10000);
     expObj.set_default_hyp('AverageDegree', 3);
     expObj.set_default_hyp('RhoMax', 0.4);
-    expObj.set_default_hyp('BlockSize', 64);
     expObj.set_default_hyp('InAmplitude', 1);
     expObj.set_default_hyp('SVDWaveletBlockSize', 1);
-    expObj.set_default_hyp('SVDWaveleRteduction', 1);
-    expObj.set_default_hyp('ReservoirSize', 6400);
+    expObj.set_default_hyp('SVDWaveletReduction', 1);
+    expObj.set_default_hyp('ReservoirSize', 3200);
     expObj.set_default_hyp('FilterCutoff', 0.01);
     expObj.set_default_hyp('TimeDelay', 0);
     expObj.set_default_hyp('TimeDelayShift', 100);
     expObj.set_default_hyp('SeparateUnknowns', false);
-
-    % Tikhonov regularization
-    expObj.set_default_hyp('Lambda', 1e-10);
 
     % Input matrix type
     % (1) sparse
@@ -122,6 +111,7 @@ function [dir] = QG_GridExp(varargin)
     % (5) local_pod
     % (6) wav+pod
     expObj.set_default_hyp('ScaleSeparation', 1);
+    expObj.set_default_hyp('BlockSize', 64);
     expObj.set_default_hyp('ReductionFactor', 1);
 
     % Add details
@@ -138,17 +128,16 @@ function [dir] = QG_GridExp(varargin)
     % (6) corr_only
     % (7) esn_plus_dmd
     % (8) hybrid_esn_dmd
-    expObj.set_default_hyp('ModelConfig', 8);
 
-    expObj.add_experiment('ReservoirSize', [200,400,800,1600,3200,6400,12800]);
-    % expObj.add_experiment('FilterCutoff', [0.5, 0.1, 0.01, 0.0]);
-
-    expObj.add_experiment('ModelConfig', [1:8]);
-
-    % expObj.add_experiment('ScaleSeparation', [2, 4, 5] );
-    % expObj.add_experiment('ReductionFactor', [1/4,1/8,1/16,1/32,1/64]);
-    % expObj.add_experiment('ModelConfig', [1, 2, 4, 5, 6, 8] );
-    % expObj.add_experiment('BlockSize', [32*32,16*16,8*8,4*4]);
+    expObj.error_windowsize = 10;
+    expObj.err_type = 'norm';
+    expObj.err_tol = 0.1;
+    expObj.shifts = 50;
+    
+    expObj.ident = 'QG_GridExp';
+    expObj.set_default_hyp('Lambda', 1e-8);
+    expObj.add_experiment('ModelConfig', [1, 2, 4, 5, 6, 8]);
+    expObj.add_experiment('ReservoirSize', [100, 200, 400, 800, 1600, 3200, 6400, 12800]);
 
     % run experiments
     dir = expObj.run();

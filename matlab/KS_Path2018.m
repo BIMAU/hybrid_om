@@ -32,16 +32,15 @@ function [dir] = KS_Path2018(varargin)
     % create experiment class
     expObj = Experiment(dgen, pid, procs);
 
-    % add experiment identification
-    expObj.ident = 'Pathak2018repl';
-
     % experimental setup
     expObj.shifts = 100;
     
     expObj.reps = 1;
     expObj.store_state = 'final';
-    expObj.nrmse_windowsize = 50;
-    expObj.err_tol = 0.5;
+    expObj.error_windowsize = 10;
+    expObj.err_type = 'norm';
+    expObj.err_tol = 0.4;
+    
     expObj.max_preds = round(200 / dgen.dt_imp);
 
     % adjust hyperparam defaults
@@ -93,9 +92,10 @@ function [dir] = KS_Path2018(varargin)
     expObj.set_default_hyp('ModelConfig', 4);
 
     % Tikhonov regularization
-    expObj.set_default_hyp('Lambda', 1e-8);
+    expObj.ident = 'Pathak2018repl';
+    expObj.set_default_hyp('Lambda', 1e-10);
 
-    expObj.add_experiment('ReservoirSize', [200,400,800,1600,3200,6400]);
+    expObj.add_experiment('ReservoirSize', [50,100,200,400,800,1600,3200,6400]);
     expObj.add_experiment('ModelConfig', [1,2,4,5,6,8]);
 
     % run experiments
