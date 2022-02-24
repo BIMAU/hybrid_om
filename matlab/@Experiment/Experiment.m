@@ -83,8 +83,9 @@ classdef Experiment < handle
         id2ind  = @ (hyp_ids, str) find(strcmp(hyp_ids, str));
 
         % data storage for all runs
-        predictions; % stores all predictions
-        truths; % stores all truths
+        predictions; % stores predictions
+        corrections; % stores corrections
+        truths; % stores truths
         errors; % stores the errors
         ESN_states; % stores snapshots of the ESN state X
         damping; % stores SVD damping curves
@@ -229,13 +230,14 @@ classdef Experiment < handle
                 self.VX   = self.modes.Vinv * self.data.X;
                 self.VPhi = self.modes.Vinv * self.data.Phi;
 
-                [predY, testY, err, esnX, damping] = self.experiment_core();
+                [predY, corrY, testY, err, esnX, damping] = self.experiment_core();
 
                 self.num_predicted(i, j) = size(predY, 1);
 
                 self.damping{i, j} = damping;
                 if strcmp(self.store_state, 'all')
                     self.predictions{i, j} = predY(:,:);
+                    self.corrections{i, j} = corrY(:,:);
                     if ~isempty(testY)
                         self.truths{i, j} = testY(:,:);
                     end
@@ -243,6 +245,7 @@ classdef Experiment < handle
 
                 elseif strcmp(self.store_state, 'final');
                     self.predictions{i, j} = predY(end,:);
+                    self.corrections{i, j} = corrY(end,:);
 
                     if ~isempty(testY)
                         self.truths{i, j} = testY(end,:);
@@ -252,13 +255,23 @@ classdef Experiment < handle
 
                 elseif strcmp(self.store_state, 'stats');
                     self.predictions{i, j} = predY(end,:);
+                    self.corrections{i, j} = corrY(end,:);
+
                     if ~isempty(testY)
                         self.truths{i, j} = testY(end,:);
                     end
                     self.ESN_states{i,j} = esnX(end,:);
+
+                    % create spectra (yearly mean Pm and variance Pv) for predictions
                     [Pm, Pv] = Utils.get_qg_yearly_spectrum(self.model, predY');
                     self.spectra{i,j,1} = Pm;
                     self.spectra{i,j,2} = Pv;
+
+                    % create spectra (yearly mean Qm and variance Qv) for corrections
+                    [Qm, Qv] = Utils.get_qg_yearly_spectrum(self.model, corrY');
+                    self.spectra{i,j,3} = Qm;
+                    self.spectra{i,j,4} = Qv;
+
                     stat_opts.windowsize = self.stats_windowsize;
                     self.stats{i,j} = ...
                         Utils.get_qg_statistics(self.model, predY', stat_opts);
@@ -285,6 +298,7 @@ classdef Experiment < handle
                           {'num_predicted', self.num_predicted}, ...
                           {'errs', self.errors}, ...
                           {'predictions', self.predictions}, ...
+                          {'corrections', self.corrections}, ...
                           {'truths', self.truths}, ...
                           {'test_range', self.test_range}, ...
                           {'train_range', self.train_range}, ...
@@ -343,7 +357,7 @@ classdef Experiment < handle
 
         [] = add_field_to_memory(self, name, field);
 
-        [predY, testY, err, esnX, damping] = experiment_core(self);
+        [predY, corrY, testY, err, esnX, damping] = experiment_core(self);
 
         [stop_flag, err] = stopping_criterion(self, predY, testY);
 

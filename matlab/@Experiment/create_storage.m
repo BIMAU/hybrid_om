@@ -3,11 +3,12 @@ function create_storage(self)
     N_rl = self.reps*self.shifts;
 
     self.predictions = cell(N_rl, self.num_hyp_settings);
+    self.corrections = cell(N_rl, self.num_hyp_settings);
     self.truths      = cell(N_rl, self.num_hyp_settings);
     self.errors      = cell(N_rl, self.num_hyp_settings);
     self.ESN_states  = cell(N_rl, self.num_hyp_settings);
     self.damping     = cell(N_rl, self.num_hyp_settings);
-    self.spectra     = cell(N_rl, self.num_hyp_settings, 2);
+    self.spectra     = cell(N_rl, self.num_hyp_settings, 4);
     self.stats       = cell(N_rl, self.num_hyp_settings);
 
     % Number of predicted time steps that are within the error limit.

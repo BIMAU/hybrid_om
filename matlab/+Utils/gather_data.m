@@ -1,5 +1,5 @@
 function [errs, nums, pids, ...
-          metadata, predictions, ...
+          metadata, predictions, corrections...
           truths, spectra, stats] = gather_data(varargin)
 
     switch nargin
@@ -51,6 +51,7 @@ function [errs, nums, pids, ...
         data = load(fileNames{d});
         time = toc;
         fprintf('loading %s done (%fs) \n', fileNames{d}, time);
+
         if initialize
             [n_ens, n_hyps] = size(data.num_predicted);
 
@@ -58,9 +59,10 @@ function [errs, nums, pids, ...
             pids = nan(n_ens, n_hyps);
 
             predictions = cell(n_ens, n_hyps);
+            corrections = cell(n_ens, n_hyps);
             truths = cell(n_ens, n_hyps);
             stats = cell(n_ens, n_hyps);
-            spectra = cell(n_ens, n_hyps, 2); % contains Pm and Pv
+            spectra = cell(n_ens, n_hyps, 4); % contains Pm, Pv, Qm, Qv
             nums = nan(n_ens, n_hyps);
 
             initialize = false;
@@ -94,12 +96,21 @@ function [errs, nums, pids, ...
             pids(i, j) = d;
 
             predictions{i, j} = data.predictions{i, j};
+            if isfield(data, 'corrections')
+                corrections{i, j} = data.corrections{i, j};
+            end
             truths{i, j} = data.truths{i, j};
 
             if isfield(data, 'stats') && ...
                     isfield(data, 'spectra')
                 spectra{i, j, 1} = data.spectra{i, j, 1};
                 spectra{i, j, 2} = data.spectra{i, j, 2};
+
+                if size(data.spectra, 3) == 4
+                    spectra{i, j, 3} = data.spectra{i, j, 3};
+                    spectra{i, j, 4} = data.spectra{i, j, 4};
+                end
+
                 stats{i, j} = data.stats{i, j};
             end
 
@@ -110,12 +121,11 @@ function [errs, nums, pids, ...
 
         end
     end
-    assert(i == size(data.num_predicted, 1), ...
-           'failed assertion, probably wrong procs');
+
     % export additional labels for plotting
     metadata = struct();
-    importlabs = {'xlab', ...
-                  'ylab', ...
+    importlabs = {'xlab',...
+                  'ylab',...
                   'hyp_range',...
                   'hyp',...
                   'exp_id',...

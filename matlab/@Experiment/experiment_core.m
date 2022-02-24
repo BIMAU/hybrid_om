@@ -1,6 +1,7 @@
-function [predY, testY, err, esnX, damping] = experiment_core(self)
+function [predY, corrY, testY, err, esnX, damping] = experiment_core(self)
 % Core routine for running an experiment
-%   predY:  full dimensional predictions
+%   predY:  full dimensional predictions (yk)
+%   corrY:  full dimensional corrections (yk - Pyk)
 %   testY:  full dimensional truths
 
     self.printpid(' train range: %d - %d\n', ...
@@ -51,7 +52,7 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
     elseif model_only
     end
 
-    tfirst = self.train_range_range(1)+1;
+    tfirst = self.train_range(end)+1;
     if esn_dmd_active
         assert(tfirst == self.test_range(1), ...
                'incompatible train and test range');
@@ -67,11 +68,12 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
     if self.testing_on
         testY = testY(:, self.test_range)';
     else
-        testY = [];
+        testY = testY(:, tfirst:end)';
     end
 
     Npred = numel(self.test_range); % number of prediction steps
     predY = zeros(Npred, size(self.modes.V,1)); % full dimensional predictions
+    corrY = zeros(Npred, size(self.modes.V,1)); % full dimensional corrections
     err   = zeros(Npred, 1); % error array
     esnX  = 0; % esn state snapshots
 
@@ -179,6 +181,9 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
         % store result
         predY(i,:) = yk;
 
+        % store correction
+        corrY(i,:) = yk - Pyk;
+
         % check stopping criterion
         stop = false;
         if self.testing_on
@@ -199,6 +204,7 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
 
     % truncate output arrays
     predY = predY(1:i,:);
+    corrY = corrY(1:i,:);
     if self.testing_on
         testY = testY(1:i,:);
     end

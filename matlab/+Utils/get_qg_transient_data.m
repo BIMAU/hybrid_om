@@ -1,6 +1,6 @@
 function [nums, mdat, preds, truths, s] = get_qg_transient_data(dir, opts)
 
-    [errs, nums, pids, mdat, preds, truths] = ...
+    [errs, nums, pids, mdat, preds, corrs, truths] = ...
         Utils.gather_data(dir);
 
     [T,n] = size(preds{1,1});
