@@ -2,6 +2,10 @@
 Framework for hybrid ocean modeling experiments with a
 physics-controlled ESN.
 
+# dependencies
+ - QG (matlab/c++ implementation)
+ - ESN: https://github.com/erik808/ESN
+
 # usage notes:
 - Adjust the `base_dir` in `DataGen`
 
