@@ -84,8 +84,8 @@ function [dir] = QG_reference(varargin)
     expObj.reps = 1;
     expObj.store_state = 'all';
     expObj.testing_on = false;
-    expObj.nrmse_windowsize = 50;
-    expObj.err_tol = 0.5;
+    expObj.error_windowsize = 10;
+    expObj.err_tol = 0.1;
     expObj.max_preds = 100*365;
 
     expObj.set_default_hyp('TrainingSamples', 10000);

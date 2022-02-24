@@ -69,15 +69,13 @@ function [dir] = QG_transient(varargin)
     % create experiment class
     expObj = Experiment(dgen, pid, procs);
 
-    % add experiment identification
-    expObj.ident = 'QG_transient';
-
     %
-    expObj.shifts = 1;
+    expObj.shifts = 50;
     expObj.reps = 1;
-    expObj.store_state = 'all';
+    expObj.store_state = 'stats';
     expObj.testing_on = false;
-    expObj.nrmse_windowsize = 50;
+    expObj.error_windowsize = 50;
+    expObj.stats_windowsize = 50;
     expObj.err_tol = 0.5;
     expObj.max_preds = 100*365;
 
@@ -90,14 +88,15 @@ function [dir] = QG_transient(varargin)
     expObj.set_default_hyp('InAmplitude', 1);
     expObj.set_default_hyp('SVDWaveletBlockSize', 1);
     expObj.set_default_hyp('SVDWaveletReduction', 1);
-    expObj.set_default_hyp('ReservoirSize', 6400);
+    expObj.set_default_hyp('ReservoirSize', 3200);
     expObj.set_default_hyp('FilterCutoff', 0.01);
     expObj.set_default_hyp('TimeDelay', 0);
     expObj.set_default_hyp('TimeDelayShift', 100);
     expObj.set_default_hyp('SeparateUnknowns', false);
 
     % Tikhonov regularization
-    expObj.set_default_hyp('Lambda', 1e2);
+    % expObj.set_default_hyp('Lambda', 4e-2);
+    expObj.set_default_hyp('Lambda', 4e-2);
 
     % Input matrix type
     % (1) sparse
@@ -123,12 +122,12 @@ function [dir] = QG_transient(varargin)
     % (5) local_pod
     % (6) wav+pod
     expObj.set_default_hyp('ScaleSeparation', 1);
-    expObj.set_default_hyp('ReductionFactor', 1);
+    expObj.set_default_hyp('ReductionFactor', 3/16);
 
     % Add details
     % (1) disabled
     % (2) from model
-    expObj.set_default_hyp('AddDetails',2);
+    expObj.set_default_hyp('AddDetails', 2);
 
     % Model configuration options:
     % (1) model_only
@@ -139,9 +138,40 @@ function [dir] = QG_transient(varargin)
     % (6) corr_only
     % (7) esn_plus_dmd
     % (8) hybrid_esn_dmd
-    expObj.add_experiment('ModelConfig', [1:8]);
-    expObj.add_experiment('Lambda', 1e2);
+
+    % % ESN-based transient
+    % expObj.ident = 'QG_transient_ESNscaling';
+    % expObj.shifts = 50;
+    % expObj.max_preds = 100*365;
+    % expObj.set_default_hyp('Lambda', 1);
+    % expObj.set_default_hyp('ScaleSeparation', 1);
+    % expObj.add_experiment('ModelConfig', [2,4,8]);
+    % expObj.add_experiment('ReservoirSize', [200, 400, 800, 1600, 3200, 6400, 12800]);
     
+    % % DMDc transient
+    % expObj.ident = 'QG_transient_DMDc';
+    % expObj.set_default_hyp('Lambda', 36);
+    % expObj.add_experiment('ModelConfig', 5);
+    % expObj.add_experiment('ScaleSeparation', 1);
+
+    % % Model only transient
+    % expObj.ident = 'QG_transient_modelonly';
+    % expObj.add_experiment('ModelConfig', [1]);
+    % expObj.set_default_hyp('Lambda', 1);
+    % expObj.add_experiment('ScaleSeparation', [1]);
+
+    % % Correction only transient
+    % expObj.ident = 'QG_transient_corr';
+    % expObj.set_default_hyp('Lambda', 16);
+    % expObj.add_experiment('ModelConfig', 6);
+    % expObj.add_experiment('ScaleSeparation', 1);
+    
+    % Regularization test
+    expObj.ident = 'QG_transient_lambdatest';
+    expObj.add_experiment('ModelConfig', [2,4,5,6,8]);
+    expObj.set_default_hyp('ReservoirSize', 3200);
+    expObj.add_experiment('Lambda', linspace(0.05,2.7,20).^4);
+
     % run experiments
     dir = expObj.run();
 end
