@@ -51,7 +51,7 @@ function [predY, testY, err, esnX, damping] = experiment_core(self)
     elseif model_only
     end
 
-    tfirst = self.train_range_range(1)+1;
+    tfirst = self.train_range(end)+1;
     if esn_dmd_active
         assert(tfirst == self.test_range(1), ...
                'incompatible train and test range');
