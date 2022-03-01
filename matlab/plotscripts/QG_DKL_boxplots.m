@@ -147,6 +147,8 @@ for qnt_idx = 1:numel(quantity)
 
         uistack(hcorr,'top')
         uistack(hESNDMDc,'bottom')
+        
+        legend([fESN, fESNc, fDMDc, fcorr, fESNDMDc], 'ESN', 'ESNc', 'DMDc', 'correction only', 'ESN+DMDc', 'interpreter','latex','location','northeastoutside')
 
         set(gca, 'yscale','log')
         ylim([3*10^(-2),10^2])
