@@ -6,9 +6,9 @@
 ##SBATCH --mem-per-cpu=20GB
 
 # For QG experiments:
-#SBATCH --time=24:00:00
+#SBATCH --time=4:00:00
 #SBATCH --ntasks=50
-#SBATCH --mem-per-cpu=16GB
+#SBATCH --mem-per-cpu=24GB
 
 ### A short test (QG)
 ##SBATCH --ntasks=5

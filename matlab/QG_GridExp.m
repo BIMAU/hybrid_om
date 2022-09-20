@@ -131,10 +131,10 @@ function [dir] = QG_GridExp(varargin)
 
     expObj.error_windowsize = 10;
     expObj.err_type = 'norm';
-    expObj.err_tol = 0.1;
+    expObj.err_tol = 0.4;
     expObj.shifts = 50;
     
-    expObj.ident = 'QG_GridExp';
+    expObj.ident = 'QG_GridExp_tol0.4';
     expObj.set_default_hyp('Lambda', 1e-8);
     expObj.add_experiment('ModelConfig', [1, 2, 4, 5, 6, 8]);
     expObj.add_experiment('ReservoirSize', [100, 200, 400, 800, 1600, 3200, 6400, 12800]);
