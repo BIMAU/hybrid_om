@@ -4,7 +4,7 @@ function [dir] = QG_Spinup(varargin)
 
     % Create perfect/fine QG model 
     Re_f = 1000;
-    nx_f = 64;
+    nx_f = 128;
     ny_f = nx_f;
 
     ampl = 2; % stirring amplitude
@@ -20,11 +20,11 @@ function [dir] = QG_Spinup(varargin)
     [Ldim, ~, Udim] = qg_f.get_nondim();
     
     % create data generator for a single model
-    dgen = DataGen(qg_f); ## TODO
+    dgen = DataGen(qg_f);  %## TODO
 
     % set initial solution in datagen
-    x_init = ##TODO
-    dgen.x_init_prf = init_sol.x_init;
+    x_init = 0.001*randn(qg_f.N,1);
+    dgen.x_init_prf = x_init;
 
     % set the time step to one day
     Tdim = Ldim / Udim; % in seconds
@@ -34,7 +34,6 @@ function [dir] = QG_Spinup(varargin)
     dgen.dt_prf = dt_prf;
 
     dgen.T = round(100 * year / Tdim);
-    dgen.verbosity = 10;
-    dgen.generate_prf_transient();
-    
+    dgen.verbosity = 30;
+    dgen.generate_prf_transient();    
 end
