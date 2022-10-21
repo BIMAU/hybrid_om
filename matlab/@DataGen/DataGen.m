@@ -101,7 +101,7 @@ classdef DataGen < handle
                 fprintf('Obtained time series with %d samples.\n', self.Nt_prf);
             else
                 fprintf('Not existing: %s\n', out_file);
-                time = tic;
+                time_since = tic;
                 self.Nt_prf = ceil(self.T / self.dt_prf);
                 self.X      = zeros(self.N_prf, self.Nt_prf);
                 self.X(:,1) = self.x_init_prf;
@@ -116,7 +116,11 @@ classdef DataGen < handle
                     if mod(i, self.verbosity) == 0
                         fprintf(' step %4d/%4d, Newton iterations: %d\n',...
                                 i, self.Nt_prf, k);
-                        fprintf(' saving tmp to: \n %s \n', out_file);
+                        fprintf(' kinetic E: %4d, enstrophy Z: %4d \n',...
+                                abs(Utils.compute_qg_energy(self.X(:,i))), ...
+                                Utils.compute_qg_enstrophy(self.X(:,i)));
+                        fprintf(' time since start: %f \n', toc(time_since))
+                        fprintf(' saving fields to: \n %s \n', out_file);
                         pairs = {{'X', self.X}, ...
                                  {'Nt_prf', self.Nt_prf}, ...
                                  {'T', self.T}};
@@ -125,7 +129,7 @@ classdef DataGen < handle
                     end
                 end
 
-                fprintf('Generate time series... done (%f)\n', toc(time));
+                fprintf('Generate time series... done (%f)\n', toc(time_since));
                 fprintf('Average # Newton iterations: (%f)\n', ...
                         avg_k / (self.Nt_prf-1));
 
