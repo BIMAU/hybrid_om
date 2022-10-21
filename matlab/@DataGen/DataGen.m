@@ -53,6 +53,12 @@ classdef DataGen < handle
 
     methods
         function self = DataGen(model_prf, model_imp)
+
+            if nargin < 2
+                % For single-model data generation
+                model_imp = model_prf
+            end
+
             assert(strcmp(model_prf.name, model_imp.name));
 
             self.model_prf = model_prf;
@@ -83,6 +89,8 @@ classdef DataGen < handle
                                 self.T - self.trunc, self.dt_prf, ...
                                 self.model_prf.control_param())];
 
+            tmp_file = [out_file(1:end-4),'.tmp.mat'];
+
             if exist(out_file, 'file') && ~self.overwrite
                 fprintf('Obtain time series from file: \n %s \n', out_file);
                 d = load(out_file);
@@ -108,6 +116,12 @@ classdef DataGen < handle
                     if mod(i, self.verbosity) == 0
                         fprintf(' step %4d/%4d, Newton iterations: %d\n',...
                                 i, self.Nt_prf, k);
+                        fprintf(' saving tmp to: \n %s \n', out_file);
+                        pairs = {{'X', self.X}, ...
+                                 {'Nt_prf', self.Nt_prf}, ...
+                                 {'T', self.T}};
+                        Utils.save_pairs(tmp_file, pairs);
+                        fprintf(' done\n');
                     end
                 end
 
