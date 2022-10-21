@@ -2,7 +2,7 @@ function [dir] = QG_Spinup(varargin)
     [pid, procs] = Utils.input_handling(nargin, varargin);
     Utils.add_paths();
 
-    % Create perfect/fine QG model 
+    % Create perfect/fine QG model
     Re_f = 1000;
     nx_f = 128;
     ny_f = nx_f;
@@ -18,12 +18,12 @@ function [dir] = QG_Spinup(varargin)
 
     % get QG nondimensionalization
     [Ldim, ~, Udim] = qg_f.get_nondim();
-    
+
     % create data generator for a single model
-    dgen = DataGen(qg_f);  %## TODO
+    dgen = DataGen(qg_f);
 
     % set initial solution in datagen
-    x_init = 0.001*randn(qg_f.N,1);
+    x_init = 0.1*randn(qg_f.N,1);
     dgen.x_init_prf = x_init;
 
     % set the time step to one day
@@ -33,7 +33,8 @@ function [dir] = QG_Spinup(varargin)
     dt_prf = day / Tdim;
     dgen.dt_prf = dt_prf;
 
+    % run for a 100 years
     dgen.T = round(100 * year / Tdim);
-    dgen.verbosity = 30;
-    dgen.generate_prf_transient();    
+    dgen.verbosity = 100;
+    dgen.generate_prf_transient();
 end
