@@ -47,6 +47,15 @@ classdef DataGen < handle
         % overwrite the data in out_file if true
         overwrite = false;
 
+        % write data in chunks
+        chunking = false;
+
+        % when chunking use this chunk_size (in time)
+        chunk_size = 365;
+
+        % Create backup when saving data
+        backup = true;
+
         % output during transient and predictions
         verbosity = 500;
     end
@@ -108,6 +117,8 @@ classdef DataGen < handle
 
                 fprintf('Generate time series... \n');
                 avg_k = 0;
+
+                chunk_first = 1;
                 for i = 2:self.Nt_prf
                     [self.X(:,i), k] = ...
                         self.model_prf.step(self.X(:,i-1), self.dt_prf);
@@ -121,10 +132,32 @@ classdef DataGen < handle
                                 Utils.compute_qg_enstrophy(self.X(:,i)));
                         fprintf(' time since start: %f \n', toc(time_since))
                         fprintf(' saving fields to: \n %s \n', out_file);
-                        pairs = {{'X', self.X}, ...
+
+                        chunk_last = i;
+
+                        if self.chunking
+                            % has no use when chunking
+                            self.backup = false;
+                            
+                            chunk_range = chunk_first:chunk_last;
+                            
+                            tmp_file = [out_file(1:end-4), ...
+                                        sprintf('.chunk_%d-%d.mat', ...
+                                                chunk_first, chunk_last)]
+
+                        else
+                            chunk_range = 1:self.Nt_prf;
+                        end
+                        
+                        % for the next iteration:
+                        chunk_first = chunk_last + 1;
+
+                        pairs = {{'X', self.X(:, chunk_range)}, ...
                                  {'Nt_prf', self.Nt_prf}, ...
                                  {'T', self.T}};
-                        Utils.save_pairs(tmp_file, pairs);
+
+                        Utils.save_pairs(tmp_file, pairs, self.backup);
+
                         fprintf(' done\n');
                     end
                 end
