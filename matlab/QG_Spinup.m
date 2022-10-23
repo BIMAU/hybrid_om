@@ -3,7 +3,7 @@ function [dir] = QG_Spinup(varargin)
     Utils.add_paths();
 
     % Create perfect/fine QG model
-    Re_f = 1000;
+    Re_f = 2000;
     nx_f = 128;
     ny_f = nx_f;
 
@@ -25,6 +25,7 @@ function [dir] = QG_Spinup(varargin)
     % set initial solution in datagen
     x_init = 0.1*randn(qg_f.N,1);
     dgen.x_init_prf = x_init;
+    dgen.chunking = true;
 
     % set the time step to one day
     Tdim = Ldim / Udim; % in seconds
@@ -35,6 +36,6 @@ function [dir] = QG_Spinup(varargin)
 
     % run for a 100 years
     dgen.T = round(100 * year / Tdim);
-    dgen.verbosity = 100;
+    dgen.verbosity = 10;
     dgen.generate_prf_transient();
 end
