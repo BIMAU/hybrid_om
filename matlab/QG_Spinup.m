@@ -36,6 +36,6 @@ function [dir] = QG_Spinup(varargin)
 
     % run for a 100 years
     dgen.T = round(100 * year / Tdim);
-    dgen.verbosity = 10;
+    dgen.output_freq = round(year / Tdim); % yearly output
     dgen.generate_prf_transient();
 end
