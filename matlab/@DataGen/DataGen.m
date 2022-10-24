@@ -124,7 +124,7 @@ classdef DataGen < handle
                         self.model_prf.step(self.X(:,i-1), self.dt_prf);
                     avg_k = avg_k + k;
 
-                    if mod(i, self.verbosity) == 0
+                    if mod(i, self.output_freq) == 0
                         fprintf(' step %4d/%4d, Newton iterations: %d\n',...
                                 i, self.Nt_prf, k);
                         fprintf(' kinetic E: %4d, enstrophy Z: %4d \n',...
@@ -228,7 +228,7 @@ classdef DataGen < handle
                 for i = 1:self.Nt_imp
                     [self.Phi(:,i), k] = self.model_imp.step(self.X(:,i), self.dt_imp);
                     avg_k = avg_k + k;
-                    if mod(i, self.verbosity) == 0
+                    if mod(i, self.output_freq) == 0
                         fprintf(' step %4d/%4d, Newton iterations: %d\n',...
                                 i, self.Nt_imp, k);
                     end

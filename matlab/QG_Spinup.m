@@ -3,7 +3,7 @@ function [dir] = QG_Spinup(varargin)
     Utils.add_paths();
 
     % Create perfect/fine QG model
-    Re_f = 2000;
+    Re_f = 1000;
     nx_f = 128;
     ny_f = nx_f;
 
@@ -36,6 +36,7 @@ function [dir] = QG_Spinup(varargin)
 
     % run for a 100 years
     dgen.T = round(100 * year / Tdim);
-    dgen.output_freq = round(year / Tdim); % yearly output
+    dgen.output_freq = round(year / Tdim / dt_prf); % yearly output
+
     dgen.generate_prf_transient();
 end
