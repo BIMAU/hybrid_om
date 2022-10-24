@@ -42,7 +42,7 @@ classdef DataGen < handle
         out_file;
         out_file_path;
 
-        base_dir = '~/Projects/hybrid_om';
+        data_dir = '/data/p267904/Projects/hybrid_om/data';
 
         % overwrite the data in out_file if true
         overwrite = false;
@@ -57,7 +57,7 @@ classdef DataGen < handle
         backup = true;
 
         % output during transient and predictions
-        verbosity = 500;
+        output_freq = 500;
     end
 
     methods
@@ -83,7 +83,7 @@ classdef DataGen < handle
             end
 
             % create path
-            self.out_file_path = sprintf([self.base_dir, '/data/%s/%d_%d/'], ...
+            self.out_file_path = sprintf([self.data_dir, '/%s/%d_%d/'], ...
                                          self.model_prf.name, ...
                                          self.N_prf, self.N_imp);
 
@@ -94,7 +94,7 @@ classdef DataGen < handle
         % evolve full model for Nt steps
 
             out_file = [self.out_file_path, ...
-                        sprintf('transient_T=%d_dt=%1.3f_param=%1.1e.mat', ...
+                        sprintf('transient_T=%d_dt=%1.3e_param=%1.1e.mat', ...
                                 self.T - self.trunc, self.dt_prf, ...
                                 self.model_prf.control_param())];
 
@@ -143,7 +143,7 @@ classdef DataGen < handle
                             
                             tmp_file = [out_file(1:end-4), ...
                                         sprintf('.chunk_%d-%d.mat', ...
-                                                chunk_first, chunk_last)]
+                                                chunk_first, chunk_last)];
 
                         else
                             chunk_range = 1:self.Nt_prf;
