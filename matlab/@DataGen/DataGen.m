@@ -22,6 +22,7 @@ classdef DataGen < handle
         stride = 1; % dt_imp = stride * dt_prf
 
         T = 10; % end time
+        restart_T = 0; % THIS IS A HACK #FIXME. Used to restart with a chunk from a different run.
         Nt_prf; % number of time steps of the perfect model
         Nt_imp; % number of time steps of the imperfect model
 
@@ -92,6 +93,7 @@ classdef DataGen < handle
 
         function generate_prf_transient(self);
         % evolve full model for Nt steps
+        % ##FIXME there is sooo much to factorize here
 
             out_file = [self.out_file_path, ...
                         sprintf('transient_T=%d_dt=%1.3e_param=%1.1e.mat', ...
@@ -118,29 +120,94 @@ classdef DataGen < handle
                 fprintf('Generate time series... \n');
                 avg_k = 0;
 
-                chunk_first = 1;
-                for i = 2:self.Nt_prf
+                if self.chunking
+
+                    % identify a collection of chunks using the current output_freq
+                    chunk_list = [1:self.output_freq:self.Nt_prf; ...
+                                  self.output_freq:self.output_freq:self.Nt_prf];
+                    chunk_list = chunk_list(:);
+
+                    id_first = 1;
+                    id_last  = 2;
+
+                    chunk_first = chunk_list(id_first);
+                    chunk_last = chunk_list(id_last);
+
+                    base_name = [self.out_file_path, ...
+                                 sprintf('transient_T=%d_dt=%1.3e_param=%1.1e.mat', ...
+                                         self.restart_T, self.dt_prf, ...
+                                         self.model_prf.control_param())];
+                    
+                    chunk_file = [base_name(1:end-4), ...
+                                  sprintf('.chunk_%d-%d.mat', ...
+                                          chunk_first, chunk_last)];
+
+                    if ~exist(chunk_file, 'file')
+                        chunk_first = 1;
+                        chunk_last = 0;
+                    else
+
+                        while exist(chunk_file, 'file')
+                            fprintf('-- %s found\n', chunk_file)
+                            id_first = id_first + 2;
+                            id_last = id_last + 2;
+                            chunk_first = chunk_list(id_first);
+                            chunk_last = chunk_list(id_last);
+
+                            chunk_file = [base_name(1:end-4), ...
+                                          sprintf('.chunk_%d-%d.mat', ...
+                                                  chunk_first, chunk_last)];
+                        end
+                        % rewind one step
+                        id_first = id_first - 2;
+                        id_last = id_last - 2;
+
+                        chunk_first = chunk_list(id_first);
+                        chunk_last = chunk_list(id_last);
+
+                        last_chunk_file = [base_name(1:end-4), ...
+                                           sprintf('.chunk_%d-%d.mat', ...
+                                                   chunk_first, chunk_last)];
+
+                        % last available chunk
+                        fprintf('loading last available chunk file: %s\n', last_chunk_file)
+                        chunk = load(last_chunk_file);
+                        self.X(:,chunk_first:chunk_last) = chunk.X;
+                    end
+                end
+
+                if self.chunking
+                    chunk_first = chunk_last + 1;
+                    fprintf('starting at step %d\n', chunk_first)
+                else
+                    chunk_first = 1;
+                    chunk_last = 0;
+                end
+
+                start_idx = max(2, chunk_first);
+                for i = start_idx:self.Nt_prf
+                    fprintf('%d, %f\n', i, norm(self.X(:,i-1)))
+
                     [self.X(:,i), k] = ...
                         self.model_prf.step(self.X(:,i-1), self.dt_prf);
                     avg_k = avg_k + k;
 
-                    if mod(i, self.output_freq) == 0
-                        fprintf(' step %4d/%4d, Newton iterations: %d\n',...
+                    if (mod(i, self.output_freq) == 0) || (i == self.Nt_prf)
+                        fprintf(' step %4d/%4d, Newton iterations: %d\n', ...
                                 i, self.Nt_prf, k);
-                        fprintf(' kinetic E: %4d, enstrophy Z: %4d \n',...
+                        fprintf(' kinetic E: %4d, enstrophy Z: %4d \n', ...
                                 abs(Utils.compute_qg_energy(self.X(:,i))), ...
                                 Utils.compute_qg_enstrophy(self.X(:,i)));
                         fprintf(' time since start: %f \n', toc(time_since))
-                        fprintf(' saving fields to: \n %s \n', out_file);
 
                         chunk_last = i;
 
                         if self.chunking
                             % has no use when chunking
                             self.backup = false;
-                            
+
                             chunk_range = chunk_first:chunk_last;
-                            
+
                             tmp_file = [out_file(1:end-4), ...
                                         sprintf('.chunk_%d-%d.mat', ...
                                                 chunk_first, chunk_last)];
@@ -148,7 +215,7 @@ classdef DataGen < handle
                         else
                             chunk_range = 1:self.Nt_prf;
                         end
-                        
+
                         % for the next iteration:
                         chunk_first = chunk_last + 1;
 
@@ -156,6 +223,7 @@ classdef DataGen < handle
                                  {'Nt_prf', self.Nt_prf}, ...
                                  {'T', self.T}};
 
+                        fprintf(' saving fields to: \n %s \n', tmp_file);
                         Utils.save_pairs(tmp_file, pairs, self.backup);
 
                         fprintf(' done\n');
@@ -166,18 +234,27 @@ classdef DataGen < handle
                 fprintf('Average # Newton iterations: (%f)\n', ...
                         avg_k / (self.Nt_prf-1));
 
-                fprintf('Truncating t = [0,%d]\n', self.trunc);
-                trunc_steps = floor(self.trunc / self.dt_prf);
-                self.X = self.X(:,trunc_steps+1:self.Nt_prf);
-                self.Nt_prf = size(self.X, 2);
-                self.T = self.T - self.trunc;
+                % truncating dataset
+                if self.chunking
+                    fprintf('not going to truncate as the data is already chunked and on the disk\n')
+                else
+                    fprintf('Truncating t = [0,%d]\n', self.trunc);
+                    trunc_steps = floor(self.trunc / self.dt_prf);
+                    self.X = self.X(:,trunc_steps+1:self.Nt_prf);
+                    self.Nt_prf = size(self.X, 2);
+                    self.T = self.T - self.trunc;
+                end
 
-                fprintf('Saving time series to: \n %s \n', out_file);
-                pairs = {{'X', self.X}, ...
-                         {'Nt_prf', self.Nt_prf}, ...
-                         {'T', self.T}};
-                Utils.save_pairs(out_file, pairs);
-                fprintf('Created time series with %d samples.\n', self.Nt_prf);
+                if self.chunking
+                    fprintf('not going to save as the data is already chunked and on the disk\n')
+                else
+                    fprintf('Saving time series to: \n %s \n', out_file);
+                    pairs = {{'X', self.X}, ...
+                             {'Nt_prf', self.Nt_prf}, ...
+                             {'T', self.T}};
+                    Utils.save_pairs(out_file, pairs);
+                    fprintf('Created time series with %d samples.\n', self.Nt_prf);
+                end
             end
         end
 
