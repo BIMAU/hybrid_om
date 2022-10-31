@@ -11,7 +11,6 @@ exportdir = '~/Projects/doc/mlqg/figs/QG_spectra/';
 
 trunc = 20*365; % truncate initial spinup
 
-
 spec_opts = [];
 spec_opts.windowsize = 10;
 spec_opts.trunc = trunc;
@@ -86,7 +85,7 @@ function [f] = plot_spectra(qg, p, plot_data, names, colors, opts)
     for j = 1:numel(plot_data)
         opts.T = size(plot_data{j},2);
         [f{j}, Pm_ref, Pv_ref, g] = p.plot_qg_mean_spectrum(qg, plot_data{j}, ...
-                                                         opts, '.-', 'color', colors{j});
+                                                            opts, '.-', 'color', colors{j});
         hold on
         drawnow
     end

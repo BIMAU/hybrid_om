@@ -15,7 +15,6 @@ function [f, Pm, Pv, g] = plot_qg_mean_spectrum(self, qg, states, opts, varargin
         Pv = mean(states{2},2);
     end
     maxr = size(Pm,1);
-
     plot_range = 2:maxr-2;
     plot_range_var = 2:maxr-2;
 

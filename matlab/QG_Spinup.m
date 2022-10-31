@@ -3,8 +3,8 @@ function [dir] = QG_Spinup(varargin)
     Utils.add_paths();
 
     % Create perfect/fine QG model
-    Re_f = 1000;
-    nx_f = 128;
+    Re_f = 3000;
+    nx_f = 256;
     ny_f = nx_f;
 
     ampl = 2; % stirring amplitude
@@ -23,7 +23,7 @@ function [dir] = QG_Spinup(varargin)
     dgen = DataGen(qg_f);
 
     % set initial solution in datagen
-    x_init = 0.1*randn(qg_f.N,1);
+    x_init = 0.001*randn(qg_f.N,1);
     dgen.x_init_prf = x_init;
     dgen.chunking = true;
 
@@ -34,9 +34,14 @@ function [dir] = QG_Spinup(varargin)
     dt_prf = day / Tdim;
     dgen.dt_prf = dt_prf;
 
-    % run for a 100 years
-    dgen.T = round(100 * year / Tdim);
-    dgen.output_freq = round(year / Tdim / dt_prf); % yearly output
+    % run for a 250 years
+    dgen.T = round(250 * year / Tdim);
 
+    % start from another run (that is identifiable with a different
+    % end time) #HACK #FIXME
+    dgen.restart_T = round(100 * year / Tdim);
+
+    % output frequency
+    dgen.output_freq = round(year / Tdim / dt_prf); % yearly output
     dgen.generate_prf_transient();
 end
