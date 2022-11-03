@@ -7,11 +7,11 @@
 # #SBATCH --partition=short
 # #SBATCH --output=matlab.out
 
-#SBATCH --time=100:00:00
+#SBATCH --time=24:00:00
 
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=8
+#SBATCH --cpus-per-task=4
 #SBATCH --job-name=qg_spinup
 #SBATCH --mem=64G
 
