@@ -133,6 +133,10 @@ classdef DataGen < handle
                     chunk_first = chunk_list(id_first);
                     chunk_last = chunk_list(id_last);
 
+                    if self.restart_T == 0
+                        self.restart_T = self.T;
+                    end                        
+                    
                     base_name = [self.out_file_path, ...
                                  sprintf('transient_T=%d_dt=%1.3e_param=%1.1e.mat', ...
                                          self.restart_T, self.dt_prf, ...
