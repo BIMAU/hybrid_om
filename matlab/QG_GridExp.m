@@ -4,9 +4,9 @@ function [dir] = QG_GridExp(varargin)
 
     % Create two QG models with different grids and different Reynolds
     % numbers.
-    Re_f = 1000;
+    Re_f = 2000;
     Re_c = 500;
-    nx_f = 64;
+    nx_f = 256;
     ny_f = nx_f;
     nx_c = 32;
     ny_c = nx_c;
