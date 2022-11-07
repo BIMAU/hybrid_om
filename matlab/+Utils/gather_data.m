@@ -9,7 +9,7 @@ function [errs, nums, pids, ...
                'experiment directory does not exist');
 
         % number of procs = number of files in dir:
-        [~, fc] = system(['ls ', dir, ' -1 | grep mat | wc -l']);
+        [~, fc] = system(['ls ', dir, ' -1 | grep [^k].mat | wc -l']);
         procs = str2num(fc);
 
       case 2
