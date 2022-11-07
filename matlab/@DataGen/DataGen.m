@@ -135,13 +135,13 @@ classdef DataGen < handle
 
                     if self.restart_T == 0
                         self.restart_T = self.T;
-                    end                        
-                    
+                    end
+
                     base_name = [self.out_file_path, ...
                                  sprintf('transient_T=%d_dt=%1.3e_param=%1.1e.mat', ...
                                          self.restart_T, self.dt_prf, ...
                                          self.model_prf.control_param())];
-                    
+
                     chunk_file = [base_name(1:end-4), ...
                                   sprintf('.chunk_%d-%d.mat', ...
                                           chunk_first, chunk_last)];
@@ -325,12 +325,15 @@ classdef DataGen < handle
         end
 
         function build_grid_transfers(self, boundary)
-        % Grid transfers between fine and coarse grids. The coarse grid is
-        % half the fine grid in all directions. We assume a square
-        % grid: nx = ny = nz.
-        %
+        % Grid transfers between fine and coarse grids. The fine grid
+        % size is a power of two times the coarse grid size in both
+        % directions. Restrictions are compositions of restrictions
+        % for grid halvings/doublings.
+
+        % We assume a square grid: nx = ny
+
         % Computes grid transfers between a grid of size nx_prf
-        % and another of size nx_prf / 2 = nx_imp
+        % and another of size nx_prf / 2^k = nx_imp
         %
         % Operators are repeated for every unknown in the grid
         %
@@ -341,14 +344,27 @@ classdef DataGen < handle
 
             nx_prf = self.model_prf.nx;
             nx_imp = self.model_imp.nx;
-            nun = self.model_imp.nun;
 
+            % sanity checks
+            nun = self.model_imp.nun;
             assert(nun == self.model_prf.nun, 'nun does not correspond between models');
             assert(mod(nx_prf,2) == 0);
 
-            Nc = nx_prf / 2;
-            assert(Nc == nx_imp, 'imperfect model grid size is incorrect');
+            % Range of grid halvings/doublings.
+            Nf_range = 2.^(log2(nx_prf):-1:log2(nx_imp)+1)
+            R = 1;
+            P = 1;
+            for Nf = Nf_range
+                Nc = Nf / 2
+                [Rtmp, Ptmp] = self.create_R_and_P(boundary, Nf, Nc);
+                R = Rtmp * R; % left multiply restriction operator
+                P = P * Ptmp; % right multiply prolongation operator
+            end
+            self.R = R;
+            self.P = P;
+        end
 
+        function [R,P] = create_R_and_P(self, boundary, Nf, Nc)
             ico = [];
             jco = [];
             co  = [];
@@ -362,18 +378,19 @@ classdef DataGen < handle
                 % fix periodicity
                 jco(end) = 1;
             end
-            self.R = sparse(ico, jco, co, Nc, nx_prf);
+            self.R = sparse(ico, jco, co, Nc, Nf);
             self.P = 2*self.R';
 
             if strcmp(self.dimension, '2D')
-                self.R = kron(self.R,self.R);
+                self.R = kron(self.R, self.R);
                 self.P = 4*self.R';
             end
 
             % repeat operator for every unknown in the grid
+            nun = self.model_prf.nun
             I = speye(nun);
-            self.R = kron(self.R, I);
-            self.P = kron(self.P, I);
+            R = kron(self.R, I);
+            P = kron(self.P, I);
         end
     end
 end
