@@ -45,6 +45,9 @@ classdef DataGen < handle
 
         data_dir = '/data/p267904/Projects/hybrid_om/data';
 
+        % do the restriction here in generate_imp_predictions()
+        do_restrict = true;
+
         % overwrite the data in out_file if true
         overwrite = false;
 
@@ -263,16 +266,26 @@ classdef DataGen < handle
         end
 
         function generate_imp_predictions(self)
-        % When the size of the perfect and imperfect models differ, check that
-        % there is a suitable restriction from the perfect to the
-        % imperfect model grid.
+        % Generate predictions with the imperfect model.
+            
+            if self.N_imp == size(self.X,1)
+                fprintf('data seems to be on the imperfect grid\n')
+                fprintf(' not restricting\n')
+                self.do_restrict = false
+            end
 
+            % When the size of the perfect and imperfect models differ, check that
+            % there is a suitable restriction from the perfect to the
+            % imperfect model grid.
             if self.N_prf ~= self.N_imp
                 assert(~isempty(self.R), 'specify restriction operator R');
                 assert(self.N_imp == size(self.R,1), 'incorrect row dimension in R');
                 assert(self.N_prf == size(self.R,2), 'incorrect column dimension in R');
                 fprintf('Grid transfer operators are available.\n')
-                self.X = self.R*self.X; % restrict the transient to the coarse grid
+
+                if self.do_restrict
+                    self.X = self.R*self.X; % restrict the transient to the coarse grid
+                end
             end
 
             self.stride = round(self.dt_imp / self.dt_prf);
@@ -313,7 +326,6 @@ classdef DataGen < handle
                         fprintf(' step %4d/%4d, Newton iterations: %d\n',...
                                 i, self.Nt_imp, k);
                     end
-
                 end
 
                 fprintf('Generate imperfect predictions... done (%f)\n', toc(time));
