@@ -37,7 +37,7 @@ function [dir] = QG_GridExp(varargin)
     dgen.build_grid_transfers('periodic');
 
     % load appropriate initial solution for QG
-    init_sol = load('~/Projects/hybrid_om/data/QGmodel/starting_solutions/equilibrium_nx64_Re1e3_ampl2_stir0_rot1.mat');
+    init_sol = load('~/Projects/hybrid_om/data/QGmodel/starting_solutions/equilibrium_nx256_Re2e3_ampl2_stir0_rot1.mat');
 
     % check that what we got is ok
     assert(init_sol.Re == Re_f);
@@ -48,7 +48,7 @@ function [dir] = QG_GridExp(varargin)
 
     % set initial solution in datagen
     dgen.x_init_prf = init_sol.x_init;
-
+    
     % set the time step to one day
     Tdim = Ldim / Udim; % in seconds
     day  = 24*3600; % in seconds
@@ -56,9 +56,10 @@ function [dir] = QG_GridExp(varargin)
     dt_prf = day / Tdim;
     dgen.dt_prf = dt_prf;
 
-    % compute 100 years, which should roughly give 36500 snapshots
+    % compute 100 years, which should give 36500 snapshots
     dgen.T = round(100 * year / Tdim);
-    dgen.verbosity = 10;
+    dgen.output_freq = 10;    
+    
     dgen.generate_prf_transient();
 
     % generate imperfect model predictions
