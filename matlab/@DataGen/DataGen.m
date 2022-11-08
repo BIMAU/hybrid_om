@@ -351,11 +351,11 @@ classdef DataGen < handle
             assert(mod(nx_prf,2) == 0);
 
             % Range of grid halvings/doublings.
-            Nf_range = 2.^(log2(nx_prf):-1:log2(nx_imp)+1)
+            Nf_range = 2.^(log2(nx_prf):-1:log2(nx_imp)+1);
             R = 1;
             P = 1;
             for Nf = Nf_range
-                Nc = Nf / 2
+                Nc = Nf / 2;
                 [Rtmp, Ptmp] = self.create_R_and_P(boundary, Nf, Nc);
                 R = Rtmp * R; % left multiply restriction operator
                 P = P * Ptmp; % right multiply prolongation operator
@@ -387,7 +387,7 @@ classdef DataGen < handle
             end
 
             % repeat operator for every unknown in the grid
-            nun = self.model_prf.nun
+            nun = self.model_prf.nun;
             I = speye(nun);
             R = kron(self.R, I);
             P = kron(self.P, I);

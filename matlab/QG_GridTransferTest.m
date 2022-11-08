@@ -8,7 +8,7 @@ Re_f = 2000;
 Re_c = 500;
 nx_f = 256;
 ny_f = nx_f;
-nx_c = 128;
+nx_c = 32;
 ny_c = nx_c;
 
 ampl = 2; % stirring amplitude
@@ -46,8 +46,8 @@ R = dgen.R;
 P = dgen.P;
 
 % load chunk
-first_day = 20076;
-last_day  = 20440;
+first_day = 90521;
+last_day  = 90885;
 total_T = 250;
 
 chunk = Utils.load_chunk(qg_f, dgen, first_day, last_day, total_T);
