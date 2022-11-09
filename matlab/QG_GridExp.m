@@ -37,7 +37,7 @@ function [dir] = QG_GridExp(varargin)
     dgen.build_grid_transfers('periodic');
 
     % load appropriate initial solution for QG
-    init_sol = load('../data/QGmodel/starting_solutions/equilibrium_nx256_Re2e3_ampl2_stir0_rot1.mat');
+    init_sol = load('~/Projects/hybrid_om/data/QGmodel/starting_solutions/equilibrium_nx256_Re2e3_ampl2_stir0_rot1.mat');
 
     % check that what we got is ok
     assert(init_sol.Re == Re_f);

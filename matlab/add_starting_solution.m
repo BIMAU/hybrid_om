@@ -16,4 +16,4 @@ plot(max(data.X))
 
 input('save final state?')
 
-save('../data/QGmodel/starting_solutions/equilibrium_nx256_Re2e3_ampl2_stir0_rot1.mat', 'x_init', 'Re', 'ampl', 'stir', 'nx', 'ny', 'dt', 'step')
+save('~/Projects/hybrid_om/data/QGmodel/starting_solutions/equilibrium_nx256_Re2e3_ampl2_stir0_rot1.mat', 'x_init', 'Re', 'ampl', 'stir', 'nx', 'ny', 'dt', 'step')
