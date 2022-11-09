@@ -57,4 +57,4 @@ title('');
 
 fs = 12;
 dims = [20,14];
-exportfig([exportdir, 'results_romexp.eps'], fs, dims, invert)
+Utils.exportfig([exportdir, 'results_romexp.eps'], fs, dims, invert)

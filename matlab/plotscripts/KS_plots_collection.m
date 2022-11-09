@@ -41,15 +41,15 @@ for k = 1:numel(exp_dirs)
                      'correction only', 'ESN+DMDc', 'location', 'northeastoutside', ...
                      'interpreter', 'latex', 'orientation','vertical');
         lgd.NumColumns = 1;
-        exportfig([output_dir, '/fig.eps'], 16, [22,14])
+        Utils.exportfig([output_dir, '/fig.eps'], 16, [22,14])
     elseif k == 4
         % create legend plot
         lgd = legend([f{:}], 'imperfect model', 'ESN', 'ESNc', 'DMDc', ...
                      'correction only', 'ESN+DMDc', 'location', 'northwest', ...
                      'interpreter', 'latex', 'orientation','vertical');
         lgd.NumColumns = 1;
-        exportfig([output_dir, '/fig.eps'], 16, [18,14])
+        Utils.exportfig([output_dir, '/fig.eps'], 16, [18,14])
     else
-        exportfig([output_dir, '/fig.eps'], 16, [18,14])
+        Utils.exportfig([output_dir, '/fig.eps'], 16, [18,14])
     end
 end

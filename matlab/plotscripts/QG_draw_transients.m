@@ -138,7 +138,7 @@ for idx = [3]
     
     xlabel('PDF', 'interpreter','latex')
 
-    exportfig([exportdir, 'spinup_', quantity{idx}, '.eps'], fs, dims, invert);
+    Utils.exportfig([exportdir, 'spinup_', quantity{idx}, '.eps'], fs, dims, invert);
 
 end
 %------------------------------------------------------------------
@@ -192,7 +192,7 @@ for idx = [3,4,2]
 
     ylabel(ylbls{idx}, 'interpreter', 'latex');
     set(gca,'xtick', [])
-    exportfig([exportdir, 'pdf_', quantity{idx}, '.eps'], fs, dims, invert);
+    Utils.exportfig([exportdir, 'pdf_', quantity{idx}, '.eps'], fs, dims, invert);
 end
 
 %-----------------------------------------------------------------------------
@@ -235,6 +235,6 @@ for idx = [3,4,2]
 
     ylabel(ylbls{idx}, 'interpreter', 'latex');
     set(gca,'xtick', [])
-    exportfig([exportdir, 'pdf_rom_', quantity{idx}, '.eps'], fs, dims, invert);
+    Utils.exportfig([exportdir, 'pdf_rom_', quantity{idx}, '.eps'], fs, dims, invert);
 
 end

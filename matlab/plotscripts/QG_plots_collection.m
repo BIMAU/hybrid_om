@@ -75,7 +75,7 @@ if 0
             axis off
             title(titles{j},'interpreter','latex')
         end
-        exportfig(fnames{j}, fs, dims, invert)
+        Utils.exportfig(fnames{j}, fs, dims, invert)
     end
 
 end
@@ -121,7 +121,7 @@ if 0
     ylim([1e-4,1e3])
     grid on
 
-    exportfig([exportdir, 'motivating_powerspec.eps'], fs, dims, invert)
+    Utils.exportfig([exportdir, 'motivating_powerspec.eps'], fs, dims, invert)
 
     %-------------------------------------------------------------------------
     clf
@@ -178,9 +178,9 @@ if 0
         title('average (equilibrium) energy spectrum','interpreter','latex');
     end
     if rom_plots
-        exportfig([exportdir, 'results_powerspec_rom.eps'], fs, dims, invert)
+        Utils.exportfig([exportdir, 'results_powerspec_rom.eps'], fs, dims, invert)
     else
-        exportfig([exportdir, 'results_powerspec.eps'], fs, dims, invert)
+        Utils.exportfig([exportdir, 'results_powerspec.eps'], fs, dims, invert)
     end
 end
 
@@ -327,7 +327,7 @@ if 1
     if invert
         invertcolors()
     end
-    exportfig([exportdir, 'motivating_transientplot.eps'], fs, dims, invert, ylm)
+    Utils.exportfig([exportdir, 'motivating_transientplot.eps'], fs, dims, invert, ylm)
 
     %------------------------------------------------------------------
     subplot(2,2,1)
@@ -455,14 +455,14 @@ if 1
     end
 
     if rom_plots
-        exportfig([exportdir, 'results_transientplot_rom.eps'], fs, dims, invert)
+        Utils.exportfig([exportdir, 'results_transientplot_rom.eps'], fs, dims, invert)
     else
-        exportfig([exportdir, 'results_transientplot_all.eps'], fs, dims, invert)
+        Utils.exportfig([exportdir, 'results_transientplot_all.eps'], fs, dims, invert)
         set(p3_2{4},'visible','off')
         set(p3_2{5},'visible','off')
         set(p3_4{4},'visible','off')
         set(p3_4{5},'visible','off')
-        exportfig([exportdir, 'results_transientplot1.eps'], fs, dims, invert)
+        Utils.exportfig([exportdir, 'results_transientplot1.eps'], fs, dims, invert)
 
         set(p3_2{1},'visible','off')
         set(p3_2{2},'visible','off')
@@ -475,7 +475,7 @@ if 1
         set(p3_2{5},'visible','on')
         set(p3_4{4},'visible','on')
         set(p3_4{5},'visible','on')
-        exportfig([exportdir, 'results_transientplot2.eps'], fs, dims, invert)
+        Utils.exportfig([exportdir, 'results_transientplot2.eps'], fs, dims, invert)
     end
 end
 
@@ -504,7 +504,7 @@ if 0
         dims = [18,14];
     end
     title('');
-    exportfig([exportdir, 'results_gridexp.eps'], fs, dims, invert)
+    Utils.exportfig([exportdir, 'results_gridexp.eps'], fs, dims, invert)
 end
 
 if 0
@@ -522,5 +522,5 @@ if 0
     ylabel('accurate days', 'interpreter', 'latex')
     xlabel('ESN state size $N_r$', 'interpreter', 'latex')
     title('');
-    exportfig([exportdir, 'results_romexp.eps'], fs, dims, invert)
+    Utils.exportfig([exportdir, 'results_romexp.eps'], fs, dims, invert)
 end

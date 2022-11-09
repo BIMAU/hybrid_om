@@ -55,5 +55,5 @@ for j = 1:numel(fields)
     caxis(crange)
     set(gca,'xtick',[])
     set(gca,'ytick',[])
-    exportfig(fnames{j}, fs, dims, invert)
+    Utils.exportfig(fnames{j}, fs, dims, invert)
 end
