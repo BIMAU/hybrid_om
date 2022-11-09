@@ -7,7 +7,7 @@ exp_dirs = {'Pathak2018repl/NR_50-6400_MC_1-8_parallel_param_1.00e+00/', ...
             'Pathak2018repl/NR_50-6400_MC_1-8_parallel_param_1.00e-02/' ...
             'KS_GridExp/NR_50-6400_MC_1-8_parallel_param_0.00e+00'};
 
-base_dir = '~/Projects/hybrid_om/data/experiments/';
+base_dir = '../../data/experiments/';
 set(groot,'defaultAxesTickLabelInterpreter','latex');
 nums=[];
 for k = 1:numel(exp_dirs)
