@@ -16,7 +16,7 @@ exportdir = '~/Projects/doc/mlqg/figs/QG_snapshots/';
 fs = 10;
 dims = [11, 10];
 
-map = my_colmap(); % colormap
+map = Utils.my_colmap(); % colormap
 crange = [-0.3,0.3];
 
 % snapshots at 200 years since initial spinup

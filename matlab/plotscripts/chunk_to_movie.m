@@ -85,7 +85,7 @@ for i = frames
     tstr = sprintf('Vorticity (day$^{-1}$),   day %2d', first_day + i - 1);
     title(tstr,'interpreter','latex');
     caxis(crange)
-    map = my_colmap();
+    map = Utils.my_colmap();
     colormap(map);
     colorbar
     % invertcolors()
@@ -102,7 +102,7 @@ for i = frames
     tstr = sprintf('Restricted vorticity (day$^{-1}$),   day %2d', first_day + i - 1);
     title(tstr,'interpreter','latex');
     caxis(crange)
-    map = my_colmap();
+    map = Utils.my_colmap();
     colormap(map);
     colorbar
     % invertcolors()

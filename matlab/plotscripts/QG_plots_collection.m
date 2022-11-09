@@ -38,7 +38,7 @@ else
     dims = [14,12];
 end
 
-map = my_colmap(); % colormap
+map = Utils.my_colmap(); % colormap
 crange = [-0.3,0.3];
 
 if 0
