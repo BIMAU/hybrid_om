@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [ "$#" -ne 2 ]; then
-    echo "Usage: ./compile_and_submit.sh <matlab_file> <build_dir>"
+if [ "$#" -ne 3 ]; then
+    echo "Usage: ./compile_and_submit.sh <matlab_file> <build_dir> <numproc>"
     exit
 fi
 
@@ -48,7 +48,7 @@ if ! [[ -s $2/$output_exec ]] || [ $recompile -eq 1 ]
 then
     mkdir -p $2
     mcc -R -singleCompThread -v -C -m $src_name -d $2 -a ../matlab \
-        -a ~/local/matlab -a ~/Projects/ESN/matlab/ESN.m \
+        -a ~/local/matlab -a ../../ESN/matlab/ESN.m \
         -o $output_exec
     sleep 1
 else
@@ -77,8 +77,12 @@ fi
 
 if [ $on_cluster -eq 1 ]
 then
-    sbatch submit_mpi_experiment.sh $output_exec
+    for (( i=0; i<$3; i++ ))
+    do
+        echo "Submitting job $i of $3";
+        sbatch submit_mpi_experiment.sh $output_exec $i $3;
+    done
     sleep 1
 else
-    mpirun --oversubscribe -np 4 ./interface $output_exec
+    mpirun --oversubscribe -np $3 ./interface $output_exec
 fi
