@@ -52,7 +52,7 @@ f = plot_spectra(qg_c, p, plot_data(1:4), names(1:4), colors(1:4), spec_opts);
 
 fs = 10;
 dims = [12,8];
-exportfig([exportdir, 'results_powerspec.eps'], fs, dims, invert)
+Utils.exportfig([exportdir, 'results_powerspec.eps'], fs, dims, invert)
 
 return
 %-----------------------------------------------------------------------------
@@ -77,7 +77,7 @@ colors = {cols(1,:), ...
           cols(4,:), ...
           cols(7,:)};
 f = plot_spectra(qg_c, p, plot_data, names, colors, spec_opts);
-exportfig([exportdir, 'results_powerspec_rom.eps'], fs, dims, invert)
+Utils.exportfig([exportdir, 'results_powerspec_rom.eps'], fs, dims, invert)
 %-----------------------------------------------------------------------------
 
 function [f] = plot_spectra(qg, p, plot_data, names, colors, opts)

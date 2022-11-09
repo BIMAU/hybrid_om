@@ -1,18 +1,18 @@
 addpath('../')
 
-dir = '~/Projects/hybrid_om/data/experiments/Pathak2018repl/MC_1-8_NR_200-6400_parallel_param_1.00e+00/';
-dir = '~/Projects/hybrid_om/data/experiments/Pathak2018repl/MC_1-8_NR_200-6400_parallel_param_1.00e-01/';
-dir = '~/Projects/hybrid_om/data/experiments/Pathak2018repl/MC_1-8_NR_200-6400_parallel_param_1.00e-02/';
+dir = '../../data/experiments/Pathak2018repl/MC_1-8_NR_200-6400_parallel_param_1.00e+00/';
+dir = '../../data/experiments/Pathak2018repl/MC_1-8_NR_200-6400_parallel_param_1.00e-01/';
+dir = '../../data/experiments/Pathak2018repl/MC_1-8_NR_200-6400_parallel_param_1.00e-02/';
 
-dir = '~/Projects/hybrid_om/data/experiments/Pathak2018repl/MC_1-8_NR_200-6400_parallel_param_1.00e-02/';
+dir = '../../data/experiments/Pathak2018repl/MC_1-8_NR_200-6400_parallel_param_1.00e-02/';
 
-dir = '~/Projects/hybrid_om/data/experiments/Pathak2018repl/NR_200-6400_LB_0.1-1e-06_parallel_param_1.00e-02/';
+dir = '../../data/experiments/Pathak2018repl/NR_200-6400_LB_0.1-1e-06_parallel_param_1.00e-02/';
 
-dir = '~/Projects/hybrid_om/data/experiments/Pathak2018repl/NR_200-6400_LB_1e-06-1e-08_parallel_param_1.00e-02/';
+dir = '../../data/experiments/Pathak2018repl/NR_200-6400_LB_1e-06-1e-08_parallel_param_1.00e-02/';
 
-dir = '~/Projects/hybrid_om/data/experiments/Pathak2018repl/NR_200-6400_RS_2-3_parallel_param_1.00e-02/';
+dir = '../../data/experiments/Pathak2018repl/NR_200-6400_RS_2-3_parallel_param_1.00e-02/';
 
-dir = '~/Projects/hybrid_om/data/experiments/Pathak2018repl/NR_200-6400_FC_0.1-0.001_parallel_param_1.00e-02/';
+dir = '../../data/experiments/Pathak2018repl/NR_200-6400_FC_0.1-0.001_parallel_param_1.00e-02/';
 
 exp_dir = 'Pathak2018repl/NR_200-6400_RS_2-3_parallel_param_1.00e-02/';
 
@@ -173,7 +173,7 @@ exp_dir = 'QG_GridExp/NR_200-12800_SC_1-5_parallel_param_5.00e+02/';
 exp_dir = 'QG_reductionfactors_6400/SC_2-5_RF_0.25-0.015625_parallel_param_5.00e+02/';
 
 exp_dir = 'QG_NR_ScaleSep_T10000/NR_200-12800_SC_1-5_parallel_param_5.00e+02/';
-base_dir = '~/Projects/hybrid_om/data/experiments/';
+base_dir = '../../data/experiments/';
 
 dir = [base_dir, exp_dir, '/'];
 p = Plot(dir);

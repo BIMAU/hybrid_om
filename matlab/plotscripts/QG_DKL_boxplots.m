@@ -117,7 +117,7 @@ for qnt_idx = 1:numel(quantity)
         fs = 10;
         dims = [20, 8];
         invert = false;
-        exportfig([exportdir, 'dkl_Nr_', quantity{qnt_idx}, '.eps'], fs, dims, invert);
+        Utils.exportfig([exportdir, 'dkl_Nr_', quantity{qnt_idx}, '.eps'], fs, dims, invert);
     end
 
     %-------------------------------------------------------------------
@@ -167,7 +167,7 @@ for qnt_idx = 1:numel(quantity)
         fs = 10;
         dims = [20, 8];
         invert = false;
-        exportfig([exportdir, 'dkl_lamtest_', quantity{qnt_idx}, '.eps'], fs, dims, invert);
+        Utils.exportfig([exportdir, 'dkl_lamtest_', quantity{qnt_idx}, '.eps'], fs, dims, invert);
     end
 
     % ------------------------------------------------------------------
@@ -223,6 +223,6 @@ for qnt_idx = 1:numel(quantity)
         fs = 10;
         dims = [20, 8];
         invert = false;
-        exportfig([exportdir, 'dkl_Nr_ROM_', quantity{qnt_idx}, '.eps'], fs, dims, invert);
+        Utils.exportfig([exportdir, 'dkl_Nr_ROM_', quantity{qnt_idx}, '.eps'], fs, dims, invert);
     end
 end

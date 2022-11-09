@@ -1,6 +1,6 @@
 addpath('../')
 
-base_dir = '~/Projects/hybrid_om/data/experiments/';
+base_dir = '../../data/experiments/';
 exportdir = '~/Projects/doc/mlqg/figs/QG_scaling/';
 invert = false;
 set(groot,'defaultAxesTickLabelInterpreter','latex');
@@ -38,7 +38,7 @@ fs = 12;
 dims = [18,14];
 
 title('');
-exportfig([exportdir, 'results_gridexp.eps'], fs, dims, invert)
+Utils.exportfig([exportdir, 'results_gridexp.eps'], fs, dims, invert)
 
 %-----------------------------------------------------------------------------
 % figure(2)
@@ -57,4 +57,4 @@ exportfig([exportdir, 'results_gridexp.eps'], fs, dims, invert)
 % ylabel('accurate days', 'interpreter', 'latex')
 % xlabel('$N_r$', 'interpreter', 'latex')
 % title('');
-% exportfig([exportdir, 'results_romexp.eps'], fs, dims, invert)
+% Utils.exportfig([exportdir, 'results_romexp.eps'], fs, dims, invert)

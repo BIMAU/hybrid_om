@@ -46,7 +46,7 @@ dgen.build_grid_transfers('periodic');
 opts.R = dgen.R;
 
 % load appropriate initial solution for QG
-init_sol = load('~/Projects/hybrid_om/data/QGmodel/starting_solutions/equilibrium_nx64_Re1e3_ampl2_stir0_rot1.mat');
+init_sol = load('../../data/QGmodel/starting_solutions/equilibrium_nx64_Re1e3_ampl2_stir0_rot1.mat');
 
 % check that what we got is ok
 assert(init_sol.Re == Re_f);
@@ -73,7 +73,7 @@ dgen.generate_prf_transient();
 
 %% ------------------------------------------------------------------
 % load reference solution
-base_dir = '~/Projects/hybrid_om/data/experiments/';
+base_dir = '../../data/experiments/';
 exp_dir = 'QG_reference_transient/MC_1-1_serial_param_1.00e+03/';
 ref_dir = [base_dir, exp_dir, '/'];
 training_samples = 10000;

@@ -63,7 +63,7 @@ dgen.build_grid_transfers('periodic');
 % store the grid transfers in the options
 R = dgen.R;
 
-map = my_colmap();
+map = Utils.my_colmap();
 
 T = size(preds{1,1},1);
 
