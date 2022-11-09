@@ -4,9 +4,9 @@ function [dir] = QG_transient(varargin)
 
     % Create two QG models with different grids and different Reynolds
     % numbers.
-    Re_f = 1000;
+    Re_f = 2000;
     Re_c = 500;
-    nx_f = 64;
+    nx_f = 256;
     ny_f = nx_f;
     nx_c = 32;
     ny_c = nx_c;
@@ -37,7 +37,7 @@ function [dir] = QG_transient(varargin)
     dgen.build_grid_transfers('periodic');
 
     % load appropriate initial solution for QG
-    init_sol = load('~/Projects/hybrid_om/data/QGmodel/starting_solutions/equilibrium_nx64_Re1e3_ampl2_stir0_rot1.mat');
+    init_sol = load('~/Projects/hybrid_om/data/QGmodel/starting_solutions/equilibrium_nx256_Re2e3_ampl2_stir0_rot1.mat');
 
     % check that what we got is ok
     assert(init_sol.Re == Re_f);

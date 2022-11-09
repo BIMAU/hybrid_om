@@ -38,11 +38,25 @@ dgen.build_grid_transfers('periodic');
 R = dgen.R;
 P = dgen.P;
 
-% We take year 100 to 200 in a 250 year spinup.
+total_T = 250;
+% Take year 200 to 250 in a 250 year spinup.
+first_day = 73001;
+last_day  = 91250;
+T = 100;
+
+% Take year 100 to 200 in a 250 year spinup.
 first_day = 36501;
 last_day  = 73000;
 T = 100;
-total_T = 250;
+
+% Take year 0 to 100 in a 250 year spinup.
+first_day = 1;
+last_day  = 36500;
+T = 100;
+
+first_day = 73001;
+last_day  = 91250;
+T = 50;
 
 % assuming yearly chunks
 chunk_list = first_day:365:last_day;
@@ -59,7 +73,7 @@ out_file_path = sprintf([dgen.data_dir, '/%s/%d_%d/'], ...
                         dgen.N_prf, dgen.N_imp);
 
 out_file = [out_file_path, ...
-            sprintf('transient_T=%d_dt=%1.3e_param=%1.1e.mat', ...
+            sprintf('remainder_T=%d_dt=%1.3e_param=%1.1e.mat', ...
                     T, dgen.dt_prf, ...
                     dgen.model_prf.control_param())];
 
