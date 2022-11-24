@@ -47,7 +47,7 @@ function [errs, nums, pids, ...
         end
 
         tic
-        fprintf('loading %s\n', fileNames{d});
+        fprintf('loading %s / %d\n', fileNames{d}, procs);
         data = load(fileNames{d});
         time = toc;
         fprintf('loading %s done (%fs) \n', fileNames{d}, time);

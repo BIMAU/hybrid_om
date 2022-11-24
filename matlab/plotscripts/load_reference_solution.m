@@ -80,4 +80,6 @@ training_samples = 10000;
 X = opts.R*dgen.X(:,1:training_samples);
 
 stats_0 = Utils.get_qg_statistics(qg_c, X, opts);
+
 [~, ~, ref_preds, ~, ref_stats] = Utils.get_qg_transient_data(ref_dir, opts);
+

@@ -20,7 +20,7 @@ function [Pm, Pv] = get_qg_mean_spectrum(qg, states, opts)
     end
     Pm = mean(P,2);
     if Np > 1
-        Pv = var(P,2);
+        Pv = var(P,0,2);
     else
         Pv = zeros(maxr,Np);
     end
