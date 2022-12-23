@@ -64,7 +64,7 @@ for qnt_idx = 1:numel(quantity)
     p.style = {'.', '.-', '-'};
     p.msize = {14, 14};
 
-    do_dklcomp=true
+    do_dklcomp=false
     if do_dklcomp
         figure(qnt_idx)
         clf
@@ -115,7 +115,7 @@ for qnt_idx = 1:numel(quantity)
         else
             set(gca, 'xticklabels', {'200','400','800','1600','3200','6400','12800'});
         end
-        
+
         xlabel('$N_r$','interpreter','latex');
         set(gca, 'yticklabels', {});
         xtickangle(45);
@@ -147,17 +147,24 @@ for qnt_idx = 1:numel(quantity)
         z = linspace(0.05,2.7,20);
         a = z(2)-z(1);
         b = z(1)-a;
-        xlabs = 0.1:0.3:2.8;
+        xlabs = 0.1:0.4:5.6;
         xt = (xlabs-b)/a;
 
         figure(qnt_idx);
         clf
-        fESN  = p.my_boxplot(DKL{5}(:,ESN_range),   {cols(3,:), cols(3,:)}); hold on
-        fESNc = p.my_boxplot(DKL{5}(:,ESNc_range),  {cols(4,:), cols(4,:)}); hold on
-        fDMDc = p.my_boxplot(DKL{5}(:,DMDc_range),  {cols(5,:), cols(5,:)}); hold on
-        [fcorr, hcorr] = p.my_boxplot(DKL{5}(:,corr_range),  {cols(6,:), cols(6,:)}); hold on
-        [fESNDMDc, hESNDMDc] = p.my_boxplot(DKL{5}(:,ESNDMDc_range),  {cols(7,:), cols(7,:)}); hold on
 
+        fESN  = p.my_boxplot([DKL{5}(:,ESN_range),DKL{6}(:,ESN_range(2:end))], ...
+                             {cols(3,:), cols(3,:)}); hold on
+        fESNc = p.my_boxplot([DKL{5}(:,ESNc_range),DKL{6}(:,ESNc_range(2:end))],...
+                             {cols(4,:), cols(4,:)}); hold on
+        fDMDc = p.my_boxplot([DKL{5}(:,DMDc_range),DKL{6}(:,DMDc_range(2:end))],...
+                             {cols(5,:), cols(5,:)}); hold on
+        [fcorr, hcorr] = p.my_boxplot([DKL{5}(:,corr_range), DKL{6}(:,corr_range(2:end))], ...
+                                      {cols(6,:), cols(6,:)}); hold on
+        [fESNDMDc, hESNDMDc] = p.my_boxplot([DKL{5}(:,ESNDMDc_range(2:end)), DKL{6}(:,ESNDMDc_range(2:end))], ...
+                                            {cols(7,:), cols(7,:)}); hold on
+        hold on
+        
         uistack(hcorr,'top')
         uistack(hESNDMDc,'bottom')
 
