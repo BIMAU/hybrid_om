@@ -1,4 +1,5 @@
 addpath('../')
+addpath('~/local/matlab')
 
 if ~exist('ref_stats', 'var')
     load_qg_reference
@@ -54,6 +55,7 @@ for qnt_idx = 1:numel(quantity)
             end
         end
     end
+
     cols = [0,0,0; min(1.0*lines(20),1)];
     p = Plot();
     p.plot_mean = false;
@@ -91,9 +93,14 @@ for qnt_idx = 1:numel(quantity)
 
         sp2 = subplot(1,2,2);
 
-        ESN_range = 1:7;
-        ESNc_range = 8:14;
-        ESNDMDc_range = 15:21;
+        n_combs = size(DKL{4}, 2)
+
+        ESN_range = 1:n_combs/3;
+        ESNc_range = n_combs/3 + 1:2*n_combs/3;
+        ESNDMDc_range = 2*n_combs/3+1:n_combs;
+
+        % sanity check
+        assert(ESNDMDc_range(end) == n_combs)
 
         fESNDMDc = p.my_boxplot(DKL{4}(:,ESNDMDc_range),  {cols(7,:), cols(7,:)}); hold on
         fESN     = p.my_boxplot(DKL{4}(:,ESN_range), {cols(3,:), cols(3,:)}); hold on
@@ -103,13 +110,19 @@ for qnt_idx = 1:numel(quantity)
 
         set(gca, 'yscale','log')
         ylim([3*10^(-2),10^2])
-        set(gca, 'xticklabels', {'200','400','800','1600','3200','6400','12800'});
+        if n_combs / 3 == 8
+            set(gca, 'xticklabels', {'100', '200','400','800','1600','3200','6400','12800'});
+        else
+            set(gca, 'xticklabels', {'200','400','800','1600','3200','6400','12800'});
+        end
+        
         xlabel('$N_r$','interpreter','latex');
         set(gca, 'yticklabels', {});
         xtickangle(45);
         grid on
 
-        legend([fESN, fESNc, fESNDMDc], 'ESN', 'ESNc', 'ESN+DMDc', 'interpreter','latex','location','southwest')
+        legend([fESN, fESNc, fESNDMDc], 'ESN', 'ESNc', 'ESN+DMDc', ...
+               'interpreter','latex','location','southwest')
 
         set(sp1,'Position', [0.13 0.195 0.13 0.78])
         set(sp2,'Position', [0.31 0.195 0.57 0.78])
@@ -121,7 +134,7 @@ for qnt_idx = 1:numel(quantity)
     end
 
     %-------------------------------------------------------------------
-    do_lamtest=false;
+    do_lamtest=true;
     if do_lamtest
 
         ESN_range=1:20;
@@ -147,7 +160,7 @@ for qnt_idx = 1:numel(quantity)
 
         uistack(hcorr,'top')
         uistack(hESNDMDc,'bottom')
-        
+
         legend([fESN, fESNc, fDMDc, fcorr, fESNDMDc], 'ESN', ...
                'ESNc', 'DMDc', 'correction only', 'ESN+DMDc', ...
                'interpreter','latex','location','northeastoutside')
