@@ -46,12 +46,12 @@ for idx = [3]
 
     % -----------------------------------------------------------------------------
     % Reference spinup
-
+    
     T1 = size(X_spinup, 2);
     T2 = T1 + size(X,2);
     trange_spin = (start_idx(idx):T1) / 365;
-    trange_ref1 = (T1 + (start_idx(idx):size(X,2)))/365;
-    trange_ref2 = (T2 + (start_idx(idx):size(ref_preds{1,1},1)))/365;
+    trange_ref1 = (T1 + (start_idx(idx):size(X,2))) / 365;
+    trange_ref2 = (T2 + (start_idx(idx):size(ref_preds{1,1}, 1))) / 365;
 
     trange_full = [trange_spin, trange_ref1, trange_ref2];
     tserie_full = [spinup_stats.(quantity{idx})', ...

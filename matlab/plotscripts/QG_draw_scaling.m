@@ -1,6 +1,7 @@
 addpath('../')
 
-base_dir = '../../data/experiments/';
+% base_dir = '../../data/experiments/';
+base_dir = '/data/p267904/Projects/hybrid_om/data/experiments/';
 exportdir = '~/Projects/doc/mlqg/figs/QG_scaling/';
 invert = false;
 set(groot,'defaultAxesTickLabelInterpreter','latex');

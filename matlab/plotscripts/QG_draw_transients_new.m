@@ -4,6 +4,11 @@ set(groot,'defaultAxesTickLabelInterpreter','latex');
 figure(1)
 clf
 invert = false;
+
+if ~exist('stats_dkl', 'var')
+    load_qg_transient_data
+end
+
 base_dir = '/data/p267904/Projects/hybrid_om/data/QGmodel/131072_2048';
 
 f_spinup    = [base_dir, '/spinup_T=100_dt=2.740e-03_param=2.0e+03.mat'];
@@ -33,6 +38,7 @@ qg_c.set_par(18, stir);  % stirring type: 0 = cos(5x), 1 = sin(16x)
 
 opts = [];
 opts.windowsize = 50;
+training_samples = 10000;
 
 % reference transient statistics
 ref_stats = Utils.get_qg_statistics(qg_c, full_transient, opts);
@@ -60,12 +66,17 @@ for idx = [3]
     %                stats_dkl{1}{1,1}.(quantity{idx}), ...
     %                stats_dkl{5}{1,5}.(quantity{idx}), ...
     %                stats_dkl{5}{1,12}.(quantity{idx}) };
-    plot_stats = { ref_stats.(quantity{idx}) };
+    plot_stats = {ref_stats.(quantity{idx}),
+                  stats_dkl{1}{1,1}.(quantity{idx}),
+                  stats_dkl{4}{1,5}.(quantity{idx}),
+                  stats_dkl{4}{1,12}.(quantity{idx})};
 
-    T = size(full_transient, 2);
-    trange_full = (start_idx(idx):T)/365;
-    tserie_full = ref_stats.(quantity{idx})';
-        % Confidence interval
+    T1 = size(full_transient, 2);
+    T2 = 100 * 365 + training_samples;
+    trange_full = (start_idx(idx):T1)/365;
+    tserie_full = plot_stats{1};
+    
+    % Confidence interval for the reference run
     trunc_ref = 50*365;
     mn = mean(tserie_full(trunc_ref:end));
     vr = var(tserie_full(trunc_ref:end));
@@ -73,14 +84,31 @@ for idx = [3]
     conf_lo = mn - 2*sqrt(vr);
 
     h1 = subplot(1,2,1)
+    % plot reference
     [f_ref, u_ref] = my_plot(trange_full, tserie_full, 'color', cols(1,:));
     hold on
+    % plot corresponding confidence interval
     f_c = plot(trange_full, ...
                repmat(conf_hi, 1, numel(trange_full)), ...
                '--', 'color', cols(1,:));
     f_c = plot(trange_full, ...
                repmat(conf_lo, 1, numel(trange_full)), ...
                '--', 'color', cols(1,:));
+
+    % create trange for predictions
+    trange = T2 + start_idx(idx) + (1:numel(plot_stats{2}));
+    trange = trange / 365; % convert to years
+
+    tserie_modonly = plot_stats{2};
+    f_modonly = my_plot(trange, tserie_modonly, 'color', colors{2});
+
+    tserie_esn = plot_stats{3};
+    [f_esn, u_esn] = my_plot(trange, tserie_esn, 'color', colors{3});
+    uistack(u_esn, 'bottom')
+
+    tserie_esnc = plot_stats{4};
+    [f_esnc, u_esnc] = my_plot(trange, tserie_esnc, 'color', colors{4});
+    uistack(u_ref, 'top')
 
     hold off
 
@@ -92,11 +120,11 @@ for idx = [3]
     end
 
     xlim([trange_full(365), trange_full(end)])
-    % lg = legend([f_ref, f_c, f_modonly, f_esn, f_esnc], ...
-    %             'perfect QG', 'confidence interval', ...
-    %             'imperfect QG', 'ESN prediction', 'ESNc prediction',  ...
-    %             'interpreter', 'latex', ...
-    %             'orientation', 'vertical', 'location', 'southwest');
+    lg = legend([f_ref, f_c, f_modonly, f_esn, f_esnc], ...
+                'perfect QG', 'confidence interval', ...
+                'imperfect QG', 'ESN prediction', 'ESNc prediction',  ...
+                'interpreter', 'latex', ...
+                'orientation', 'vertical', 'location', 'southwest');
 
     trunc_stats = 20*365;
     bins = 20;
@@ -115,8 +143,8 @@ for idx = [3]
     end
     box on
     
-    % uistack(pdf_lines{4}, 'bottom')
-    % uistack(pdf_lines{1}, 'top')
+    uistack(pdf_lines{4}, 'bottom')
+    uistack(pdf_lines{1}, 'top')
     
     %ylabel(ylbls{idx}, 'interpreter', 'latex');
     set(gca,'xtick', [])
