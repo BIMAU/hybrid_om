@@ -64,7 +64,7 @@ for qnt_idx = 1:numel(quantity)
     p.style = {'.', '.-', '-'};
     p.msize = {14, 14};
 
-    do_dklcomp=false
+    do_dklcomp=true
     if do_dklcomp
         figure(qnt_idx)
         clf
@@ -121,8 +121,9 @@ for qnt_idx = 1:numel(quantity)
         xtickangle(45);
         grid on
 
-        legend([fESN, fESNc, fESNDMDc], 'ESN', 'ESNc', 'ESN+DMDc', ...
-               'interpreter','latex','location','southwest')
+        leg = legend([fESN, fESNc, fESNDMDc], 'ESN', 'ESNc', 'ESN+DMDc', ...
+                     'location','southwest');
+        set(leg,'interpreter','latex');
 
         set(sp1,'Position', [0.13 0.195 0.13 0.78])
         set(sp2,'Position', [0.31 0.195 0.57 0.78])
@@ -168,9 +169,10 @@ for qnt_idx = 1:numel(quantity)
         uistack(hcorr,'top')
         uistack(hESNDMDc,'bottom')
 
-        legend([fESN, fESNc, fDMDc, fcorr, fESNDMDc], 'ESN', ...
-               'ESNc', 'DMDc', 'correction only', 'ESN+DMDc', ...
-               'interpreter','latex','location','northeastoutside')
+        leg = legend([fESN, fESNc, fDMDc, fcorr, fESNDMDc], 'ESN', ...
+                     'ESNc', 'DMDc', 'correction only', 'ESN+DMDc', ...
+                     'location','northeastoutside');
+        set(leg,'interpreter','latex');           
 
         set(gca, 'yscale','log')
         ylim([3*10^(-2),10^2])
