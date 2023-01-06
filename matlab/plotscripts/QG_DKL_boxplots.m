@@ -87,7 +87,7 @@ for qnt_idx = 1:numel(quantity)
         set(gca, 'xticklabels', {'imperfect QG', 'DMDc', 'correction only'});
         yticks([0.1,1,10])
         xlim([0.5,3.5])
-        xtickangle(45);
+        xtickangle(30);
         grid on
         ylabel(['$D_{KL}$, ', qntlabels{qnt_idx}], 'interpreter','latex');
 
@@ -118,7 +118,7 @@ for qnt_idx = 1:numel(quantity)
 
         xlabel('$N_r$','interpreter','latex');
         set(gca, 'yticklabels', {});
-        xtickangle(45);
+        xtickangle(0);
         grid on
 
         leg = legend([fESN, fESNc, fESNDMDc], 'ESN', 'ESNc', 'ESN+DMDc', ...
@@ -135,7 +135,7 @@ for qnt_idx = 1:numel(quantity)
     end
 
     %-------------------------------------------------------------------
-    do_lamtest=true;
+    do_lamtest=false;
     if do_lamtest
 
         ESN_range=1:20;
