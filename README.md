@@ -4,7 +4,7 @@ physics-controlled ESN.
 
 # dependencies
  - QG (matlab/c++ implementation)
- - ESN: [![DOI](https://zenodo.org/badge/265245681.svg)](https://zenodo.org/badge/latestdoi/265245681)
+ - ESN: https://github.com/erik808/ESN [![DOI](https://zenodo.org/badge/265245681.svg)](https://zenodo.org/badge/latestdoi/265245681)
 
 # usage notes:
 - Adjust the `base_dir` in `DataGen`
