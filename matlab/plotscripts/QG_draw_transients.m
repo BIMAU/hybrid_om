@@ -11,7 +11,7 @@ if ~exist('stats_dkl', 'var')
     load_qg_transient_data
 end
 
-exportdir = '~/Projects/doc/mlqg/figs/QG_transients/';
+exportdir = '~/Projects/doc/mlqg/figs/QG_transients/test';
 
 cols = [0,0,0; min(1.0*lines(20),1)];
 
