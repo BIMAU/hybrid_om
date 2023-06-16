@@ -38,47 +38,35 @@ dgen.build_grid_transfers('periodic');
 R = dgen.R;
 P = dgen.P;
 
-total_T = 250;
-% Take year 200 to 250 in a 250 year spinup.
-first_day = 73001;
-last_day  = 91250;
-T = 100;
+data_dir_esnc = '/home/erik/Projects/hybrid_om/data/QGmodel/return_from_esnc_131072_131072';
 
-% Take year 100 to 200 in a 250 year spinup.
-first_day = 36501;
-last_day  = 73000;
-T = 100;
+data_dir_modelonly = '/home/erik/Projects/hybrid_om/data/QGmodel/return_from_modelonly_131072_131072'
 
-% Take year 0 to 100 in a 250 year spinup.
+data_dir = data_dir_modelonly
+
+total_T = 40;
 first_day = 1;
-last_day  = 36500;
-T = 100;
-
-first_day = 73001;
-last_day  = 91250;
-T = 50;
+last_day  = 5475;
+freq = 365
 
 % assuming yearly chunks
-chunk_list = first_day:365:last_day;
+chunk_list = first_day:freq:last_day;
 X = [];
 for first = chunk_list
     fprintf('%d\n', first);
     last = first + 364;
-    chunk = Utils.load_chunk(qg_f, dgen, first, last, total_T);
+    chunk = Utils.load_chunk(qg_f, data_dir, first, last, total_T);
     X = [X, R*chunk.X];
 end
 
-out_file_path = sprintf([dgen.data_dir, '/%s/%d_%d/'], ...
-                        dgen.model_prf.name, ...
-                        dgen.N_prf, dgen.N_imp);
-
-out_file = [out_file_path, ...
-            sprintf('remainder_T=%d_dt=%1.3e_param=%1.1e.mat', ...
-                    T, dgen.dt_prf, ...
+out_file = [data_dir, ...
+            sprintf('/restricted_%d_T=%d_dt=%1.3e_param=%1.1e.mat', ...
+                    dgen.N_imp, total_T, dgen.dt_prf, ...
                     dgen.model_prf.control_param())];
 
 pairs = {{'X', X}, ...
          {'Nt_prf', size(X,2)}, ...
-         {'T', T}};
+         {'T', size(X,2)/365}};
 
+fprintf('saving to %s\n', out_file)
 Utils.save_pairs(out_file, pairs, false);
