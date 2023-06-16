@@ -58,11 +58,11 @@ classdef DataGen < handle
         % write data in chunks
         chunking = false;
 
-        % when chunking use this chunk_size (in time)
-        chunk_size = 365;
-
         % Create backup when saving data
         backup = true;
+
+        % Store the states already in restricted from (to save memory)
+        store_restricted = false;
 
         % output during transient and predictions
         output_freq = 500;
@@ -134,6 +134,10 @@ classdef DataGen < handle
                 self.X      = zeros(self.N_prf, self.Nt_prf);
                 self.X(:,1) = self.x_init_prf;
 
+                if self.store_restricted
+                    self.X = self.R * self.X;
+                end
+
                 fprintf('Generate time series... \n');
                 avg_k = 0;
 
@@ -199,19 +203,40 @@ classdef DataGen < handle
 
                 if self.chunking
                     chunk_first = chunk_last + 1;
-                    fprintf('starting at step %d\n', chunk_first)
+                    fprintf('starting at step %d\n', chunk_first);
                 else
                     chunk_first = 1;
                     chunk_last = 0;
                 end
 
                 start_idx = max(2, chunk_first);
-                for i = start_idx:self.Nt_prf
-                    fprintf('%d, %f\n', i, norm(self.X(:,i-1)))
 
-                    [self.X(:,i), k] = ...
-                        self.model_prf.step(self.X(:,i-1), self.dt_prf);
+                if start_idx == 2
+                    x_next = self.x_init_prf;
+                else
+                    x_next = chunk.last_xprf;
+                end
+
+                for i = start_idx:self.Nt_prf
+
+                    x_now = x_next;
+
+                    if self.store_restricted
+                        x_now = x_next;
+                    else
+                        x_now = self.X(:,i-1);
+                    end
+
+                    fprintf('%d, %f\n', i, norm(x_now));
+
+                    [x_next, k] = self.model_prf.step(x_now, self.dt_prf);
                     avg_k = avg_k + k;
+
+                    if self.store_restricted
+                        self.X(:,i) = self.R * x_next;
+                    else
+                        self.X(:,i) = x_next;
+                    end
 
                     if (mod(i, self.output_freq) == 0) || (i == self.Nt_prf)
                         fprintf(' step %4d/%4d, Newton iterations: %d\n', ...
@@ -242,7 +267,8 @@ classdef DataGen < handle
 
                         pairs = {{'X', self.X(:, chunk_range)}, ...
                                  {'Nt_prf', self.Nt_prf}, ...
-                                 {'T', self.T}};
+                                 {'T', self.T}, ...
+                                 {'last_xprf', x_next}};
 
                         fprintf(' saving fields to: \n %s \n', tmp_file);
                         Utils.save_pairs(tmp_file, pairs, self.backup);
@@ -350,7 +376,7 @@ classdef DataGen < handle
             end
         end
 
-        function build_grid_transfers(self, boundary)
+        function build_grid_transfers(self, boundary, model_imp)
         % Grid transfers between fine and coarse grids. The fine grid
         % size is a power of two times the coarse grid size in both
         % directions. Restrictions are compositions of restrictions
@@ -368,11 +394,15 @@ classdef DataGen < handle
         % R: weighted restriction operator
         % P: prolongation operator
 
+            if nargin < 3
+                model_imp = self.model_imp
+            end
+
             nx_prf = self.model_prf.nx;
-            nx_imp = self.model_imp.nx;
+            nx_imp = model_imp.nx;
 
             % sanity checks
-            nun = self.model_imp.nun;
+            nun = model_imp.nun;
             assert(nun == self.model_prf.nun, 'nun does not correspond between models');
             assert(mod(nx_prf,2) == 0);
 
