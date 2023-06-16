@@ -8,8 +8,8 @@ nun = 2;
 dim = nun * nx_f * ny_f;
 
 output_freq = 365;
-final_day = 91250;
-years = 250;
+final_day = 5110;
+years = 40;
 first_days = 1:output_freq:final_day;
 
 E = zeros(1, output_freq * numel(first_days));
@@ -22,12 +22,18 @@ var_1y_Z = [];
 var_6m_Z = [];
 var_3m_Z = [];
 
-data_dir = sprintf(['/data/p267904/Projects/hybrid_om/data/QGmodel',...
-                    '/%d_%d'], dim, dim)
+% data_dir = sprintf(['/data/p267904/Projects/hybrid_om/data/QGmodel',...
+%                     '/%d_%d'], dim, dim)
+
+data_dir = '/home/erik/Projects/hybrid_om/data/QGmodel/return_from_esnc_131072_131072'
+
+data_dir = '/home/erik/Projects/hybrid_om/data/QGmodel/return_from_modelonly_131072_131072'
+
+ % '/home/erik/Projects/hybrid_om/data/QGmodel/return_from_esnc_131072_131072/transient_T=40_dt=2.740e-03_param=2.0e+03.chunk_1-365.mat'
 
 for first_day = first_days
     last_day = first_day + output_freq - 1;
-    data_fname = sprintf(['%s/transient_T=%3d_dt=2.740e-03_param=%1.1e.chunk_%d-%d.mat'], ...
+    data_fname = sprintf(['%s/transient_T=%d_dt=2.740e-03_param=%1.1e.chunk_%d-%d.mat'], ...
                          data_dir, years, Re_f, first_day, last_day);
 
     fprintf('load %s / %d\n', data_fname, final_day)

@@ -43,7 +43,11 @@ classdef DataGen < handle
         out_file;
         out_file_path;
 
-        data_dir = '/data/p267904/Projects/hybrid_om/data';
+        %data_dir = '/data/p267904/Projects/hybrid_om/data';
+        data_dir = '~/Projects/hybrid_om/data';
+
+        % optional name for the generated dataset
+        optional_name = ''
 
         % do the restriction here in generate_imp_predictions()
         do_restrict = true;
@@ -87,16 +91,26 @@ classdef DataGen < handle
             end
 
             % create path
-            self.out_file_path = sprintf([self.data_dir, '/%s/%d_%d/'], ...
+            self.out_file_path = sprintf([self.data_dir, '/%s/%s%d_%d/'], ...
                                          self.model_prf.name, ...
+                                         self.optional_name, ...
                                          self.N_prf, self.N_imp);
+        end
 
-            eval(['mkdir ', self.out_file_path]);
+        function rename(self, name)
+        % create path
+            self.optional_name = name
+
+            self.out_file_path = sprintf([self.data_dir, '/%s/%s%d_%d/'], ...
+                                         self.model_prf.name, ...
+                                         self.optional_name, ...
+                                         self.N_prf, self.N_imp);
         end
 
         function generate_prf_transient(self);
         % evolve full model for Nt steps
         % ##FIXME there is sooo much to factorize here
+            eval(['mkdir ', self.out_file_path]);
 
             out_file = [self.out_file_path, ...
                         sprintf('transient_T=%d_dt=%1.3e_param=%1.1e.mat', ...
@@ -267,7 +281,7 @@ classdef DataGen < handle
 
         function generate_imp_predictions(self)
         % Generate predictions with the imperfect model.
-            
+
             if self.N_imp == size(self.X,1)
                 fprintf('data seems to be on the imperfect grid\n')
                 fprintf(' not restricting\n')

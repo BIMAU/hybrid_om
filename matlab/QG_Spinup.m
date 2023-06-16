@@ -21,9 +21,13 @@ function [dir] = QG_Spinup(varargin)
 
     % create data generator for a single model
     dgen = DataGen(qg_f);
+    %dgen.rename('return_from_modelonly_')
+    dgen.rename('return_from_esnc_')
 
     % set initial solution in datagen
-    x_init = 0.001*randn(qg_f.N,1);
+    % x_init = 0.001*randn(qg_f.N,1);
+    x_init = load('modelonly_prediction.mat').x
+    x_init = load('esnc_prediction.mat').x
     dgen.x_init_prf = x_init;
     dgen.chunking = true;
 
@@ -35,7 +39,8 @@ function [dir] = QG_Spinup(varargin)
     dgen.dt_prf = dt_prf;
 
     % run for a 250 years
-    dgen.T = round(250 * year / Tdim);
+    % dgen.T = round(250 * year / Tdim);
+    dgen.T = round(40 * year / Tdim);
 
     % start from another run (that is identifiable with a different
     % end time) #HACK #FIXME
