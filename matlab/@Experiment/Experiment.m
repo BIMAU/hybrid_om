@@ -345,7 +345,7 @@ classdef Experiment < handle
         [] = create_hyp_range(self);
         [] = create_storage(self);
 
-        [inds] = my_indices(self, pid, procs, Ni);
+        [inds] = Utils.my_indices(pid, procs, Ni);
 
         [] = print(self, varargin);
         [] = printpid(self, varargin);
