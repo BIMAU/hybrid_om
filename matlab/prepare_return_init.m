@@ -46,10 +46,14 @@ exp_dir_ESNc = 'QG_transient_ESNscaling/MC_2-8_NR_200-12800_parallel_param_5.00e
  metadata, predictions, corrections...
  truths, spectra, stats] = Utils.gather_data([base_dir, exp_dir_ESNc]);
 
+% [errs, nums, pids, ...
+%  metadata, predictions, corrections...
+%  truths, spectra, stats] = Utils.gather_data([base_dir, exp_dir_modelonly]);
+
 for i = 1:size(predictions,1)
-    x = P*predictions{i,12}';
-    basename = 'esnc_prediction'
-    fname = sprintf('%s/%s_%d.mat', start_solutions, basename, i)
-    fprintf('saving to %s\n', fname)
-    save(fname, 'x')
+    x = P*predictions{i,5}';
+    basename = 'esn_prediction';
+    fname = sprintf('%s/%s_%d.mat', start_solutions, basename, i);
+    fprintf('saving to %s\n', fname);
+    save(fname, 'x');
 end
