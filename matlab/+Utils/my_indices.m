@@ -1,4 +1,4 @@
-function [inds] = my_indices(self, pid, procs, N)
+function [inds] = my_indices(pid, procs, N)
 % a simple decomposition to take care of parallel needs
 
     assert((pid < procs) && (pid >= 0), ...
