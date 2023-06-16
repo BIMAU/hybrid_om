@@ -1,10 +1,14 @@
-function [chunk] = load_chunk(qg, dgen, first, last, total_T)
+function [chunk] = load_chunk(qg, data, first, last, total_T)
 
-    dim = qg.nun * qg.nx * qg.ny;    
-    
-    data_dir = sprintf(['%s/%s',...
-                        '/%d_%d'], dgen.data_dir, qg.name, dim, dim);
-    
+    dim = qg.nun * qg.nx * qg.ny;
+
+    if isstr(data)
+        data_dir = data;
+    else
+        data_dir = sprintf(['%s/%s',...
+                            '/%d_%d'], data.data_dir, qg.name, dim, dim);
+    end
+
     chunk_fname = sprintf(['%s/transient_T=%d_dt=2.740e-03_param=%1.1e.chunk_%d-%d.mat'], ...
                           data_dir, total_T, qg.control_param(), first, last);
 
