@@ -12,7 +12,8 @@ exp_dirs{3} = 'QG_transient_corr/MC_6-6_SC_1-1_parallel_param_5.00e+02/'; %corr
 exp_dirs{4} = 'QG_transient_ESNscaling/MC_2-8_NR_200-12800_parallel_param_5.00e+02/'
 % exp_dirs{5} = 'QG_transient_ESNscaling_lam9/MC_2-8_NR_200-12800_parallel_param_5.00e+02/'
 % exp_dirs{6} = 'QG_transient_lambdatest/MC_4-6_LB_1e-08-16_parallel_param_5.00e+02/';
-exp_dirs{5} = 'QG_transient_lambdatest/MC_2-8_LB_6.25e-06-53.1441_parallel_param_5.00e+02/'
+% exp_dirs{5} = 'QG_transient_lambdatest/MC_2-8_LB_6.25e-06-53.1441_parallel_param_5.00e+02/'
+exp_dirs{5} = 'QG_transient_lambdatest_2/MC_2-8_LB_53.1441-819.2475_parallel_param_5.00e+02/'
 
 %#exp_dirs{7} = 'QG_transient_lambdatest/MC_6-8_LB_6.25e-06-53.1441_parallel_param_5.00e+02/'
 
