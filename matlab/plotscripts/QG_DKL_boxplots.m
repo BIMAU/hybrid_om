@@ -1,4 +1,5 @@
 addpath('../')
+addpath('~/local/matlab')
 
 if ~exist('ref_stats', 'var')
     load_qg_reference
@@ -54,6 +55,7 @@ for qnt_idx = 1:numel(quantity)
             end
         end
     end
+
     cols = [0,0,0; min(1.0*lines(20),1)];
     p = Plot();
     p.plot_mean = false;
@@ -85,15 +87,20 @@ for qnt_idx = 1:numel(quantity)
         set(gca, 'xticklabels', {'imperfect QG', 'DMDc', 'correction only'});
         yticks([0.1,1,10])
         xlim([0.5,3.5])
-        xtickangle(45);
+        xtickangle(30);
         grid on
         ylabel(['$D_{KL}$, ', qntlabels{qnt_idx}], 'interpreter','latex');
 
         sp2 = subplot(1,2,2);
 
-        ESN_range = 1:7;
-        ESNc_range = 8:14;
-        ESNDMDc_range = 15:21;
+        n_combs = size(DKL{4}, 2)
+
+        ESN_range = 1:n_combs/3;
+        ESNc_range = n_combs/3 + 1:2*n_combs/3;
+        ESNDMDc_range = 2*n_combs/3+1:n_combs;
+
+        % sanity check
+        assert(ESNDMDc_range(end) == n_combs)
 
         fESNDMDc = p.my_boxplot(DKL{4}(:,ESNDMDc_range),  {cols(7,:), cols(7,:)}); hold on
         fESN     = p.my_boxplot(DKL{4}(:,ESN_range), {cols(3,:), cols(3,:)}); hold on
@@ -103,13 +110,20 @@ for qnt_idx = 1:numel(quantity)
 
         set(gca, 'yscale','log')
         ylim([3*10^(-2),10^2])
-        set(gca, 'xticklabels', {'200','400','800','1600','3200','6400','12800'});
+        if n_combs / 3 == 8
+            set(gca, 'xticklabels', {'100', '200','400','800','1600','3200','6400','12800'});
+        else
+            set(gca, 'xticklabels', {'200','400','800','1600','3200','6400','12800'});
+        end
+
         xlabel('$N_r$','interpreter','latex');
         set(gca, 'yticklabels', {});
-        xtickangle(45);
+        xtickangle(0);
         grid on
 
-        legend([fESN, fESNc, fESNDMDc], 'ESN', 'ESNc', 'ESN+DMDc', 'interpreter','latex','location','southwest')
+        leg = legend([fESN, fESNc, fESNDMDc], 'ESN', 'ESNc', 'ESN+DMDc', ...
+                     'location','southwest');
+        set(leg,'interpreter','latex');
 
         set(sp1,'Position', [0.13 0.195 0.13 0.78])
         set(sp2,'Position', [0.31 0.195 0.57 0.78])
@@ -135,24 +149,34 @@ for qnt_idx = 1:numel(quantity)
         z = linspace(2.7,2*2.7-0.05,20)
         a = z(2)-z(1);
         b = z(1)-a;
+
         % xlabs = 0.1:0.3:2.8;
-        xlabs = 2.8:0.3:5.6;
+        % xlabs = 2.8:0.3:5.6;
+        xlabs = 0.1:0.4:5.6;
         xt = (xlabs-b)/a;
 
         figure(qnt_idx);
         clf
-        fESN  = p.my_boxplot(DKL{5}(:,ESN_range),   {cols(3,:), cols(3,:)}); hold on
-        fESNc = p.my_boxplot(DKL{5}(:,ESNc_range),  {cols(4,:), cols(4,:)}); hold on
-        fDMDc = p.my_boxplot(DKL{5}(:,DMDc_range),  {cols(5,:), cols(5,:)}); hold on
-        [fcorr, hcorr] = p.my_boxplot(DKL{5}(:,corr_range),  {cols(6,:), cols(6,:)}); hold on
-        [fESNDMDc, hESNDMDc] = p.my_boxplot(DKL{5}(:,ESNDMDc_range),  {cols(7,:), cols(7,:)}); hold on
 
+        fESN  = p.my_boxplot([DKL{5}(:,ESN_range),DKL{6}(:,ESN_range(2:end))], ...
+                             {cols(3,:), cols(3,:)}); hold on
+        fESNc = p.my_boxplot([DKL{5}(:,ESNc_range),DKL{6}(:,ESNc_range(2:end))],...
+                             {cols(4,:), cols(4,:)}); hold on
+        fDMDc = p.my_boxplot([DKL{5}(:,DMDc_range),DKL{6}(:,DMDc_range(2:end))],...
+                             {cols(5,:), cols(5,:)}); hold on
+        [fcorr, hcorr] = p.my_boxplot([DKL{5}(:,corr_range), DKL{6}(:,corr_range(2:end))], ...
+                                      {cols(6,:), cols(6,:)}); hold on
+        [fESNDMDc, hESNDMDc] = p.my_boxplot([DKL{5}(:,ESNDMDc_range(2:end)), DKL{6}(:,ESNDMDc_range(2:end))], ...
+                                            {cols(7,:), cols(7,:)}); hold on
+        hold on
+        
         uistack(hcorr,'top')
         uistack(hESNDMDc,'bottom')
-        
-        legend([fESN, fESNc, fDMDc, fcorr, fESNDMDc], 'ESN', ...
-               'ESNc', 'DMDc', 'correction only', 'ESN+DMDc', ...
-               'interpreter','latex','location','northeastoutside')
+
+        leg = legend([fESN, fESNc, fDMDc, fcorr, fESNDMDc], 'ESN', ...
+                     'ESNc', 'DMDc', 'correction only', 'ESN+DMDc', ...
+                     'location','northeastoutside');
+        set(leg,'interpreter','latex');           
 
         set(gca, 'yscale','log')
         ylim([3*10^(-2),10^2])
