@@ -62,7 +62,7 @@ for qnt_idx = 1:numel(quantity)
     p.style = {'.', '.-', '-'};
     p.msize = {14, 14};
 
-    do_dklcomp=true
+    do_dklcomp=false
     if do_dklcomp
         figure(qnt_idx)
         clf
@@ -121,7 +121,7 @@ for qnt_idx = 1:numel(quantity)
     end
 
     %-------------------------------------------------------------------
-    do_lamtest=false;
+    do_lamtest=true;
     if do_lamtest
 
         ESN_range=1:20;
@@ -131,10 +131,12 @@ for qnt_idx = 1:numel(quantity)
         corr_range=61:80;
         ESNDMDc_range=81:100;
 
-        z = linspace(0.05,2.7,20);
+        % z = linspace(0.05,2.7,20);
+        z = linspace(2.7,2*2.7-0.05,20)
         a = z(2)-z(1);
         b = z(1)-a;
-        xlabs = 0.1:0.3:2.8;
+        % xlabs = 0.1:0.3:2.8;
+        xlabs = 2.8:0.3:5.6;
         xt = (xlabs-b)/a;
 
         figure(qnt_idx);
