@@ -44,6 +44,7 @@ classdef DataGen < handle
         out_file_path;
 
         %data_dir = '/data/p267904/Projects/hybrid_om/data';
+        %data_dir = '/scratch/p267904/Projects/hybrid_om/data';
         data_dir = '~/Projects/hybrid_om/data';
 
         % optional name for the generated dataset
@@ -99,13 +100,22 @@ classdef DataGen < handle
 
         function rename(self, name)
         % create path
-            self.optional_name = name
+            self.optional_name = name;
 
             self.out_file_path = sprintf([self.data_dir, '/%s/%s%d_%d/'], ...
                                          self.model_prf.name, ...
                                          self.optional_name, ...
                                          self.N_prf, self.N_imp);
         end
+
+        function set_data_dir(self, data_dir)
+            self.data_dir = data_dir;
+            self.out_file_path = sprintf([data_dir, '/%s/%s%d_%d/'], ...
+                                         self.model_prf.name, ...
+                                         self.optional_name, ...
+                                         self.N_prf, self.N_imp);
+        end
+
 
         function generate_prf_transient(self);
         % evolve full model for Nt steps
@@ -217,6 +227,7 @@ classdef DataGen < handle
                     x_next = chunk.last_xprf;
                 end
 
+                time_start = tic;
                 for i = start_idx:self.Nt_prf
 
                     x_now = x_next;
@@ -227,7 +238,8 @@ classdef DataGen < handle
                         x_now = self.X(:,i-1);
                     end
 
-                    fprintf('%d, %f\n', i, norm(x_now));
+                    fprintf('iter: %6d, norm: %6.0f, walltime: %8.2fm\n', ...
+                            i, norm(x_now), toc(time_start)/60.);
 
                     [x_next, k] = self.model_prf.step(x_now, self.dt_prf);
                     avg_k = avg_k + k;

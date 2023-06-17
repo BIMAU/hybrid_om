@@ -14,10 +14,10 @@ then
     echo "matlab compiler available at" $mcc_path
     on_cluster=0
 else
-    #assume we're on a cluster
+    #assume we're on a cluster and matlab needs loading
     on_cluster=1
-    echo "loading matlab module"
-    module load MATLAB/2018a
+    echo "loading MATLAB"
+    module load MATLAB
 fi
 
 #if [ $on_cluster -eq 1 ]
@@ -61,6 +61,8 @@ cp -v $interface_src $2/.
 if [ $on_cluster -eq 1 ]
 then
     cp -v submit_mpi_experiment.sh $2/.
+    echo "loading foss"
+    module load foss
 fi
 
 cd $2

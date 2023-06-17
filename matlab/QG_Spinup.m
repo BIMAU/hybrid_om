@@ -1,4 +1,4 @@
-function [dir] = QG_Spinup(xinit_mat, name, years)
+function [dir] = QG_Spinup(xinit_mat, name, years, data_dir)
     Utils.add_paths();
 
     % Create perfect/fine QG model
@@ -29,17 +29,6 @@ function [dir] = QG_Spinup(xinit_mat, name, years)
     qg_c.set_par(11, ampl);  % stirring amplitude
     qg_c.set_par(18, stir);  % stirring type: 0 = cos(5x), 1 = sin(16x)
 
-    % create data generator
-    dgen = DataGen(qg_f, qg_c);
-    if nargin >= 2
-        dgen.rename(name);
-    end
-
-    % we want to store the results on the coarse grid
-    dgen.store_restricted = true;
-    dgen.dimension = '2D';
-    dgen.build_grid_transfers('periodic', qg_c);
-
     % set initial solution in datagen
     if nargin >= 1
         x_init = load(xinit_mat).x;
@@ -47,10 +36,24 @@ function [dir] = QG_Spinup(xinit_mat, name, years)
         x_init = 0.001*randn(qg_f.N,1);
     end
 
+    % create data generator
+    dgen = DataGen(qg_f, qg_c);
+    if nargin >= 2
+        dgen.rename(name);
+    end
+
+    % set output dir for datagen
+    if nargin >= 4
+        dgen.set_data_dir(data_dir);
+    end
+
+    % we want to store the results on the coarse grid
+    dgen.store_restricted = true;
+    dgen.dimension = '2D';
+    dgen.build_grid_transfers('periodic', qg_c);
+
     dgen.x_init_prf = x_init;
     dgen.chunking = true;
-
-    dgen
 
     % set the time step to one day
     Tdim = Ldim / Udim; % in seconds
@@ -68,5 +71,8 @@ function [dir] = QG_Spinup(xinit_mat, name, years)
 
     % output frequency
     dgen.output_freq = round(year / Tdim / dt_prf); % yearly output
+
+    dgen
+
     dgen.generate_prf_transient();
 end
