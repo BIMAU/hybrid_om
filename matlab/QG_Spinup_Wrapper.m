@@ -16,7 +16,7 @@ function [dir] = QG_Spinup_Wrapper(varargin)
     for i = my_inds
         init_name = sprintf('%s/%s_prediction_%d.mat', ...
                             start_solutions, basename, i);
-        spinup_name = sprintf('return_from_modelonly/spinup_%d_', i);
+        spinup_name = sprintf('return_from_%s/spinup_%d_', basename, i);
         QG_Spinup(init_name, spinup_name, years)
     end    
     
