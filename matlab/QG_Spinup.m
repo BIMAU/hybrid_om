@@ -30,9 +30,16 @@ function [dir] = QG_Spinup(xinit_mat, name, years, data_dir)
     qg_c.set_par(18, stir);  % stirring type: 0 = cos(5x), 1 = sin(16x)
 
     % set initial solution in datagen
-    if nargin >= 1
+    if nargin >= 1 && strcmp(xinit_mat, 'noise')
+        random_init = true;
+    else
+        random_init = false;
+    end
+
+    if nargin >= 1 && ~random_init
         x_init = load(xinit_mat).x;
     else
+        fprintf('initialize randomly\n');
         x_init = 0.001*randn(qg_f.N,1);
     end
 
