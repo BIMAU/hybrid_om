@@ -12,8 +12,12 @@ function QG_Spinup_Wrapper(varargin)
     % habrok
     data_dir = '/scratch/p267904/Projects/hybrid_om/data';
 
-    % basename = 'modelonly';
-    basename = 'esnc';
+    % Spinup initialization:
+    % current options: 'modelonly', 'esn', 'esnc', 'noise'
+    % init_type = 'modelonly';
+    % init_type = 'esnc';
+    % init_type = 'noise';
+    init_type = 'esn';
 
     % spinup time
     years = 40;
@@ -24,7 +28,7 @@ function QG_Spinup_Wrapper(varargin)
 
     % loop for output only
     for i = my_inds
-        spinup_name = sprintf('return_from_%s/spinup_%d_', basename, i);
+        spinup_name = sprintf('return_from_%s/spinup_%d_', init_type, i);
         fprintf('pid %d procs %d, %s \n', pid, procs, ...
                 spinup_name);
     end
@@ -32,8 +36,12 @@ function QG_Spinup_Wrapper(varargin)
     % loop to call spinup routine
     for i = my_inds
         init_name = sprintf('%s/%s_prediction_%d.mat', ...
-                            start_solutions, basename, i);
-        spinup_name = sprintf('return_from_%s/spinup_%d_', basename, i);
+                            start_solutions, init_type, i);
+        if strcmp(init_type, 'noise')
+            init_name = init_type;
+        end
+
+        spinup_name = sprintf('return_from_%s/spinup_%d_', init_type, i);
 
         fprintf('pid %d procs %d, %s, %s \n', pid, procs, ...
                 init_name, spinup_name);
