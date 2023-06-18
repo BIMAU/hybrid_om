@@ -32,7 +32,7 @@ end
 [subdir_indices, permutation] = sortrows(subdir_indices);
 subdir_names = {subdir_names{permutation}};
 
-all_stats = cell(Nsubdirs,1)
+all_stats = cell(Nsubdirs,1);
 for i = 1:Nsubdirs
     spinup_dir = [folder, '/', ...
                   subdir_names{i}, '/'];
@@ -70,5 +70,14 @@ for i = 1:Nsubdirs
     opts = [];
     opts.windowsize = 50;
     allstats{i} = Utils.get_qg_statistics(qg_c, X, opts);
-
 end
+%%
+
+for i = 1:Nsubdirs
+    values = allstats{i}.Km;
+    time = (1:numel(values)) / 365;
+    plot(time, allstats{i}.Km);
+    xlabel('years')
+    hold on
+end
+hold off
