@@ -16,8 +16,8 @@ function QG_Spinup_Wrapper(varargin)
     % current options: 'modelonly', 'esn', 'esnc', 'noise'
     % init_type = 'modelonly';
     % init_type = 'esnc';
-    % init_type = 'noise';
-    init_type = 'esn';
+    % init_type = 'esn';
+    init_type = 'noise';
 
     % spinup time
     years = 40;
@@ -39,6 +39,9 @@ function QG_Spinup_Wrapper(varargin)
                             start_solutions, init_type, i);
         if strcmp(init_type, 'noise')
             init_name = init_type;
+            % Seed the rng with time and pid
+            now = clock;
+            rng(round(100*self.pid*sqrt(now(end))));
         end
 
         spinup_name = sprintf('return_from_%s/spinup_%d_', init_type, i);
