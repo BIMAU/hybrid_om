@@ -12,7 +12,8 @@ function QG_Spinup_Wrapper(varargin)
     % habrok
     data_dir = '/scratch/p267904/Projects/hybrid_om/data';
 
-    basename = 'modelonly';
+    % basename = 'modelonly';
+    basename = 'esnc';
 
     % spinup time
     years = 40;
