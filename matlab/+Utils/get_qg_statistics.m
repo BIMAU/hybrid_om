@@ -8,7 +8,11 @@ function [stats] = get_qg_statistics(qg, states, opts)
     end
 
     fprintf(' computing statistics ... \n');
-    wsize = opts.windowsize;
+    if isfield(opts, 'windowsize')
+        wsize = opts.windowsize;
+    else
+        wsize = 50
+    end
 
     if ~isfield(opts, 'track_points')
         track_points = false;

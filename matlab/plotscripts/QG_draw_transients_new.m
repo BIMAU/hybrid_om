@@ -25,16 +25,7 @@ d_remainder = load(f_remainder);
 full_transient = [d_spinup.X, d_transient.X, d_remainder.X];
 
 % coarse QG with periodic bdc
-nx_c = 32;
-ny_c = nx_c;
-Re_c = 500;
-ampl = 2; % stirring amplitude
-stir = 0; % stirring type: 0 = cos(5x), 1 = sin(16x)
-
-qg_c = QG(nx_c, ny_c, 1);
-qg_c.set_par(5,  Re_c);  % Reynolds number
-qg_c.set_par(11, ampl);  % stirring amplitude
-qg_c.set_par(18, stir);  % stirring type: 0 = cos(5x), 1 = sin(16x)
+qg_c = Utils.create_coarse_QG();
 
 opts = [];
 opts.windowsize = 50;
@@ -75,7 +66,7 @@ for idx = [3]
     T2 = 100 * 365 + training_samples;
     trange_full = (start_idx(idx):T1)/365;
     tserie_full = plot_stats{1};
-    
+
     % Confidence interval for the reference run
     trunc_ref = 50*365;
     mn = mean(tserie_full(trunc_ref:end));
@@ -142,17 +133,17 @@ for idx = [3]
         ylim([0.003, 0.019]);
     end
     box on
-    
+
     uistack(pdf_lines{4}, 'bottom')
     uistack(pdf_lines{1}, 'top')
-    
+
     %ylabel(ylbls{idx}, 'interpreter', 'latex');
     set(gca,'xtick', [])
     set(gca,'ytick', [])
-    
+
     set(h1,'Position', [0.13 0.11 0.65 0.815])
     set(h2,'Position', [0.81 0.11 0.13 0.815])
-    
+
     xlabel('PDF', 'interpreter','latex')
 
     Utils.exportfig([exportdir, 'spinup_', quantity{idx}, '.eps'], ...

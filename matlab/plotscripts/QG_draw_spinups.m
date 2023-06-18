@@ -1,49 +1,155 @@
-% coarse QG with periodic bdc
-nx_c = 32;
-ny_c = nx_c;
-Re_c = 500;
-ampl = 2; % stirring amplitude
-stir = 0; % stirring type: 0 = cos(5x), 1 = sin(16x)
+if ~exist('ref_stats', 'var')
+    load_reference_spinup
+end
 
-qg_c = QG(nx_c, ny_c, 1);
-qg_c.set_par(5,  Re_c);  % Reynolds number
-qg_c.set_par(11, ampl);  % stirring amplitude
-qg_c.set_par(18, stir);  % stirring type: 0 = cos(5x), 1 = si
+qg_c = Utils.create_coarse_QG();
+
+cols = [0,0,0; lines(3)];
+colors = {cols(1,:), ...
+          cols(2,:), ...
+          cols(3,:), ...
+          cols(4,:)};
 
 % spinup dir
-folder = ['/home/erik/Projects/hybrid_om/data/QGmodel/',...
-          'return_from_modelonly'];
+folder_base = ['/home/erik/Projects/hybrid_om/data/QGmodel/', ...
+               'return_from_'];
 
-% subfolder names
-subdir_names = {dir(folder).name};
+originsMap = struct();
+originsMap.modelonly = struct('name', 'spinups initialized with imperfect QG predictions', ...
+                              'color', colors{2});
+originsMap.esnc = struct('name', 'spinups initialized with ESNc predictions', ...
+                         'color', colors{4});
 
-% keep everything with the correct name
-subdir_names = subdir_names(contains(subdir_names, ...
-                                     'spinup'));
-Nsubdirs = numel(subdir_names);
+% options for statistics calculations
+opts = [];
+opts.windowsize = 50;
 
-% sort subdirs
-subdir_indices = zeros(Nsubdirs,1);
-for i = 1:Nsubdirs
-    subdir_index = regexp(subdir_names{i}, 'spinup_(\d+)_', ...
-                          'tokens', 'once');
-    subdir_indices(i) = str2num(subdir_index{1});
+keys = fieldnames(originsMap);
+for kidx = 1:numel(keys)
+    key = keys{kidx};
+    folder = [folder_base, key];
+
+    % subfolder names
+    subdir_names = {dir(folder).name};
+
+    % keep everything with the correct name
+    subdir_names = subdir_names(contains(subdir_names, ...
+                                         'spinup'));
+
+    % sort subdirs
+    subdir_names = sort_subdirs(subdir_names);
+
+    Nsubdirs = numel(subdir_names);
+    all_stats = cell(Nsubdirs,1);
+    for i = 1:Nsubdirs
+        spinup_dir = [folder, '/', ...
+                      subdir_names{i}, '/'];
+
+        fprintf('%s\n', subdir_names{i})
+
+        % get chunks:
+        files = {dir(fullfile(spinup_dir, '*.mat')).name};
+        
+        % sort chunk files
+        [files, chunks] = sort_chunkfiles(files, spinup_dir);
+        
+        % load data
+        X = [];
+        for j = 1:numel(files)
+            file = [spinup_dir, '/', files{j}];
+            X = [X, load(file).X];
+        end
+
+        fprintf('time steps: %d\n', size(X,2))
+
+        % compute statistics
+        allstats{kidx, i} = Utils.get_qg_statistics(qg_c, X, opts);
+    end
+    %%
+
 end
-[subdir_indices, permutation] = sortrows(subdir_indices);
-subdir_names = {subdir_names{permutation}};
 
-all_stats = cell(Nsubdirs,1);
-for i = 1:Nsubdirs
-    spinup_dir = [folder, '/', ...
-                  subdir_names{i}, '/'];
+set(groot,'defaultAxesTickLabelInterpreter','latex');
+quantity = 'Km';
 
-    fprintf('%s\n', subdir_names{i})
+idxMap.E = 0;
+idxMap.Z = 0;
+idxMap.Km = opts.windowsize;
+idxMap.Ke = opts.windowsize;
 
-    % get chunks:
-    files = {dir(fullfile(spinup_dir, '*.mat')).name};
+ylbls.E = '$E$';
+ylbls.Z = '$Z$';
+ylbls.Km = '$K_m$';
+ylbls.Ke = '$K_e$';
+
+% Confidence interval for the reference run
+tserie_full = ref_stats.(quantity);
+trunc_ref = 50*365;
+mn = mean(tserie_full(trunc_ref:end));
+vr = var(tserie_full(trunc_ref:end));
+conf_hi = mn + 2*sqrt(vr);
+conf_lo = mn - 2*sqrt(vr);
+
+legnames = {};
+for kidx = 1:numel(keys)
+    key = keys{kidx};
+    for i = 1:Nsubdirs
+        values = allstats{kidx, i}.(quantity);
+        time = (idxMap.(quantity) + (1:numel(values)) ) / 365;
+        p(kidx) = plot(time, values, ...
+                       'color', originsMap.(key).color);
+        % p(kidx) = plot(time, values);
+        xlabel('years');
+        ylabel(ylbls.(quantity), 'interpreter', 'latex');
+        xlabel('time (years)', 'interpreter', 'latex');
+        hold on
+    end
+    legnames = [legnames, originsMap.(key).name];
+end
+
+if strcmp(quantity, 'Km')
+    ylim([0.003, 0.025]);
+    xlim([opts.windowsize/365, 40]);
+end
+
+f_c = plot(xlim(), [conf_hi, conf_hi], ...
+           '--', 'color', cols(1,:));
+f_c = plot(xlim(), [conf_lo, conf_lo], ...
+           '--', 'color', cols(1,:));
+
+legnames = [legnames, 'confidence interval (original perfect QG spinup)'];
+
+legend([p, f_c], legnames, ...
+       'interpreter', 'latex', ...
+       'orientation', 'vertical', 'location', 'southeast');
+hold off
+
+% exporting
+fs = 10;
+dims = [24, 10];
+exportdir = '~/Projects/doc/mlqg/figs/QG_transients/';
+Utils.exportfig([exportdir, 'returnspinups_', ...
+                 quantity, '.eps'], ...
+                fs, dims, invert);
+
+%-------------------------------------------------------
+% supporting functions
+
+function [subdir_names] = sort_subdirs(subdir_names)
+    Nsubdirs = numel(subdir_names);
+    subdir_indices = zeros(Nsubdirs,1);
+    for i = 1:Nsubdirs
+        subdir_index = regexp(subdir_names{i}, 'spinup_(\d+)_', ...
+                              'tokens', 'once');
+        subdir_indices(i) = str2num(subdir_index{1});
+    end
+    [subdir_indices, permutation] = sortrows(subdir_indices);
+    subdir_names = {subdir_names{permutation}};
+end
+
+function [files, chunks] = sort_chunkfiles(files, spinup_dir)
+% sort chunkfiles
     Nfiles = numel(files);
-
-    % sort chunkfiles
     chunks = zeros(Nfiles,2);
     for j = 1:Nfiles
         file = [spinup_dir, '/', files{j}];
@@ -56,28 +162,5 @@ for i = 1:Nsubdirs
     end
     [chunks, permutation] = sortrows(chunks);
     files = {files{permutation}};
-
-    % load data
-    X = [];
-    for j = 1:Nfiles
-        file = [spinup_dir, '/', files{j}];
-        X = [X, load(file).X];
-    end
-
-    fprintf('time steps: %d\n', size(X,2))
-
-    % compute statistics
-    opts = [];
-    opts.windowsize = 50;
-    allstats{i} = Utils.get_qg_statistics(qg_c, X, opts);
 end
-%%
 
-for i = 1:Nsubdirs
-    values = allstats{i}.Km;
-    time = (1:numel(values)) / 365;
-    plot(time, allstats{i}.Km);
-    xlabel('years')
-    hold on
-end
-hold off
