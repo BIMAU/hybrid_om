@@ -1,5 +1,5 @@
 % Load initialization
-start_solutions = '/home/erik/Projects/hybrid_om/data/QGmodel/starting_solutions'
+start_solutions = '~/Projects/hybrid_om/data/QGmodel/starting_solutions'
 
 Utils.add_paths();
 
@@ -37,14 +37,17 @@ dgen.build_grid_transfers('periodic');
 R = dgen.R;
 P = dgen.P;
 
-base_dir = '../data/experiments/';
-exp_dir_modelonly = 'QG_transient_modelonly/MC_1-1_SC_1-1_parallel_param_5.00e+02/';
+base_dir = '/projects/p267904/Projects/hybrid_om/data/experiments/';
 
-exp_dir_ESNc = 'QG_transient_ESNscaling/MC_2-8_NR_200-12800_parallel_param_5.00e+02/'
+exp_dir_modelonly = ['QG_transient_modelonly/',...
+                    'MC_1-1_SC_1-1_parallel_param_5.00e+02/'];
+
+exp_dir_ESNscaling = ['QG_transient_ESNscaling/',...
+                    'MC_2-8_NR_200-12800_parallel_param_5.00e+02/'];
 
 [errs, nums, pids, ...
  metadata, predictions, corrections...
- truths, spectra, stats] = Utils.gather_data([base_dir, exp_dir_ESNc]);
+ truths, spectra, stats] = Utils.gather_data([base_dir, exp_dir_ESNscaling]);
 
 % [errs, nums, pids, ...
 %  metadata, predictions, corrections...
