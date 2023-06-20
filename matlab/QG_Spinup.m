@@ -41,6 +41,7 @@ function [dir] = QG_Spinup(xinit_mat, name, years, data_dir)
     else
         fprintf('initialize randomly\n');
         x_init = 0.001*randn(qg_f.N,1);
+        fprintf('norm x_init: %f\n', norm(x_init));
     end
 
     % create data generator

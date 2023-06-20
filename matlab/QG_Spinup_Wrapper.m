@@ -39,9 +39,14 @@ function QG_Spinup_Wrapper(varargin)
                             start_solutions, init_type, i);
         if strcmp(init_type, 'noise')
             init_name = init_type;
+
             % Seed the rng with time and pid
             now = clock;
-            rng(round(100*self.pid*sqrt(now(end))));
+            seed = round(100*pid*sqrt(now(end)));
+
+
+            fprintf('Random init, pid: %d, seeding with %f\n', pid, seed)
+            rng(seed);
         end
 
         spinup_name = sprintf('return_from_%s/spinup_%d_', init_type, i);
