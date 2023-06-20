@@ -37,25 +37,56 @@ dgen.build_grid_transfers('periodic');
 R = dgen.R;
 P = dgen.P;
 
-base_dir = '/projects/p267904/Projects/hybrid_om/data/experiments/';
+% on habrok
+% base_dir = '/projects/p267904/Projects/hybrid_om/data/experiments/';
 
-exp_dir_modelonly = ['QG_transient_modelonly/',...
+% local machine
+base_dir = '~/Projects/hybrid_om/data/experiments/';
+
+
+exp_dir_struct.modelonly = ['QG_transient_modelonly/',...
                     'MC_1-1_SC_1-1_parallel_param_5.00e+02/'];
 
-exp_dir_ESNscaling = ['QG_transient_ESNscaling/',...
+exp_dir_struct.corr = ['QG_transient_corr/',...
+                    'MC_6-6_SC_1-1_parallel_param_5.00e+02/'];
+
+exp_dir_struct.dmdc = ['QG_transient_DMDc/',...
+                    'MC_5-5_SC_1-1_parallel_param_5.00e+02/'];
+
+
+exp_dir_struct.esn = ['QG_transient_ESNscaling/',...
                     'MC_2-8_NR_200-12800_parallel_param_5.00e+02/'];
+
+exp_dir_struct.esnc = exp_dir_struct.esn;
+exp_dir_struct.esndmdc = exp_dir_struct.esn;
+
+% correct indices for the predictions array
+jdx_struct.mod = 1;   % model only
+jdx_struct.dmdc = 1;  % DMDc (lambda = 10)
+jdx_struct.corr = 1;  % correction only (lambda = 5)
+jdx_struct.esn = 5;   % ESN (Nr = 3200, lambda = 8)
+jdx_struct.esnc = 12; % ESNc (Nr = 3200, lambda = 8)
+jdx_struct.esndmdc = 19; % ESN + DMDc (Nr = 3200, lambda = 8)
+
+% Select experiment
+exp = 'esndmdc';
+jdx = jdx_struct.(exp);
+basename = [exp,'_prediction'];
+exp_dir = exp_dir_struct.(exp);
+
 
 [errs, nums, pids, ...
  metadata, predictions, corrections...
- truths, spectra, stats] = Utils.gather_data([base_dir, exp_dir_ESNscaling]);
+ truths, spectra, stats] = Utils.gather_data([base_dir, exp_dir]);
 
-% [errs, nums, pids, ...
-%  metadata, predictions, corrections...
-%  truths, spectra, stats] = Utils.gather_data([base_dir, exp_dir_modelonly]);
+[labels, Nvalues, par_names, ...
+ exp_ind, I, opts_str] = Utils.unpack_metadata(metadata);
+
+lambda_range = sqrt(metadata.hyp.Lambda.range)
 
 for i = 1:size(predictions,1)
-    x = P*predictions{i,5}';
-    basename = 'esn_prediction';
+    x = P*predictions{i,jdx}';
+
     fname = sprintf('%s/%s_%d.mat', start_solutions, basename, i);
     fprintf('saving to %s\n', fname);
     save(fname, 'x');
