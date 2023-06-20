@@ -13,11 +13,21 @@ function QG_Spinup_Wrapper(varargin)
     data_dir = '/scratch/p267904/Projects/hybrid_om/data';
 
     % Spinup initialization:
-    % current options: 'modelonly', 'esn', 'esnc', 'noise'
-    init_type = 'modelonly';
+    % current options:    
+    % 'modelonly'  % model only (imperfect QG)
+    % 'dmdc' % DMDc (lambda = 10)
+    % 'corr' % correction only (lambda = 5)
+    % 'esn'  % ESN (Nr = 3200, lambda = 8)
+    % 'esnc' % ESNc (Nr = 3200, lambda = 8)
+    % 'esndmdc' % ESN + DMDc (Nr = 3200, lambda = 8)
+
+    % init_type = 'modelonly';
     % init_type = 'esnc';
     % init_type = 'esn';
     % init_type = 'noise';
+    % init_type = 'corr';
+    % init_type = 'dmdc';
+    init_type = 'esndmdc';
 
     % spinup time
     years = 40;

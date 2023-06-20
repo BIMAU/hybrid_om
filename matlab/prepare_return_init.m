@@ -60,13 +60,21 @@ exp_dir_struct.esn = ['QG_transient_ESNscaling/',...
 exp_dir_struct.esnc = exp_dir_struct.esn;
 exp_dir_struct.esndmdc = exp_dir_struct.esn;
 
+% current options:
+% 'modelonly'  % model only (imperfect QG)
+% 'dmdc' % DMDc (lambda = 10)
+% 'corr' % correction only (lambda = 5)
+% 'esn'  % ESN (Nr = 3200, lambda = 8)
+% 'esnc' % ESNc (Nr = 3200, lambda = 8)
+% 'esndmdc' % ESN + DMDc (Nr = 3200, lambda = 8)
+
 % correct indices for the predictions array
-jdx_struct.mod = 1;   % model only
-jdx_struct.dmdc = 1;  % DMDc (lambda = 10)
-jdx_struct.corr = 1;  % correction only (lambda = 5)
-jdx_struct.esn = 5;   % ESN (Nr = 3200, lambda = 8)
-jdx_struct.esnc = 12; % ESNc (Nr = 3200, lambda = 8)
-jdx_struct.esndmdc = 19; % ESN + DMDc (Nr = 3200, lambda = 8)
+jdx_struct.modelonly = 1;
+jdx_struct.dmdc = 1;
+jdx_struct.corr = 1;
+jdx_struct.esn = 5;
+jdx_struct.esnc = 12;
+jdx_struct.esndmdc = 19;
 
 % Select experiment
 exp = 'esndmdc';
