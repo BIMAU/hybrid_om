@@ -2,7 +2,7 @@
 
 #SBATCH --time=80:00:00
 #SBATCH --ntasks=1
-#SBATCH --mem-per-cpu=6GB
+#SBATCH --mem-per-cpu=4GB
 
 if [ "$#" -ne 3 ]; then
     echo "Usage: submit_mpi_experiment.sh <output_exec> <pid> <numproc>"

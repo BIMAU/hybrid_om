@@ -14,10 +14,10 @@ function QG_Spinup_Wrapper(varargin)
 
     % Spinup initialization:
     % current options: 'modelonly', 'esn', 'esnc', 'noise'
-    % init_type = 'modelonly';
+    init_type = 'modelonly';
     % init_type = 'esnc';
     % init_type = 'esn';
-    init_type = 'noise';
+    % init_type = 'noise';
 
     % spinup time
     years = 40;
