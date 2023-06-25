@@ -141,11 +141,22 @@ classdef DataGen < handle
                 fprintf('Not existing: %s\n', out_file);
                 time_since = tic;
                 self.Nt_prf = ceil(self.T / self.dt_prf);
-                self.X      = zeros(self.N_prf, self.Nt_prf);
-                self.X(:,1) = self.x_init_prf;
+                disp(self.Nt_prf)
 
+                % self.X      = zeros(self.N_prf, self.Nt_prf);
+                % self.X(:,1) = self.x_init_prf;
+
+                % if self.store_restricted
+                %     self.X = self.R * self.X;
+                % end
+                
+                
                 if self.store_restricted
-                    self.X = self.R * self.X;
+                    self.X      = zeros(size(self.R, 1), self.Nt_prf);
+                    self.X(:,1) = self.R * self.x_init_prf;
+                else
+                    self.X      = zeros(self.N_prf, self.Nt_prf);
+                    self.X(:,1) = self.x_init_prf;
                 end
 
                 fprintf('Generate time series... \n');
@@ -154,8 +165,12 @@ classdef DataGen < handle
                 if self.chunking
 
                     % identify a collection of chunks using the current output_freq
-                    chunk_list = [1:self.output_freq:self.Nt_prf; ...
-                                  self.output_freq:self.output_freq:self.Nt_prf];
+                    chunk_list_p1 = 1:self.output_freq:self.Nt_prf;
+                    chunk_list_p2 = self.output_freq:self.output_freq:self.Nt_prf;
+                    assert(numel(chunk_list_1) == numel(chunk_list_p2), ...
+                           'pick a different end time (temporary solution)\n');
+                    chunk_list = [chunk_list_p1; ...
+                                  chunk_list_p2];
                     chunk_list = chunk_list(:);
 
                     id_first = 1;

@@ -116,6 +116,7 @@ function [predY, corrY, testY, err, esnX, damping] = experiment_core(self)
         esn = ESN(self.esn_pars.Nr, size(trainU,2), size(trainY,2));
         esn.setPars(self.esn_pars);
         esn.initialize;
+
         esn.train(trainU, trainY);
         self.printpid('Training done, %.2fs\n', toc(begin));
 

@@ -1,8 +1,8 @@
 #!/bin/bash
 
-#SBATCH --time=80:00:00
+#SBATCH --time=96:00:00
 #SBATCH --ntasks=1
-#SBATCH --mem-per-cpu=4GB
+#SBATCH --mem-per-cpu=6GB
 
 if [ "$#" -ne 3 ]; then
     echo "Usage: submit_mpi_experiment.sh <output_exec> <pid> <numproc>"
@@ -16,3 +16,4 @@ module load MATLAB
 echo "running " $1 $2 $3
 
 srun $1 $2 $3
+
