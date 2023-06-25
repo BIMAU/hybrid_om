@@ -11,10 +11,10 @@ d_transient = load(f_transient);
 fprintf('loading remainder\n');
 d_remainder = load(f_remainder);
 
-full_transient = [d_spinup.X, d_transient.X, d_remainder.X];
+full_reference_transient = [d_spinup.X, d_transient.X, d_remainder.X];
 
 qg_c = Utils.create_coarse_QG();
 
 opts = [];
 opts.windowsize = 50;
-ref_stats = Utils.get_qg_statistics(qg_c, full_transient, opts);
+ref_stats = Utils.get_qg_statistics(qg_c, full_reference_transient, opts);

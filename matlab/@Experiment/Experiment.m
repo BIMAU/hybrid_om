@@ -204,12 +204,12 @@ classdef Experiment < handle
             % different training ranges. This is better for the load
             % balancing, as opposed to many shifts and one or two hyp
             % configs.
-            my_inds = self.my_indices(self.pid, self.procs, Ntotal);
+            my_inds = Utils.my_indices(self.pid, self.procs, Ntotal);
 
             my_reps_hyps = reps_hyps(my_inds, :);
-
+            
             for it = my_inds
-
+                
                 i = reps_hyps(it,2);
                 j = reps_hyps(it,1);
 
@@ -344,8 +344,6 @@ classdef Experiment < handle
         [] = create_descriptors(self);
         [] = create_hyp_range(self);
         [] = create_storage(self);
-
-        [inds] = Utils.my_indices(pid, procs, Ni);
 
         [] = print(self, varargin);
         [] = printpid(self, varargin);

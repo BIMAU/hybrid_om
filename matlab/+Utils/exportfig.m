@@ -24,9 +24,9 @@ function [] = exportfig(string,fs,dims,invert)
     set(gcf,'inverthardcopy','off')
     fprintf('saving to %s...\n', string);
     %print(string, '-depsc2', '-painters', '-opengl');
-    %print(string, '-depsc2', '-painters');
+    print(string, '-depsc2', '-painters');
     %print(string, '-depsc2');
-    print(string, '-dpng')
+    %print(string, '-dpng')
     %saveas(gcf,string);
 end
 

@@ -97,12 +97,21 @@ for kidx = 1:numel(keys)
         X = [];
         save_stats.Nfiles = numel(files);
 
-        if numel(files) == 40 && ~use_all_chunks
+        fprintf('#files: %d\n', numel(files))
+        if numel(files) == 40 ...
+                && exist('allstats', 'var') ...
+                && kidx <= size(allstats,1) ...
+                && numel(allstats{kidx, i}) > 0 ...
+                && numel(allstats{kidx, i}.E) == 365*40
             % skip when we already have allstats for this spinup
+            
+            fprintf('numel(allstats{kidx, i}.E): %d\n', ...
+                    numel(allstats{kidx, i}.E))
             continue
         end
 
-        for j = 1:numel(files)
+        fprintf('loading X\n')
+        for j = 1:min(numel(files),40)
             file = [spinup_dir, '/', files{j}];
             X = [X, load(file).X];
         end
@@ -110,9 +119,8 @@ for kidx = 1:numel(keys)
         fprintf('time steps: %d\n', size(X,2))
         % compute statistics
 
-
         % compute statistics
-        if use_all_chunks
+        if use_all_chunks || kidx > size(allstats,1) || numel(allstats{kidx, i}) == 0
             stats = Utils.get_qg_statistics(qg_c, X, opts);
             for k = 1:numel(stat_keys)
                 key = stat_keys{k};

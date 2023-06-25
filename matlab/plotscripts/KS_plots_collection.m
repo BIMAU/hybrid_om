@@ -9,6 +9,7 @@ exp_dirs = {'Pathak2018repl/NR_50-6400_MC_1-8_parallel_param_1.00e+00/', ...
 
 base_dir = '../../data/experiments/';
 set(groot,'defaultAxesTickLabelInterpreter','latex');
+set(gca,'DefaultLineLineWidth',10)
 nums=[];
 for k = 1:numel(exp_dirs)
     figure(k)
@@ -25,12 +26,15 @@ for k = 1:numel(exp_dirs)
     p.scaling = 0.25 * 0.07;
     p.ylab = 'Valid time';
     p.xlab = '$N_r$';
-    p.style = {'.', '.-', {':', '-',':'}};
-    p.msize = {15, 15};
+    p.style = {{'o', '*', 's','^'}, {'o-', '*-', 's-','^-'}, {':', '-',':'}};
+    p.msize = {7, 7};
     p.plot_q_conn = [1,1,1];
 
-    [nums{k}, mdat, preds, truths, f] = p.plot_experiment(false);
-
+    [~, nm, ~, md, ~, ~, ~] = ...
+        Utils.gather_data(dir);
+    [nums{k}, mdat, preds, truths, f] = p.plot_experiment(false, false, ...
+                                                      nm, md);
+    
     output_dir = ['~/Projects/doc/mlqg/figs/', exp_dirs{k}];
     eval(['mkdir ', output_dir]);
 

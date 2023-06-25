@@ -2,9 +2,9 @@ set(groot,'defaultAxesTickLabelInterpreter','latex');
 % quantities = {'Km', 'Ke', 'Z'};
 quantities = {'Km'};
 % plot_types = {'density', 'lines'};
-plot_types = {'density'};
+plot_types = {'lines'};
 clear p
-do_annotate = true;
+do_annotate = false;
 fs = 14.5;
 
 for qu = 1:numel(quantities)

@@ -15,7 +15,11 @@ classdef Plot < handle
 
         % enable/disable title
         show_title = true;
-
+        
+        % rotate over styles
+        style_idx = 1;
+        style_idx2 = 1;
+        
         % scales the amount of samples
         scaling = 1.0;
 

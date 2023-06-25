@@ -86,6 +86,7 @@ function [predY, corrY, testY, err, esnX, damping] = experiment_core(self)
 
     damping = 0; % Tikhonov damping array
 
+    begin = tic;
     if esn_dmd_active
         % setup of different feedthroughs
         if hybrid_esn
@@ -116,6 +117,7 @@ function [predY, corrY, testY, err, esnX, damping] = experiment_core(self)
         esn.setPars(self.esn_pars);
         esn.initialize;
         esn.train(trainU, trainY);
+        self.printpid('Training done, %.2fs\n', toc(begin));
 
         if ~isempty(esn.X)
             esn_state = esn.X(end,:);
@@ -192,9 +194,10 @@ function [predY, corrY, testY, err, esnX, damping] = experiment_core(self)
         end
 
         if ( mod(i,verbosity) == 0 ) || ( i == Npred ) || stop
-            self.printpid(['prediction step %4d/%4d, Newton iterations %d,',...
+            self.printpid(['prediction step %4d/%4d, time since start %.2fs,',...
+                           'Newton iterations %d,',...
                            'error %1.2e\n'], ...
-                          i, Npred, Nk, err(i));
+                          i, Npred, toc(begin), Nk, err(i));
         end
 
         if stop

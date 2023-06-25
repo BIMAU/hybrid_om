@@ -7,10 +7,10 @@ function QG_Spinup_Wrapper(varargin)
                        'data/QGmodel/starting_solutions'];
 
     % local machine
-    % data_dir = '/home/erik/Projects/hybrid_om/data';
+    data_dir = '/home/erik/Projects/hybrid_om/data';
 
     % habrok
-    data_dir = '/scratch/p267904/Projects/hybrid_om/data';
+    % data_dir = '/scratch/p267904/Projects/hybrid_om/data';
 
     % Spinup initialization:
     % current options:    
@@ -24,13 +24,13 @@ function QG_Spinup_Wrapper(varargin)
     % init_type = 'modelonly';
     % init_type = 'esnc';
     % init_type = 'esn';
-    % init_type = 'noise';
+    init_type = 'noise';
     % init_type = 'corr';
     % init_type = 'dmdc';
-    init_type = 'esndmdc';
+    % init_type = 'esndmdc';
 
     % spinup time
-    years = 40;
+    years = 1;
 
     N_ensemble = 50;
 
@@ -38,7 +38,7 @@ function QG_Spinup_Wrapper(varargin)
 
     % loop for output only
     for i = my_inds
-        spinup_name = sprintf('return_from_%s/spinup_%d_', init_type, i);
+        spinup_name = sprintf('test_from_%s/spinup_%d_', init_type, i);
         fprintf('pid %d procs %d, %s \n', pid, procs, ...
                 spinup_name);
     end

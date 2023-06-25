@@ -1,7 +1,7 @@
 addpath('../')
 
-% base_dir = '../../data/experiments/';
-base_dir = '/data/p267904/Projects/hybrid_om/data/experiments/';
+base_dir = '../../data/experiments/';
+% base_dir = '/data/p267904/Projects/hybrid_om/data/experiments/';
 exportdir = '~/Projects/doc/mlqg/figs/QG_scaling/';
 invert = false;
 set(groot,'defaultAxesTickLabelInterpreter','latex');
@@ -21,7 +21,11 @@ gridexp_p = Plot([base_dir, gridexp_dir, '/']);
 gridexp_p.plot_mean = false;
 gridexp_p.plot_scatter = false;
 gridexp_p.style = {'.', '.-', {':', '-',':'}};
-gridexp_p.msize = {15, 15};
+gridexp_p.style = {{'o', '*', 's','^'}, ...
+                   {'o-', '*-', 's-','^-'}, ...
+                   {':', '-',':'}};
+
+gridexp_p.msize = {7, 7};
 
 [errs, nums, pids, mdat, preds, corrs, truths] = ...
     Utils.gather_data(gridexp_p.dir, 50);

@@ -58,7 +58,7 @@ function [dir] = QG_transient(varargin)
 
     % compute 100 years, which should roughly give 36500 snapshots
     dgen.T = round(100 * year / Tdim);
-    dgen.verbosity = 10;
+    dgen.output_freq = 10;
     dgen.generate_prf_transient();
 
     % generate imperfect model predictions
@@ -147,7 +147,7 @@ function [dir] = QG_transient(varargin)
     % expObj.set_default_hyp('ScaleSeparation', 1);
     % expObj.add_experiment('ModelConfig', [2,4,8]);
     % expObj.add_experiment('ReservoirSize', [200, 400, 800, 1600, 3200, 6400, 12800]);
-    
+
     % % DMDc transient
     % expObj.ident = 'QG_transient_DMDc';
     % expObj.set_default_hyp('Lambda', 36);
@@ -165,12 +165,18 @@ function [dir] = QG_transient(varargin)
     % expObj.set_default_hyp('Lambda', 16);
     % expObj.add_experiment('ModelConfig', 6);
     % expObj.add_experiment('ScaleSeparation', 1);
-    
+
     % Regularization test
-    expObj.ident = 'QG_transient_lambdatest';
-    expObj.add_experiment('ModelConfig', [2,4,5,6,8]);
+    % expObj.ident = 'QG_transient_lambdatest';
+    % expObj.add_experiment('ModelConfig', [2,4,5,6,8]);
+    % expObj.set_default_hyp('ReservoirSize', 3200);
+    % expObj.add_experiment('Lambda', linspace(0.05,2.7,20).^4);
+
+    expObj.ident = 'QG_ESNc_performancetest';
+    expObj.add_experiment('ModelConfig', [4]);
     expObj.set_default_hyp('ReservoirSize', 3200);
-    expObj.add_experiment('Lambda', linspace(0.05,2.7,20).^4);
+    expObj.add_experiment('Lambda', 64);
+    expObj.max_preds = 1*365;
 
     % run experiments
     dir = expObj.run();

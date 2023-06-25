@@ -1,5 +1,5 @@
 function [f, h] = my_boxplot(self, varargin)
-
+    
     switch nargin
       case 2
         array    = varargin{1};
@@ -38,6 +38,13 @@ function [f, h] = my_boxplot(self, varargin)
 
       otherwise
         error('Unexpected input');
+    end
+    
+    if numel(style{1}) > 1
+        self.style_idx = mod(self.style_idx+1, numel(style{1}));
+    end
+    if numel(style{2}) > 1
+        self.style_idx2 = mod(self.style_idx2+1, numel(style{1}));
     end
 
     alpha     = 0.8;
@@ -83,23 +90,29 @@ function [f, h] = my_boxplot(self, varargin)
         end
         Q(idx, :) = q_arr;
 
-        if plot_boxplot
-            f = plot(idx, q(2), style{1}, 'markersize', msize{1},  ...
-                     'linewidth',2, 'color', colors{1}, 'Parent', h);
+        if plot_boxplot            
+            f = plot(idx, q(2), style{1}{self.style_idx+1}, ...
+                     'markersize', msize{1},  ...
+                     'linewidth',2, 'color', colors{1}, ...
+                     'markerfacecolor', colors{1}, 'Parent', h);
             hold on
+            
 
             % plot quantiles
             plot(repmat(idx,1,2), ...
                  [q(1), q(3)], ...
-                 style{2}, 'markersize', msize{2},  ...
-                 'linewidth',2, 'color', colors{1}, 'Parent', h);
+                 style{2}{self.style_idx2+1}, 'markersize', msize{2},  ...
+                 'markerfacecolor', colors{1}, ...
+                 'linewidth',1, 'color', colors{1}, 'Parent', h);
         end
 
         if plot_mean
             mn = mean(arr(~isnan(arr)));
             st = std(arr(~isnan(arr)));
             plot(idx, mn, ...
-                 '*', 'markersize', 8, 'color', colors{2}, 'Parent', h);
+                 '*', 'markersize', 8, ...
+                 'linewidth',2, ...
+                 'color', colors{2}, 'Parent', h);
         end
 
         ylimMax = max(ylimMax, 1.05*quantile(arr, 0.75));
@@ -114,7 +127,15 @@ function [f, h] = my_boxplot(self, varargin)
                 st = style{3};
             end
             f(j) = plot(x_index, Q(x_index,j), st, 'markersize', msize{2}, ...
+                        'linewidth',2, ...
                         'color', colors{2}, 'Parent', h);
+            
+            f(j) = plot(NaN, NaN, style{2}{self.style_idx2+1}, ...
+                        'markersize', msize{2}, ...
+                        'markerfacecolor', colors{2}, ...
+                        'linewidth',1, ...
+                        'color', colors{2}, 'Parent', h);
+            
             uistack(f, 'bottom');
         end
         if numel(f) > 1

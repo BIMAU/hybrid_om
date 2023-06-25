@@ -238,7 +238,10 @@ classdef DataGen < handle
                         x_now = self.X(:,i-1);
                     end
 
+                    fid = fopen(['datagen.txt'], 'a');
                     fprintf('iter: %6d, norm: %11.5f, walltime: %8.2fm\n', ...
+                            i, norm(x_now), toc(time_start)/60.);
+                    fprintf(fid, 'iter: %6d, norm: %11.5f, walltime: %8.2fm\n', ...
                             i, norm(x_now), toc(time_start)/60.);
 
                     [x_next, k] = self.model_prf.step(x_now, self.dt_prf);

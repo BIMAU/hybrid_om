@@ -1,5 +1,6 @@
-%base_dir = '../../data/experiments/';
-base_dir = '/data/p267904/Projects/hybrid_om/data/experiments/'
+% base_dir = '/data/p267904/Projects/hybrid_om/data/experiments/'
+base_dir = '../..//data/experiments/'
+
 
 exp_dirs = [];
 exp_dirs{1} = 'QG_transient_modelonly/MC_1-1_SC_1-1_parallel_param_5.00e+02/'; %model only
