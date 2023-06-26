@@ -5,7 +5,7 @@
 % for a fair comparison, the reference transient starts after 10000
 % 'training' days.
 %base_dir = '../../data/experiments';
-base_dir = '/data/p267904/Projects/hybrid_om/data/experiments/'
+base_dir = '/projects/p267904/Projects/hybrid_om/data/experiments/'
 exp_dir = 'QG_transient_reference';
 
 ref_dir = [base_dir, '/', exp_dir];

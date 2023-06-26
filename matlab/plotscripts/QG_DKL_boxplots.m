@@ -62,20 +62,25 @@ for qnt_idx = 1:numel(quantity)
     p.plot_scatter = false;
     p.plot_connections = true;
     p.style = {'.', '.-', '-'};
-    p.msize = {14, 14};
+    p.style = {{'o', '*', 's','^'}, {'o-', '*-', 's-','^-'}, {'-', '-','-'}};
+    p.msize = {5, 5};
 
-    do_dklcomp=false
+    do_dklcomp=true
     if do_dklcomp
         figure(qnt_idx)
         clf
 
         sp1 = subplot(1,2,1);
+        p.style = {{'s','s'}, {'s-','s-'}, {'-', '-','-'}};
         hmod  = p.my_boxplot(repmat(DKL{1}(:,1),1,3), ...
                              {cols(2,:), cols(2,:)}, ...
                              p.style, p.msize, 1); hold on
+        p.style = {{'*','*'}, {'*-','*-'}, {'-', '-','-'}};
         hdmdc = p.my_boxplot(repmat(DKL{2}(:,1),1,3), ...
                              {cols(5,:), cols(5,:)}, ...
                              p.style, p.msize, 2); hold on
+
+        p.style = {{'s','s'}, {'s-','s-'}, {'-', '-','-'}};
         hcorr = p.my_boxplot(repmat(DKL{3}(:,1),1,3), ...
                              {cols(6,:), cols(6,:)}, ...
                              p.style, p.msize, 3); hold on
@@ -102,10 +107,15 @@ for qnt_idx = 1:numel(quantity)
         % sanity check
         assert(ESNDMDc_range(end) == n_combs)
 
-        fESNDMDc = p.my_boxplot(DKL{4}(:,ESNDMDc_range),  {cols(7,:), cols(7,:)}); hold on
-        fESN     = p.my_boxplot(DKL{4}(:,ESN_range), {cols(3,:), cols(3,:)}); hold on
-        fESNc    = p.my_boxplot(DKL{4}(:,ESNc_range),  {cols(4,:), cols(4,:)}); hold on
-
+        p.style = {{'^','^'}, {'^-','^-'}, {'-', '-','-'}};
+        fESNDMDc = p.my_boxplot(DKL{4}(:,ESNDMDc_range),  ...
+                                {cols(7,:), cols(7,:)}); hold on
+        p.style = {{'^','^'}, {'^-','^-'}, {'-', '-','-'}};
+        fESN     = p.my_boxplot(DKL{4}(:,ESN_range), ...
+                                {cols(3,:), cols(3,:)}); hold on
+        p.style = {{'o','o'}, {'o-','o-'}, {'-', '-','-'}};
+        fESNc    = p.my_boxplot(DKL{4}(:,ESNc_range),  ...
+                                {cols(4,:), cols(4,:)}); hold on
         hold off
 
         set(gca, 'yscale','log')
@@ -145,8 +155,9 @@ for qnt_idx = 1:numel(quantity)
         corr_range=61:80;
         ESNDMDc_range=81:100;
 
-        % z = linspace(0.05,2.7,20);
-        z = linspace(2.7,2*2.7-0.05,20)
+        z = linspace(0.05,2.7,20);
+        % z = linspace(2.7,2*2.7-0.05,20)
+        % z = linspace(0.05,2*2.7-0.05,20)
         a = z(2)-z(1);
         b = z(1)-a;
 
@@ -158,25 +169,31 @@ for qnt_idx = 1:numel(quantity)
         figure(qnt_idx);
         clf
 
+        p.msize = {4, 4};
+        p.style = {{'^','^'}, {'^-','^-'}, {'-', '-','-'}};
         fESN  = p.my_boxplot([DKL{5}(:,ESN_range),DKL{6}(:,ESN_range(2:end))], ...
                              {cols(3,:), cols(3,:)}); hold on
+        p.style = {{'o','o'}, {'o-','o-'}, {'-', '-','-'}};
         fESNc = p.my_boxplot([DKL{5}(:,ESNc_range),DKL{6}(:,ESNc_range(2:end))],...
                              {cols(4,:), cols(4,:)}); hold on
+        p.style = {{'*','*'}, {'*-','*-'}, {'-', '-','-'}};
         fDMDc = p.my_boxplot([DKL{5}(:,DMDc_range),DKL{6}(:,DMDc_range(2:end))],...
                              {cols(5,:), cols(5,:)}); hold on
+        p.style = {{'s','s'}, {'s-','s-'}, {'-', '-','-'}};
         [fcorr, hcorr] = p.my_boxplot([DKL{5}(:,corr_range), DKL{6}(:,corr_range(2:end))], ...
                                       {cols(6,:), cols(6,:)}); hold on
+        p.style = {{'^','^'}, {'^-','^-'}, {'-', '-','-'}};
         [fESNDMDc, hESNDMDc] = p.my_boxplot([DKL{5}(:,ESNDMDc_range(2:end)), DKL{6}(:,ESNDMDc_range(2:end))], ...
                                             {cols(7,:), cols(7,:)}); hold on
         hold on
-        
+
         uistack(hcorr,'top')
         uistack(hESNDMDc,'bottom')
 
         leg = legend([fESN, fESNc, fDMDc, fcorr, fESNDMDc], 'ESN', ...
                      'ESNc', 'DMDc', 'correction only', 'ESN+DMDc', ...
                      'location','northeastoutside');
-        set(leg,'interpreter','latex');           
+        set(leg,'interpreter','latex');
 
         set(gca, 'yscale','log')
         ylim([3*10^(-2),10^2])
@@ -184,9 +201,9 @@ for qnt_idx = 1:numel(quantity)
         xlabel('$\sqrt{\lambda}$','interpreter','latex');
         set(gca, 'xtick', (xt));
 
-        xs = round(min(z),1);
-        xe = round(max(z),1);
-        xrange = round(z,2);
+        % xs = round(min(z),1);
+        % xe = round(max(z),1);
+        % xrange = round(z,2);
         set(gca, 'xticklabels', xlabs);
 
         ylabel(['$D_{KL}$, ', qntlabels{qnt_idx}], 'interpreter','latex');

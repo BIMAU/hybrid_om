@@ -4,6 +4,10 @@ function [f, Pm, Pv, g] = plot_qg_mean_spectrum(self, qg, states, opts, varargin
         opts.conf_int = false;
     end
 
+    if ~isfield(opts, 'norm_factor')
+        opts.norm_factor = 1;
+    end
+
     if ~isfield(opts, 'power_laws')
         opts.power_laws = false;
     end
@@ -14,6 +18,9 @@ function [f, Pm, Pv, g] = plot_qg_mean_spectrum(self, qg, states, opts, varargin
         Pm = mean(states{1},2);
         Pv = mean(states{2},2);
     end
+    
+    Pm = Pm / opts.norm_factor;
+    
     maxr = size(Pm,1);
     plot_range = 2:maxr-2;
     plot_range_var = 2:maxr-2;

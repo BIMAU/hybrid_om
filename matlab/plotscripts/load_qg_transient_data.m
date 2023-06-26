@@ -1,5 +1,7 @@
-% base_dir = '/data/p267904/Projects/hybrid_om/data/experiments/'
-base_dir = '../..//data/experiments/'
+addpath('../')
+
+base_dir = '/projects/p267904/Projects/hybrid_om/data/experiments/'
+% base_dir = '../..//data/experiments/'
 
 
 exp_dirs = [];

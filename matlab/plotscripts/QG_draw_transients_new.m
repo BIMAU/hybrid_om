@@ -9,8 +9,8 @@ if ~exist('stats_dkl', 'var')
     load_qg_transient_data
 end
 
-% base_dir = '/data/p267904/Projects/hybrid_om/data/QGmodel/131072_2048';
-base_dir = '../..//data/QGmodel/131072_2048';
+base_dir = '/projects/p267904/Projects/hybrid_om/data/QGmodel/131072_2048';
+% base_dir = '../..//data/QGmodel/131072_2048';
 
 f_spinup    = [base_dir, '/spinup_T=100_dt=2.740e-03_param=2.0e+03.mat'];
 f_transient = [base_dir, '/transient_T=100_dt=2.740e-03_param=2.0e+03.mat'];
@@ -77,8 +77,13 @@ for idx = [3]
 
     h1 = subplot(1,2,1)
     % plot reference
-    [f_ref, u_ref] = my_plot(trange_full, tserie_full, 'color', cols(1,:));
+    [f_ref, u_ref] = my_plot(trange_full, tserie_full, 'linewidth', 1.2, ...
+                             'color', cols(1,:));
     hold on
+    f_ref = plot(NaN, NaN, '.-', 'linewidth', 1.2, ...
+                 'color', cols(1,:) ,...
+                 'markerfacecolor', cols(1,:), 'markersize', 9);
+
     % plot corresponding confidence interval
     f_c = plot(trange_full, ...
                repmat(conf_hi, 1, numel(trange_full)), ...
@@ -92,14 +97,26 @@ for idx = [3]
     trange = trange / 365; % convert to years
 
     tserie_modonly = plot_stats{2};
-    f_modonly = my_plot(trange, tserie_modonly, 'color', colors{2});
+    f_modonly = my_plot(trange, tserie_modonly, 'linewidth', 1.2, ...
+                        'color', colors{2});
+    f_modonly = plot(NaN, NaN, 's-', 'linewidth', 1.2, ...
+                     'color', cols(2,:),...
+                      'markerfacecolor', cols(2,:), 'markersize', 3);
 
     tserie_esn = plot_stats{3};
-    [f_esn, u_esn] = my_plot(trange, tserie_esn, 'color', colors{3});
+    [f_esn, u_esn] = my_plot(trange, tserie_esn, 'linewidth', 1.2, ...
+                             'color', colors{3});
+    f_esn = plot(NaN, NaN, '^-', 'linewidth', 1.2, ...
+                 'color', cols(3,:),...
+                  'markerfacecolor', cols(3,:), 'markersize', 3);
     uistack(u_esn, 'bottom')
 
     tserie_esnc = plot_stats{4};
-    [f_esnc, u_esnc] = my_plot(trange, tserie_esnc, 'color', colors{4});
+    [f_esnc, u_esnc] = my_plot(trange, tserie_esnc, 'linewidth', 1.2, ...
+                               'color', colors{4});
+    f_esnc = plot(NaN, NaN, 'o-', 'linewidth', 1.2, ...
+                  'color', cols(4,:), ...
+                  'markerfacecolor', cols(4,:), 'markersize', 3);
     uistack(u_ref, 'top')
 
     hold off
@@ -123,11 +140,16 @@ for idx = [3]
 
     h2 = subplot(1,3,3);
     pdf_lines = [];
+    styles = {'.-', 's-','>-', 'o-'}
+    ms = {9,3,3,3}
     for s = 1:numel(plot_stats)
-        hold on
-        pdf_lines{s} = plotpdf(plot_stats{s}(trunc_stats:end), bins, '.-', ...
+        pdf_lines{s} = plotpdf(plot_stats{s}(trunc_stats:end), bins, ...
+                               styles{s}, ...
+                               'markerfacecolor', colors{s}, ...
                                'color', colors{s}, ...
-                               'markersize',7);
+                               'markersize',ms{s}, ...
+                               'linewidth',1.2);
+        hold on
     end
     hold off
     if strcmp(quantity{idx}, 'Km')
