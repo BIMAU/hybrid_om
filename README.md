@@ -3,7 +3,7 @@ Framework for hybrid ocean modeling experiments with a
 physics-controlled ESN.
 
 # dependencies
- - QG (matlab/c++ implementation)
+ - QG (matlab/c++ implementation) https://github.com/BIMAU/qg
  - ESN: https://github.com/erik808/ESN [![DOI](https://zenodo.org/badge/265245681.svg)](https://zenodo.org/badge/latestdoi/265245681)
 
 # usage notes:
